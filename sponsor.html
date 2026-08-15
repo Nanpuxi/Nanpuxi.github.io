@@ -193,19 +193,20 @@
     /* ===== 感谢语 ===== */
     .thanks-text {
       margin-top: 48px;
-      font-size: 14px;
-      color: #aaa;
+      font-size: 15px;
+      color: #888;
       line-height: 1.8;
     }
 
     .thanks-text .heart {
       color: #e53935;
       animation: heartbeat 1.2s ease-in-out infinite;
+      display: inline-block;
     }
 
     @keyframes heartbeat {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
+      50% { transform: scale(1.25); }
     }
 
     /* ===== 页脚 ===== */
@@ -302,8 +303,7 @@
         <div class="sponsor-card-title">微信支付</div>
         <div class="sponsor-card-desc">扫码用微信向我打赏</div>
         <div class="qrcode-placeholder" id="wechatQr">
-          <!-- 替换为你的微信收款码图片 -->
-          <span>微信收款码</span>
+          <img src="wechat_qr.png" alt="微信收款码">
         </div>
         <div class="sponsor-hint">长按/扫码即可转账</div>
       </div>
@@ -314,8 +314,7 @@
         <div class="sponsor-card-title">支付宝</div>
         <div class="sponsor-card-desc">扫码用支付宝向我打赏</div>
         <div class="qrcode-placeholder" id="alipayQr">
-          <!-- 替换为你的支付宝收款码图片 -->
-          <span>支付宝收款码</span>
+          <img src="alipay_qr.png" alt="支付宝收款码">
         </div>
         <div class="sponsor-hint">长按/扫码即可转账</div>
       </div>
@@ -326,15 +325,14 @@
       <div class="afdian-icon">⚡</div>
       <div class="afdian-title">爱发电 · 月度赞助</div>
       <div class="afdian-desc">支持我持续产出内容，还能解锁专属福利~</div>
-      <a href="https://afdian.com/a/你的爱发电ID" target="_blank" rel="noopener" class="afdian-btn">
+      <a href="https://www.ifdian.net/a/nanpuxi" target="_blank" rel="noopener" class="afdian-btn">
         ⚡ 去爱发电赞助
       </a>
     </div>
 
     <!-- 感谢语 -->
     <div class="thanks-text fade-in-up delay-4">
-      <p>每一份赞助都是对我最大的鼓励 <span class="heart">❤️</span></p>
-      <p>感谢你看到这里~ 我会继续努力的喵！</p>
+      <p>你的支持是我创作最大的动力 <span class="heart">❤️</span></p>
     </div>
 
   </main>
@@ -361,22 +359,17 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // ===== 替换收款码图片 =====
-    // 使用方法：把你的收款码图片命名为 wechat_qr.png 和 alipay_qr.png
-    // 上传到 GitHub 仓库后，取消下面注释并填入正确路径
-
-    /*
-    document.getElementById('wechatQr').innerHTML =
-      '<img src="wechat_qr.png" alt="微信收款码">';
-    document.getElementById('alipayQr').innerHTML =
-      '<img src="alipay_qr.png" alt="支付宝收款码">';
-    */
-
-    // 爱发电链接替换
-    // 把下面这行取消注释，把 URL 换成你自己的爱发电主页
-    /*
-    document.querySelector('.afdian-btn').href = 'https://afdian.com/a/你的实际ID';
-    */
+    // 收款码图片兜底：如果图片加载失败，显示占位文字
+    function setupQrFallback(id, label) {
+      const container = document.getElementById(id);
+      const img = container.querySelector('img');
+      if (!img) return;
+      img.addEventListener('error', () => {
+        container.innerHTML = '<span>' + label + '</span>';
+      });
+    }
+    setupQrFallback('wechatQr', '微信收款码');
+    setupQrFallback('alipayQr', '支付宝收款码');
   </script>
 
 </body>
