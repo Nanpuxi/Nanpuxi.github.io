@@ -17,142 +17,144 @@
 
   a { color:inherit; text-decoration:none; }
 
-  /* ===== 导航栏 ===== */
-  .nav {
-    position:fixed; top:0; left:0; right:0; height:60px;
-    background:rgba(255,255,255,0.92);
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border-bottom:1px solid #eee;
-    display:flex; align-items:center; justify-content:center; z-index:1000;
+  /* ===== 导航栏（只有一个回到首页按钮） ===== */
+  .np-nav {
+    position:fixed; top:0; left:0; right:0; height:56px;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid #f0f0f0;
+    display:flex; align-items:center; z-index:1000;
   }
-  .nav-inner { width:100%; max-width:960px; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
-  .nav-brand { font-size:16px; font-weight:700; color:#111; }
-  .nav-links { display:flex; gap:28px; }
-  .nav-links a { font-size:14px; color:#555; transition:color .2s; }
-  .nav-links a:hover { color:#111; }
-  .nav-links a.back-link { color:#2563eb; }
+  .np-nav-inner {
+    width:100%; max-width:960px; margin:0 auto; padding:0 24px;
+    display:flex; align-items:center;
+  }
+  .np-back {
+    font-size:14px; font-weight:600; color:#2563eb;
+    padding:8px 16px; border-radius:8px; transition:background .2s;
+  }
+  .np-back:hover { background:#eff6ff; }
 
   /* ===== 容器 ===== */
-  .container { max-width:860px; margin:0 auto; padding:100px 0 40px; }
+  .np-wrap { max-width:860px; margin:0 auto; padding:88px 0 40px; }
 
   /* ===== 标题区 ===== */
-  .page-title { text-align:center; margin-bottom:8px; }
-  .page-title h1 { font-size:28px; font-weight:700; letter-spacing:1px; }
-  .page-sub { text-align:center; font-size:13px; color:#999; margin-bottom:36px; }
+  .np-title { text-align:center; margin-bottom:6px; }
+  .np-title h1 { font-size:26px; font-weight:700; letter-spacing:1px; }
+  .np-sub { text-align:center; font-size:13px; color:#999; margin-bottom:32px; }
 
   /* ===== 区块 ===== */
-  .section {
-    margin-bottom:22px; background:#fafbfc; border-radius:12px;
-    padding:22px 24px; border:1px solid #eef0f3;
+  .np-block {
+    margin-bottom:20px; background:#fafbfc; border-radius:12px;
+    padding:20px 22px; border:1px solid #eef0f3;
   }
-  .section-title {
-    font-size:13px; color:#666; margin-bottom:14px; font-weight:600;
-    letter-spacing:1px; text-transform:uppercase;
+  .np-block-title {
+    font-size:12px; color:#888; margin-bottom:12px; font-weight:600;
+    letter-spacing:1.5px;
   }
 
   /* ===== 数量输入 ===== */
-  .num-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-  .num-row label { font-size:14px; color:#333; }
-  .num-row input {
-    width:90px; padding:7px 12px; border-radius:8px; border:1px solid #d9dce0;
+  .np-num { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .np-num label { font-size:14px; color:#333; }
+  .np-num input {
+    width:86px; padding:6px 10px; border-radius:8px; border:1px solid #d9dce0;
     background:#fff; color:#333; font-size:15px; outline:none; transition:border .2s;
   }
-  .num-row input:focus { border-color:#4a90d9; }
+  .np-num input:focus { border-color:#4a90d9; }
 
   /* ===== 单选组 ===== */
-  .radio-group { display:flex; flex-wrap:wrap; gap:10px; }
-  .radio-group label {
-    display:flex; align-items:center; gap:6px; padding:8px 16px;
-    background:#fff; border-radius:8px; cursor:pointer; font-size:14px;
+  .np-radio { display:flex; flex-wrap:wrap; gap:8px; }
+  .np-radio label {
+    display:flex; align-items:center; gap:5px; padding:7px 14px;
+    background:#fff; border-radius:8px; cursor:pointer; font-size:13px;
     transition:all .2s; border:1px solid #e0e2e6; color:#444; user-select:none;
   }
-  .radio-group label:hover { border-color:#b8cfe8; background:#f0f5fa; }
-  .radio-group input[type="radio"] { accent-color:#4a90d9; }
-  .radio-group label.active { background:#eaf2fc; border-color:#4a90d9; color:#2563b3; font-weight:500; }
+  .np-radio label:hover { border-color:#b8cfe8; background:#f0f5fa; }
+  .np-radio input[type="radio"] { accent-color:#4a90d9; }
+  .np-radio label.np-on { background:#eaf2fc; border-color:#4a90d9; color:#2563b3; font-weight:500; }
 
   /* ===== 生成按钮 ===== */
-  .generate-btn {
-    display:block; width:100%; padding:14px; border:none; border-radius:12px;
-    background:#2c2c2c; color:#fff; font-size:17px; font-weight:700;
-    cursor:pointer; letter-spacing:3px; transition:all .25s; margin-top:8px;
+  .np-go {
+    display:block; width:100%; padding:13px; border:none; border-radius:12px;
+    background:#2c2c2c; color:#fff; font-size:16px; font-weight:700;
+    cursor:pointer; letter-spacing:3px; transition:all .25s; margin-top:6px;
   }
-  .generate-btn:hover { background:#1a1a1a; transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+  .np-go:hover { background:#1a1a1a; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,0.1); }
 
   /* ===== 结果区 ===== */
-  .result-section { margin-top:28px; }
-  .result-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-  .result-header .info { font-size:13px; color:#999; }
-  .copy-btn { padding:7px 18px; border-radius:8px; border:1px solid #d9dce0; background:#fff; color:#555; cursor:pointer; font-size:13px; transition:all .2s; }
-  .copy-btn:hover { background:#f0f5fa; border-color:#b8cfe8; color:#2563b3; }
+  .np-res { margin-top:24px; }
+  .np-res-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
+  .np-res-info { font-size:13px; color:#999; }
+  .np-copy { padding:6px 16px; border-radius:8px; border:1px solid #d9dce0; background:#fff; color:#555; cursor:pointer; font-size:13px; transition:all .2s; }
+  .np-copy:hover { background:#f0f5fa; border-color:#b8cfe8; color:#2563b3; }
 
-  .result-box {
-    background:#fafbfc; border-radius:12px; padding:22px; min-height:120px;
-    max-height:420px; overflow-y:auto; border:1px solid #eef0f3;
+  .np-box {
+    background:#fafbfc; border-radius:12px; padding:20px; min-height:110px;
+    max-height:400px; overflow-y:auto; border:1px solid #eef0f3;
   }
-  .result-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
-  .result-item {
-    background:#fff; border:1px solid #e4e6ea; border-radius:8px; padding:10px 6px;
-    text-align:center; font-size:16px; color:#2c2c2c; font-weight:500; transition:all .2s;
+  .np-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; }
+  .np-item {
+    background:#fff; border:1px solid #e4e6ea; border-radius:8px; padding:9px 6px;
+    text-align:center; font-size:15px; color:#2c2c2c; font-weight:500; transition:all .2s;
   }
-  .result-item:hover { border-color:#4a90d9; background:#f0f7ff; transform:scale(1.02); }
-  .empty-tip { text-align:center; color:#bbb; font-size:14px; padding:36px 0; }
+  .np-item:hover { border-color:#4a90d9; background:#f0f7ff; transform:scale(1.02); }
+  .np-empty { text-align:center; color:#bbb; font-size:14px; padding:32px 0; }
 
   /* ===== 线路规划区 ===== */
-  .line-builder { margin-top:24px; }
-  .line-builder textarea {
-    width:100%; min-height:100px; border-radius:10px; border:1px solid #d9dce0;
-    background:#fff; color:#333; padding:14px; font-size:14px; resize:vertical;
+  .np-line { margin-top:20px; }
+  .np-line textarea {
+    width:100%; min-height:90px; border-radius:10px; border:1px solid #d9dce0;
+    background:#fff; color:#333; padding:12px; font-size:14px; resize:vertical;
     outline:none; font-family:inherit; line-height:1.6; transition:border .2s;
   }
-  .line-builder textarea:focus { border-color:#4a90d9; }
-  .line-builder .hint { font-size:12px; color:#aaa; margin-top:6px; }
+  .np-line textarea:focus { border-color:#4a90d9; }
+  .np-hint { font-size:12px; color:#aaa; margin-top:5px; }
 
   /* ===== 页脚 ===== */
-  .footer { text-align:center; margin-top:40px; font-size:12px; color:#ccc; padding:24px 0; }
+  .np-foot { text-align:center; margin-top:36px; font-size:12px; color:#ccc; padding:20px 0; }
 
   /* ===== Toast ===== */
-  .toast {
-    position:fixed; bottom:40px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:#1a1a1a; color:#fff; padding:12px 28px; border-radius:8px;
-    font-size:14px; opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; z-index:9999;
+  .np-toast {
+    position:fixed; bottom:36px; left:50%; transform:translateX(-50%) translateY(16px);
+    background:#1a1a1a; color:#fff; padding:10px 24px; border-radius:8px;
+    font-size:13px; opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; z-index:9999;
   }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .np-toast.np-show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* ===== 滚动条 ===== */
-  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-thumb { background:#d9dce0; border-radius:3px; }
-  ::-webkit-scrollbar-thumb:hover { background:#b8c2cc; }
 
   /* ===== 移动端 ===== */
   @media (max-width:640px) {
-    .container { padding:100px 16px 32px; }
-    .page-title h1 { font-size:22px; }
-    .section { padding:18px 16px; }
-    .radio-group label { padding:7px 12px; font-size:13px; }
-    .result-list { grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); }
+    .np-wrap { padding:88px 14px 28px; }
+    .np-title h1 { font-size:20px; }
+    .np-block { padding:16px 14px; }
+    .np-radio label { padding:6px 10px; font-size:12px; }
+    .np-grid { grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); }
   }
 </style>
 </head>
 <body>
 
-<!-- ===== 导航栏 ===== -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="nav-brand">回到首页</a>
+<!-- ===== 导航栏（只有回到首页） ===== -->
+<nav class="np-nav">
+  <div class="np-nav-inner">
+    <a href="index.html" class="np-back">← 回到首页</a>
   </div>
 </nav>
 
-<div class="container">
+<div class="np-wrap">
 
-  <div class="page-title">
+  <div class="np-title">
     <h1>架空地铁站名生成器</h1>
   </div>
-  <div class="page-sub">基于全国真实地铁站名字频统计 · 生成合理可用的架空站名</div>
+  <div class="np-sub">基于全国真实地铁站名字频统计 · 生成合理可用的架空站名</div>
 
   <!-- ===== 生成数量 ===== -->
-  <div class="section">
-    <div class="section-title">生成数量</div>
-    <div class="num-row">
+  <div class="np-block">
+    <div class="np-block-title">生成数量</div>
+    <div class="np-num">
       <label>生成</label>
       <input type="number" id="genCount" value="20" min="1" max="500">
       <label>个站名</label>
@@ -160,9 +162,9 @@
   </div>
 
   <!-- ===== 站名类型 ===== -->
-  <div class="section">
-    <div class="section-title">站名类型</div>
-    <div class="radio-group" id="typeGroup">
+  <div class="np-block">
+    <div class="np-block-title">站名类型</div>
+    <div class="np-radio" id="typeGroup">
       <label><input type="radio" name="nameType" value="road" checked> 路名型（××路）</label>
       <label><input type="radio" name="nameType" value="landmark"> 地标型（××公园）</label>
       <label><input type="radio" name="nameType" value="district"> 片区型（××村/街）</label>
@@ -172,9 +174,9 @@
   </div>
 
   <!-- ===== 站名字数 ===== -->
-  <div class="section">
-    <div class="section-title">站名字数</div>
-    <div class="radio-group" id="lenGroup">
+  <div class="np-block">
+    <div class="np-block-title">站名字数</div>
+    <div class="np-radio" id="lenGroup">
       <label><input type="radio" name="nameLen" value="2" checked> 两字</label>
       <label><input type="radio" name="nameLen" value="3"> 三字</label>
       <label><input type="radio" name="nameLen" value="4"> 四字</label>
@@ -182,32 +184,32 @@
   </div>
 
   <!-- ===== 生成按钮 ===== -->
-  <button class="generate-btn" id="genBtn">生 成 站 名</button>
+  <button class="np-go" id="genBtn">生 成 站 名</button>
 
   <!-- ===== 结果区 ===== -->
-  <div class="result-section">
-    <div class="result-header">
-      <div class="info">已生成: <span id="genTotal">0</span> 个站名</div>
-      <button class="copy-btn" id="copyBtn">复制全部</button>
+  <div class="np-res">
+    <div class="np-res-head">
+      <div class="np-res-info">已生成: <span id="genTotal">0</span> 个站名</div>
+      <button class="np-copy" id="copyBtn">复制全部</button>
     </div>
-    <div class="result-box" id="resultBox">
-      <div class="empty-tip">点击上方按钮开始生成</div>
+    <div class="np-box" id="resultBox">
+      <div class="np-empty">点击上方按钮开始生成</div>
     </div>
   </div>
 
   <!-- ===== 线路规划区 ===== -->
-  <div class="section line-builder">
-    <div class="section-title">线路规划区（可选）</div>
+  <div class="np-block np-line">
+    <div class="np-block-title">线路规划区（可选）</div>
     <textarea id="lineArea" placeholder="在这里粘贴或编辑你的线路规划，例如：&#10;一号线：永庆门 → 鼓楼西 → 大南关 → 中央广场 → ...&#10;二号线：北岸码头 → 望江塔 → ..."></textarea>
-    <div class="hint">提示：把生成的站名复制到这里，手动编排成线路图。每个站名一行，用顿号或箭头分隔即可。</div>
+    <div class="np-hint">提示：把生成的站名复制到这里，手动编排成线路图。每个站名一行，用顿号或箭头分隔即可。</div>
   </div>
 
-  <footer class="footer">喵喵喵</footer>
+  <footer class="np-foot">喵喵喵</footer>
 
 </div>
 
 <!-- ===== Toast ===== -->
-<div class="toast" id="toast"></div>
+<div class="np-toast" id="toast"></div>
 
 <script>
 // ========== 词库 ==========
@@ -269,7 +271,6 @@ const P2 = [
   '故城','旧府','新府','行宫','别苑','御园','禁苑','皇苑','王城'
 ];
 
-// 根据类型内置对应后缀，不再暴露选择界面
 const TYPE_SUFFIX = {
   road:     ['路','街','道','巷','大街','大路','大道','直街','横街','南路','北路','东路','西路'],
   landmark: ['公园','广场','中心','车站','机场','码头','体育馆','博物馆','图书馆','剧院','影院','商场','市场','医院','大学','中学','小学','科技馆','展览馆','纪念馆','文化宫','少年宫','市民中心','行政中心','政务中心','商务中心','金融中心','体育中心'],
@@ -298,18 +299,18 @@ const $ = id => document.getElementById(id);
 const rand = arr => arr[Math.floor(Math.random()*arr.length)];
 
 // ========== 单选高亮 ==========
-function bindRadioHighlight(groupName, containerId) {
+function bindRadio(groupName, containerId) {
   document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
     r.addEventListener('change', () => {
-      document.querySelectorAll(`#${containerId} label`).forEach(l => l.classList.remove('active'));
-      r.closest('label').classList.add('active');
+      document.querySelectorAll(`#${containerId} label`).forEach(l => l.classList.remove('np-on'));
+      r.closest('label').classList.add('np-on');
     });
   });
 }
-bindRadioHighlight('nameType', 'typeGroup');
-bindRadioHighlight('nameLen', 'lenGroup');
-document.querySelector('#typeGroup label').classList.add('active');
-document.querySelector('#lenGroup label').classList.add('active');
+bindRadio('nameType', 'typeGroup');
+bindRadio('nameLen', 'lenGroup');
+document.querySelector('#typeGroup label').classList.add('np-on');
+document.querySelector('#lenGroup label').classList.add('np-on');
 
 // ========== 核心生成逻辑 ==========
 function isPlausible(name) {
@@ -371,7 +372,6 @@ function makeP1Pair() {
 }
 
 function getSuffixPool(type) {
-  // mixed 模式：从所有类型后缀里随机
   if (type === 'mixed') {
     return [...TYPE_SUFFIX.road, ...TYPE_SUFFIX.landmark,
             ...TYPE_SUFFIX.district, ...TYPE_SUFFIX.nature];
@@ -428,8 +428,8 @@ $('genBtn').addEventListener('click', () => {
   totalGenerated += thisBatch.length;
   $('genTotal').textContent = totalGenerated;
 
-  resultBox.innerHTML = '<div class="result-list">' +
-    thisBatch.map(n => `<div class="result-item">${n}</div>`).join('') +
+  resultBox.innerHTML = '<div class="np-grid">' +
+    thisBatch.map(n => `<div class="np-item">${n}</div>`).join('') +
     '</div>';
   resultBox.dataset.text = thisBatch.join('\n');
 });
@@ -464,8 +464,8 @@ $('copyBtn').addEventListener('click', () => {
 function showToast(msg) {
   const toast = $('toast');
   toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  toast.classList.add('np-show');
+  setTimeout(() => toast.classList.remove('np-show'), 2000);
 }
 </script>
 </body>
