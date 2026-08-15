@@ -14,11 +14,10 @@
       color: #1a1a1a;
       line-height: 1.6;
       min-height: 100vh;
-      /* 全局平滑滚动 */
       scroll-behavior: smooth;
     }
 
-    /* ===== 滚动条美化（可选，丝滑加分项） ===== */
+    /* 滚动条美化 */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
@@ -32,7 +31,6 @@
       padding: 20px 48px;
       max-width: 960px;
       margin: 0 auto;
-      /* 入场动画 */
       opacity: 0;
       transform: translateY(-12px);
       animation: navIn 0.6s ease-out 0.1s forwards;
@@ -63,6 +61,8 @@
       text-decoration: none;
       transition: color .25s ease, transform .25s ease;
       position: relative;
+      padding: 4px 2px;
+      border-radius: 4px;
     }
 
     /* 导航链接下划线动画 */
@@ -79,6 +79,42 @@
 
     .nav-links a:hover { color: #1a1a1a; }
     .nav-links a:hover::after { width: 100%; }
+
+    /* ===== 导航链接点击动画 ===== */
+    .nav-links a:active {
+      transform: scale(0.88);
+    }
+
+    /* 点击时的波纹效果 */
+    .nav-links a {
+      overflow: hidden;
+    }
+
+    .nav-links a .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.08);
+      transform: scale(0);
+      animation: rippleExpand 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rippleExpand {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* 导航链接激活态（点击后高亮） */
+    .nav-links a.active {
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .nav-links a.active::after {
+      width: 100%;
+    }
 
     /* ===== 主内容 ===== */
     .container {
@@ -137,7 +173,6 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* 标签 hover 微动效 */
     .tag {
       transition: transform .25s ease, background .25s ease, color .25s ease;
     }
@@ -182,18 +217,15 @@
       border: 1px solid #f0f0f0;
       text-decoration: none;
       color: inherit;
-      /* 卡片入场 */
       opacity: 0;
       transform: translateY(18px);
       animation: fadeUp 0.6s ease-out forwards;
-      /* hover 过渡 */
       transition: transform .3s cubic-bezier(.25,.8,.25,1),
                   box-shadow .3s cubic-bezier(.25,.8,.25,1),
                   border-color .3s ease,
                   background .3s ease;
     }
 
-    /* 卡片依次延迟入场 */
     .card-grid .card:nth-child(1) { animation-delay: 0.7s; }
     .card-grid .card:nth-child(2) { animation-delay: 0.85s; }
     .card-grid .card:nth-child(3) { animation-delay: 1.0s; }
@@ -217,7 +249,6 @@
       transition: transform .35s cubic-bezier(.34,1.56,.64,1);
     }
 
-    /* 卡片 hover 时图标弹一下 */
     .card:hover .card-icon {
       transform: scale(1.2) rotate(-5deg);
     }
@@ -262,7 +293,6 @@
       overflow: hidden;
     }
 
-    /* 点击水波纹效果 */
     .copy-card::before {
       content: '';
       position: absolute;
@@ -365,6 +395,17 @@
     #community .section-title + .section-title { animation-delay: 0.8s; }
     #about .section-title { animation-delay: 1.0s; }
 
+    /* ===== 目标区域高亮闪烁动画 ===== */
+    @keyframes sectionHighlight {
+      0%   { background: rgba(0,0,0,0.04); border-radius: 8px; }
+      50%  { background: rgba(0,0,0,0.06); border-radius: 8px; }
+      100% { background: transparent; }
+    }
+
+    .section-highlight {
+      animation: sectionHighlight 1.2s ease-out;
+    }
+
     /* ===== 响应式 ===== */
     @media (max-width: 600px) {
       .nav { padding: 16px 20px; }
@@ -388,10 +429,10 @@
   <nav class="nav">
     <a href="index.html" class="nav-brand">南浦Xi</a>
     <div class="nav-links">
-      <a href="#projects">项目</a>
-      <a href="#tools">工具</a>
-      <a href="#community">社群</a>
-      <a href="#about">关于我</a>
+      <a href="#projects" class="nav-anchor">项目</a>
+      <a href="#tools" class="nav-anchor">工具</a>
+      <a href="#community" class="nav-anchor">社群</a>
+      <a href="#about" class="nav-anchor">关于我</a>
     </div>
   </nav>
 
@@ -506,13 +547,68 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      // 每次调用先重置动画
       clearTimeout(t._timer);
       t._timer = setTimeout(() => t.classList.remove('show'), 2000);
     }
 
+    // ===== 导航链接点击动画 + 平滑滚动 + 目标高亮 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+
+        e.preventDefault();
+
+        // 1. 先移除所有激活态
+        document.querySelectorAll('.nav-anchor').forEach(a => a.classList.remove('active'));
+        // 2. 给当前点击的加上激活态
+        this.classList.add('active');
+
+        // 3. 计算偏移量（导航栏高度 + 一点余量）
+        const navHeight = document.querySelector('.nav').offsetHeight;
+        const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+
+        // 4. 平滑滚动到目标位置
+        window.scrollTo({
+          top: targetTop,
+          behavior: 'smooth'
+        });
+
+        // 5. 给目标区域加高亮闪烁动画
+        targetEl.classList.remove('section-highlight');
+        // 强制重排，让动画重新触发
+        void targetEl.offsetWidth;
+        targetEl.classList.add('section-highlight');
+
+        // 6. 1.5s 后移除激活态
+        setTimeout(() => {
+          this.classList.remove('active');
+        }, 1500);
+      });
+    });
+
+    // ===== 导航链接波纹效果 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        // 创建波纹元素
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+
+        this.appendChild(ripple);
+
+        // 动画结束后移除
+        setTimeout(() => ripple.remove(), 500);
+      });
+    });
+
     // ===== 滚动入场动画（IntersectionObserver） =====
-    // 让下方内容滚入视口时也有淡入效果
     const observerOptions = {
       threshold: 0.15,
       rootMargin: '0px 0px -40px 0px'
@@ -528,12 +624,35 @@
       });
     }, observerOptions);
 
-    // 对社群卡片和关于我区域做滚动触发
     document.querySelectorAll('.copy-card, #about .about-text').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(16px)';
       el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
       observer.observe(el);
+    });
+
+    // ===== 滚动时自动高亮当前所在区域的导航链接 =====
+    const sections = ['projects', 'tools', 'community', 'about'];
+    const navLinks = {};
+    document.querySelectorAll('.nav-anchor').forEach(a => {
+      navLinks[a.getAttribute('href').slice(1)] = a;
+    });
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // 清除所有
+          Object.values(navLinks).forEach(a => a.classList.remove('active'));
+          // 高亮当前
+          const id = entry.target.id;
+          if (navLinks[id]) navLinks[id].classList.add('active');
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) sectionObserver.observe(el);
     });
   </script>
 
