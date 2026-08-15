@@ -6,60 +6,31 @@
   <title>南浦Xi · 个人导航</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
-    /* ========== 全局重置 ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
-      color: #1a1a1a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* ========== 导航栏 ========== */
+    /* ===== 导航栏 ===== */
     .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid #eee;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .nav-inner {
-      width: 100%;
-      max-width: 960px;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      max-width: 960px;
+      margin: 0 auto;
     }
 
     .nav-brand {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
-      color: #111;
+      color: #1a1a1a;
+      text-decoration: none;
     }
 
     .nav-links {
@@ -69,231 +40,150 @@
 
     .nav-links a {
       font-size: 14px;
-      color: #555;
-      transition: color 0.2s;
+      color: #666;
+      text-decoration: none;
+      transition: color .2s;
     }
 
-    .nav-links a:hover {
-      color: #111;
-    }
+    .nav-links a:hover { color: #1a1a1a; }
 
-    /* ========== 通用容器 ========== */
+    /* ===== 主内容 ===== */
     .container {
-      max-width: 960px;
+      max-width: 680px;
       margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ========== Hero 首屏 ========== */
-    .hero {
-      padding: 140px 24px 80px;
+      padding: 80px 24px 60px;
       text-align: center;
     }
 
-    .hero-inner {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
+    .hero-title {
       font-size: 42px;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       margin-bottom: 12px;
-      letter-spacing: 1px;
     }
 
     .hero-sub {
-      font-size: 17px;
-      color: #666;
+      font-size: 16px;
+      color: #888;
       margin-bottom: 28px;
     }
 
-    .hero .tags {
+    .tags {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
+      margin-bottom: 64px;
     }
 
-    .hero .tags span {
-      display: inline-block;
-      padding: 4px 14px;
-      border: 1px solid #ddd;
+    .tag {
+      padding: 6px 16px;
       border-radius: 20px;
+      background: #f3f3f5;
       font-size: 13px;
       color: #555;
-      background: #fafafa;
-      transition: background 0.2s, border-color 0.2s;
     }
 
-    .hero .tags span:hover {
-      background: #f0f0f0;
-      border-color: #ccc;
+    /* ===== 分区标题 ===== */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-align: left;
     }
 
-    /* ========== 分区标题 ========== */
-    .section {
-      padding: 64px 0;
-      border-top: 1px solid #f5f5f5;
-    }
-
-    .section-header {
-      margin-bottom: 36px;
-    }
-
-    .section-header h2 {
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .section-header p {
-      font-size: 14px;
-      color: #999;
-      margin-top: 4px;
-    }
-
-    /* ========== 卡片网格 ========== */
+    /* ===== 卡片 ===== */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      text-align: left;
+      margin-bottom: 56px;
     }
 
-    /* ========== 卡片 ========== */
     .card {
       display: block;
-      padding: 24px;
-      border: 1px solid #eee;
+      padding: 20px 22px;
       border-radius: 12px;
-      background: #fff;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .15s, box-shadow .15s;
     }
 
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-      border-color: #ddd;
+      box-shadow: 0 6px 20px rgba(0,0,0,.06);
     }
 
-    .card-icon {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-
-    .card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #777;
-      line-height: 1.6;
-    }
-
-    /* ========== 标签 ========== */
-    .card .tag {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 2px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      background: #f0f0f0;
-      color: #555;
-    }
-
-    .tag-blue {
-      background: #e8f0fe;
-      color: #2563eb;
-    }
-
-    .tag-gray {
-      background: #f5f5f5;
-      color: #999;
-    }
-
-    /* ========== Coming Soon 卡片 ========== */
-    .card.coming-soon {
-      opacity: 0.6;
-      cursor: default;
-    }
-
-    .card.coming-soon:hover {
-      transform: none;
-      box-shadow: none;
-      border-color: #eee;
-    }
-
-    /* ========== 社群卡片（点击复制） ========== */
-    .card.copyable {
-      cursor: pointer;
-    }
-
-    .card.copyable .group-num {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin: 6px 0;
-      color: #1a1a1a;
-    }
-
-    .card.copyable .hint {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 10px;
-    }
-
-    /* ========== 关于我 ========== */
-    .about-text {
-      font-size: 15px;
-      color: #555;
-      max-width: 640px;
-    }
-
-    .about-links {
-      margin-top: 20px;
+    .card-header {
       display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
     }
 
-    .about-links a {
-      font-size: 14px;
-      color: #333;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 2px;
-      transition: border-color 0.2s, color 0.2s;
+    .card-icon { font-size: 20px; }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
     }
 
-    .about-links a:hover {
-      color: #000;
-      border-color: #000;
+    .card-desc {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
     }
 
-    /* ========== 邮箱复制链接 ========== */
-    .copy-email {
+    .card-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 11px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .card-badge-new {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    /* ===== 社群卡片（可点击复制） ===== */
+    .copy-card {
       cursor: pointer;
+      position: relative;
     }
 
-    /* ========== Toast 提示 ========== */
+    .copy-hint {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 4px;
+    }
+
+    /* ===== Toast 提示 ===== */
     .toast {
       position: fixed;
       bottom: 40px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: #1a1a1a;
-      color: #fff;
-      padding: 12px 28px;
+      padding: 10px 22px;
       border-radius: 8px;
+      background: #333;
+      color: #fff;
       font-size: 14px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
-      z-index: 9999;
+      transition: opacity .3s, transform .3s;
+      z-index: 999;
     }
 
     .toast.show {
@@ -301,252 +191,161 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ========== 页脚 ========== */
-    .footer {
-      text-align: center;
-      padding: 40px 24px;
-      font-size: 13px;
-      color: #bbb;
-      border-top: 1px solid #f5f5f5;
+    /* ===== 关于我 ===== */
+    .about-text {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+      text-align: left;
     }
 
-    /* ========== 移动端适配 ========== */
-    @media (max-width: 640px) {
-      .hero {
-        padding: 120px 20px 60px;
-      }
+    .about-text a {
+      color: #333;
+      text-decoration: underline;
+    }
 
-      .hero h1 {
-        font-size: 30px;
-      }
+    /* ===== 页脚 ===== */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: #ccc;
+    }
 
-      .nav-inner {
-        padding: 0 16px;
-      }
-
-      .nav-links {
-        gap: 16px;
-      }
-
-      .nav-links a {
-        font-size: 13px;
-      }
-
-      .section {
-        padding: 48px 0;
-      }
-
-      .card-grid {
-        grid-template-columns: 1fr;
-      }
+    /* ===== 响应式 ===== */
+    @media (max-width: 600px) {
+      .nav { padding: 16px 20px; }
+      .container { padding: 56px 20px 40px; }
+      .hero-title { font-size: 32px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== 导航栏 ===== -->
+  <!-- 导航栏 -->
   <nav class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-brand">南浦Xi</a>
-      <div class="nav-links">
-        <a href="#projects">项目</a>
-        <a href="#tools">工具</a>
-        <a href="#community">社群</a>
-        <a href="#about">关于我</a>
-      </div>
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="#projects">项目</a>
+      <a href="#tools">工具</a>
+      <a href="#community">社群</a>
+      <a href="#about">关于我</a>
     </div>
   </nav>
 
-  <!-- ===== Hero 首屏 ===== -->
-  <header class="hero">
-    <div class="hero-inner">
-      <h1>南浦Xi</h1>
-      <p class="hero-sub">我是南浦Xi喵</p>
-      <div class="tags">
-        <span>3C成员</span>
-        <span>小up主</span>
-        <span>喵喵喵</span>
-        <span>喵喵喵喵</span>
-      </div>
+  <!-- 主内容 -->
+  <main class="container">
+
+    <!-- Hero -->
+    <h1 class="hero-title">南浦Xi</h1>
+    <p class="hero-sub">我是南浦Xi喵</p>
+    <div class="tags">
+      <span class="tag">3C成员</span>
+      <span class="tag">小up主</span>
+      <span class="tag">喵喵喵</span>
+      <span class="tag">喵喵喵喵</span>
     </div>
-  </header>
 
-  <!-- ===== 项目 ===== -->
-  <section class="section" id="projects">
-    <div class="container">
-      <div class="section-header">
-        <h2>🚀 项目</h2>
-        <p>我正在做或已经做完的东西</p>
-      </div>
-
+    <!-- 项目 -->
+    <div id="projects">
+      <p class="section-title">🚀 项目</p>
       <div class="card-grid">
-
-        <a class="card" href="https://aarc.jowei19.com" target="_blank" rel="noopener">
-          <div class="card-icon">🔗</div>
-          <h3>AARC</h3>
-          <p>帮Au宣传</p>
-          <span class="tag tag-blue">友情链接</span>
+        <a href="https://www.bilibili.com" target="_blank" rel="noopener" class="card">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">AARC</span>
+          </div>
+          <p class="card-desc">帮Au宣传</p>
         </a>
-
       </div>
     </div>
-  </section>
 
-  <!-- ===== 工具 ===== -->
-  <section class="section" id="tools">
-    <div class="container">
-      <div class="section-header">
-        <h2>🛠️ 工具</h2>
-        <p>一些随手写的小工具</p>
-      </div>
-
+    <!-- 工具 -->
+    <div id="tools">
+      <p class="section-title">🛠️ 工具</p>
       <div class="card-grid">
-
-        <a class="card" href="metro.html">
-          <div class="card-icon">🚇</div>
-          <h3>架空地铁站名生成器</h3>
-          <p>基于全国真实地铁站名字频统计，一键生成合理可用的架空站名</p>
-          <span class="tag tag-blue">新上线</span>
+        <a href="metro.html" class="card">
+          <div class="card-header">
+            <span class="card-icon">🚇</span>
+            <span class="card-title">架空地铁站名生成器</span>
+            <span class="card-badge card-badge-new">新上线</span>
+          </div>
+          <p class="card-desc">基于全国真实地铁站名字频统计，一键生成合理可用的架空站名</p>
         </a>
-
-        <div class="card coming-soon">
-          <div class="card-icon">⏳</div>
-          <h3>敬请期待</h3>
-          <p>更多工具正在开发中~</p>
-          <span class="tag tag-gray">Coming Soon</span>
-        </div>
-
       </div>
+      <p class="section-title" style="color:#ddd;">更多工具正在开发中~</p>
     </div>
-  </section>
 
-  <!-- ===== 社群 ===== -->
-  <section class="section" id="community">
-    <div class="container">
-      <div class="section-header">
-        <h2>💬 社群</h2>
-        <p>点击卡片即可复制群号 / 频道号</p>
-      </div>
-
+    <!-- 社群 -->
+    <div id="community">
+      <p class="section-title">💬 社群</p>
+      <p class="section-title" style="color:#ddd; font-size:12px; text-transform:none; letter-spacing:0;">点击卡片即可复制群号 / 频道号</p>
       <div class="card-grid">
-
-        <div class="card copyable">
-          <div class="card-icon">🐧</div>
-          <h3>van-豆射手粉丝群</h3>
-          <div class="group-num">1093548457</div>
-          <p>van-豆射手的粉丝交流群</p>
-          <div class="hint">📋 点击卡片复制群号</div>
+        <div class="card copy-card" data-copy="695369973">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">van-豆射手的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 695369973</p>
+          <p class="copy-hint">点击复制群号</p>
         </div>
-
-        <div class="card copyable">
-          <div class="card-icon">🐧</div>
-          <h3>南浦Xi的粉丝群</h3>
-          <div class="group-num">729924346</div>
-          <p>南浦Xi的粉丝交流群</p>
-          <div class="hint">📋 点击卡片复制群号</div>
+        <div class="card copy-card" data-copy="487819503">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">南浦Xi的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 487819503</p>
+          <p class="copy-hint">点击复制群号</p>
         </div>
-
-        <div class="card copyable">
-          <div class="card-icon">📡</div>
-          <h3>van-豆射手的频道</h3>
-          <div class="group-num">pd60907944</div>
-          <p>QQ频道，欢迎加入讨论</p>
-          <div class="hint">📋 点击卡片复制频道号</div>
+        <div class="card copy-card" data-copy="南浦Xi的频道">
+          <div class="card-header">
+            <span class="card-icon">📡</span>
+            <span class="card-title">QQ频道</span>
+          </div>
+          <p class="card-desc">QQ频道，欢迎加入讨论</p>
+          <p class="copy-hint">点击复制频道名</p>
         </div>
-
       </div>
     </div>
-  </section>
 
-  <!-- ===== 关于我 ===== -->
-  <section class="section" id="about">
-    <div class="container">
-      <div class="section-header">
-        <h2>👋 关于我</h2>
-      </div>
+    <!-- 关于我 -->
+    <div id="about">
+      <p class="section-title">🐱 关于我</p>
       <div class="about-text">
         <p>我是南浦Xi喵，一个喜欢轨道交通、架空世界设定的小up主，不定期更新视频喵 🎬</p>
-        <br>
-        <p>想破500粉！欢迎关注我~</p>
-      </div>
-      <div class="about-links">
-        <a href="javascript:void(0)" class="copy-email" data-email="3906951201@qq.com">📧 3906951201@qq.com</a>
-        <a href="https://b23.tv/4wZ1dX0" target="_blank" rel="noopener">📺 B站</a>
-        <a href="https://www.xiaohongshu.com/user/profile/615f7503000000001f03e5a7?xsec_token=YBAittS21V3QHiFMjx3dFHGJKJrl5H_7a9sby5-ggtkL0" target="_blank" rel="noopener">📕 小红书</a>
+        <p style="margin-top:8px;">想破500粉！欢迎关注我~</p>
       </div>
     </div>
-  </section>
 
-  <!-- ===== 页脚 ===== -->
+  </main>
+
+  <!-- 页脚 -->
   <footer class="footer">
     喵喵喵
   </footer>
 
-  <!-- ===== Toast ===== -->
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- ===== JS：群号/频道号/邮箱 一键复制 ===== -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const toast = document.getElementById("toast");
-
-      // ---- 群号 / 频道号复制 ----
-      const copyCards = document.querySelectorAll(".card.copyable");
-      copyCards.forEach(function (card) {
-        card.addEventListener("click", function () {
-          const num = card.querySelector(".group-num").textContent.trim();
-          const isChannel = num.startsWith("pd");
-          copyText(num, isChannel ? "已复制频道号 ✅" : "已复制群号 ✅");
+    // 点击复制功能
+    document.querySelectorAll('.copy-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const text = card.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('已复制：' + text);
+        }).catch(() => {
+          showToast('复制失败，请手动复制');
         });
       });
-
-      // ---- 邮箱复制 ----
-      const emailLinks = document.querySelectorAll(".copy-email");
-      emailLinks.forEach(function (link) {
-        link.addEventListener("click", function () {
-          const email = link.dataset.email;
-          copyText(email, "已复制邮箱 ✅");
-        });
-      });
-
-      // ---- 通用复制函数 ----
-      function copyText(text, successMsg) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(
-            function () { showToast(successMsg); },
-            function () { fallbackCopy(text, successMsg); }
-          );
-        } else {
-          fallbackCopy(text, successMsg);
-        }
-      }
-
-      // ---- 兼容旧浏览器 ----
-      function fallbackCopy(text, successMsg) {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.left = "-9999px";
-        document.body.appendChild(ta);
-        ta.select();
-        try {
-          document.execCommand("copy");
-          showToast(successMsg);
-        } catch (e) {
-          showToast("复制失败，请手动复制");
-        }
-        document.body.removeChild(ta);
-      }
-
-      // ---- 显示 Toast ----
-      function showToast(msg) {
-        toast.textContent = msg;
-        toast.classList.add("show");
-        setTimeout(function () {
-          toast.classList.remove("show");
-        }, 2000);
-      }
     });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
   </script>
 
 </body>
