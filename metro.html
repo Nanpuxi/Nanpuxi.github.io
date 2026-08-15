@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架空地铁站名生成器 · 南浦Xi</title>
+<style>
+  /* ========== 全局重置 ========== */
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background:#ffffff;
+    min-height:100vh; color:#1a1a1a; padding:24px 16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a { color:inherit; text-decoration:none; }
+
+  /* ========== 导航栏 ========== */
+  .nav {
+    position:fixed; top:0; left:0; right:0; height:60px;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid #eee;
+    display:flex; align-items:center; justify-content:center; z-index:1000;
+  }
+  .nav-inner { width:100%; max-width:960px; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-brand { font-size:16px; font-weight:700; color:#111; }
+  .nav-links { display:flex; gap:28px; }
+  .nav-links a { font-size:14px; color:#555; transition:color .2s; }
+  .nav-links a:hover { color:#111; }
+  .nav-links a.back-link { color:#2563eb; }
+
+  /* ========== 容器 ========== */
+  .container { max-width:860px; margin:0 auto; padding:100px 0 40px; }
+
+  /* ========== 标题区 ========== */
+  .page-title { text-align:center; margin-bottom:8px; }
+  .page-title h1 { font-size:28px; font-weight:700; letter-spacing:1px; }
+  .page-sub { text-align:center; font-size:13px; color:#999; margin-bottom:36px; }
+
+  /* ========== 区块 ========== */
+  .section {
+    margin-bottom:22px; background:#fafbfc; border-radius:12px;
+    padding:22px 24px; border:1px solid #eef0f3;
+  }
+  .section-title {
+    font-size:13px; color:#666; margin-bottom:14px; font-weight:600;
+    letter-spacing:1px; text-transform:uppercase;
+  }
+
+  /* ========== 数量输入 ========== */
+  .num-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .num-row label { font-size:14px; color:#333; }
+  .num-row input {
+    width:90px; padding:7px 12px; border-radius:8px; border:1px solid #d9dce0;
+    background:#fff; color:#333; font-size:15px; outline:none; transition:border .2s;
+  }
+  .num-row input:focus { border-color:#4a90d9; }
+
+  /* ========== 单选组 ========== */
+  .radio-group { display:flex; flex-wrap:wrap; gap:10px; }
+  .radio-group label {
+    display:flex; align-items:center; gap:6px; padding:8px 16px;
+    background:#fff; border-radius:8px; cursor:pointer; font-size:14px;
+    transition:all .2s; border:1px solid #e0e2e6; color:#444; user-select:none;
+  }
+  .radio-group label:hover { border-color:#b8cfe8; background:#f0f5fa; }
+  .radio-group input[type="radio"] { accent-color:#4a90d9; }
+  .radio-group label.active { background:#eaf2fc; border-color:#4a90d9; color:#2563b3; font-weight:500; }
+
+  /* ========== 后缀工具栏 ========== */
+  .suffix-toolbar { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .suffix-toolbar button {
+    padding:6px 16px; border-radius:8px; border:1px solid #d9dce0;
+    background:#fff; color:#555; cursor:pointer; font-size:13px; transition:all .2s;
+  }
+  .suffix-toolbar button:hover { background:#f0f5fa; border-color:#b8cfe8; color:#2563b3; }
+
+  .suffix-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr));
+    gap:6px; max-height:200px; overflow-y:auto; padding:4px;
+  }
+  .suffix-grid label {
+    display:flex; align-items:center; justify-content:center; padding:7px 4px;
+    background:#fff; border-radius:8px; cursor:pointer; font-size:14px;
+    transition:all .2s; border:1px solid #e4e6ea; color:#444; user-select:none;
+  }
+  .suffix-grid label:hover { border-color:#b8cfe8; background:#f0f5fa; }
+  .suffix-grid input[type="checkbox"] { display:none; }
+  .suffix-grid label.checked { background:#eaf2fc; border-color:#4a90d9; color:#2563b3; font-weight:500; }
+
+  .custom-suffix { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .custom-suffix input {
+    flex:1; min-width:140px; padding:8px 14px; border-radius:8px;
+    border:1px solid #d9dce0; background:#fff; color:#333; font-size:14px; outline:none; transition:border .2s;
+  }
+  .custom-suffix input:focus { border-color:#4a90d9; }
+  .custom-suffix button {
+    padding:8px 20px; border-radius:8px; border:none; background:#4a90d9;
+    color:#fff; font-weight:600; cursor:pointer; font-size:14px; transition:all .2s;
+  }
+  .custom-suffix button:hover { background:#3a7ec0; }
+
+  .current-suffix { margin-top:12px; font-size:13px; color:#999; word-break:break-all; }
+  .current-suffix b { color:#2563b3; }
+
+  /* ========== 生成按钮 ========== */
+  .generate-btn {
+    display:block; width:100%; padding:14px; border:none; border-radius:12px;
+    background:#2c2c2c; color:#fff; font-size:17px; font-weight:700;
+    cursor:pointer; letter-spacing:3px; transition:all .25s; margin-top:8px;
+  }
+  .generate-btn:hover { background:#1a1a1a; transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+
+  /* ========== 结果区 ========== */
+  .result-section { margin-top:28px; }
+  .result-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .result-header .info { font-size:13px; color:#999; }
+  .copy-btn { padding:7px 18px; border-radius:8px; border:1px solid #d9dce0; background:#fff; color:#555; cursor:pointer; font-size:13px; transition:all .2s; }
+  .copy-btn:hover { background:#f0f5fa; border-color:#b8cfe8; color:#2563b3; }
+
+  .result-box {
+    background:#fafbfc; border-radius:12px; padding:22px; min-height:120px;
+    max-height:420px; overflow-y:auto; border:1px solid #eef0f3;
+  }
+  .result-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+  .result-item {
+    background:#fff; border:1px solid #e4e6ea; border-radius:8px; padding:10px 6px;
+    text-align:center; font-size:16px; color:#2c2c2c; font-weight:500; transition:all .2s;
+  }
+  .result-item:hover { border-color:#4a90d9; background:#f0f7ff; transform:scale(1.02); }
+  .empty-tip { text-align:center; color:#bbb; font-size:14px; padding:36px 0; }
+
+  /* ========== 线路规划区 ========== */
+  .line-builder { margin-top:24px; }
+  .line-builder textarea {
+    width:100%; min-height:100px; border-radius:10px; border:1px solid #d9dce0;
+    background:#fff; color:#333; padding:14px; font-size:14px; resize:vertical;
+    outline:none; font-family:inherit; line-height:1.6; transition:border .2s;
+  }
+  .line-builder textarea:focus { border-color:#4a90d9; }
+  .line-builder .hint { font-size:12px; color:#aaa; margin-top:6px; }
+
+  /* ========== 页脚 ========== */
+  .footer { text-align:center; margin-top:40px; font-size:12px; color:#ccc; padding:24px 0; }
+
+  /* ========== Toast ========== */
+  .toast {
+    position:fixed; bottom:40px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#1a1a1a; color:#fff; padding:12px 28px; border-radius:8px;
+    font-size:14px; opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; z-index:9999;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ========== 滚动条 ========== */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-thumb { background:#d9dce0; border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:#b8c2cc; }
+
+  /* ========== 移动端 ========== */
+  @media (max-width:640px) {
+    .container { padding:100px 16px 32px; }
+    .page-title h1 { font-size:22px; }
+    .section { padding:18px 16px; }
+    .radio-group label { padding:7px 12px; font-size:13px; }
+    .result-list { grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 导航栏 ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="index.html#projects">项目</a>
+      <a href="index.html#tools">工具</a>
+      <a href="index.html#community">社群</a>
+      <a href="index.html#about">关于我</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-title">
+    <h1>架空地铁站名生成器</h1>
+  </div>
+  <div class="page-sub">基于全国真实地铁站名字频统计 · 生成合理可用的架空站名</div>
+
+  <!-- ===== 生成数量 ===== -->
+  <div class="section">
+    <div class="section-title">生成数量</div>
+    <div class="num-row">
+      <label>生成</label>
+      <input type="number" id="genCount" value="20" min="1" max="500">
+      <label>个站名</label>
+    </div>
+  </div>
+
+  <!-- ===== 站名类型 ===== -->
+  <div class="section">
+    <div class="section-title">站名类型</div>
+    <div class="radio-group" id="typeGroup">
+      <label><input type="radio" name="nameType" value="road" checked> 路名型（××路）</label>
+      <label><input type="radio" name="nameType" value="landmark"> 地标型（××公园）</label>
+      <label><input type="radio" name="nameType" value="district"> 片区型（××村/街）</label>
+      <label><input type="radio" name="nameType" value="nature"> 自然地貌型（××山/河）</label>
+      <label><input type="radio" name="nameType" value="mixed"> 混合随机</label>
+    </div>
+  </div>
+
+  <!-- ===== 站名字数 ===== -->
+  <div class="section">
+    <div class="section-title">站名字数</div>
+    <div class="radio-group" id="lenGroup">
+      <label><input type="radio" name="nameLen" value="2" checked> 两字</label>
+      <label><input type="radio" name="nameLen" value="3"> 三字</label>
+      <label><input type="radio" name="nameLen" value="4"> 四字</label>
+    </div>
+  </div>
+
+  <!-- ===== 后缀选择 ===== -->
+  <div class="section">
+    <div class="section-title">地名后缀（可多选）</div>
+    <div class="suffix-toolbar">
+      <button id="selAll">全部选中</button>
+      <button id="selNone">取消全部</button>
+    </div>
+    <div class="suffix-grid" id="suffixGrid"></div>
+    <div class="custom-suffix">
+      <input type="text" id="customSuffix" placeholder="自定义后缀，如：新城、港、湾...">
+      <button id="addSuffix">添加</button>
+    </div>
+    <div class="current-suffix">当前使用的后缀：<b id="suffixCount">0</b> 项 · <span id="suffixList"></span></div>
+  </div>
+
+  <!-- ===== 生成按钮 ===== -->
+  <button class="generate-btn" id="genBtn">生 成 站 名</button>
+
+  <!-- ===== 结果区 ===== -->
+  <div class="result-section">
+    <div class="result-header">
+      <div class="info">已生成: <span id="genTotal">0</span> 个站名</div>
+      <button class="copy-btn" id="copyBtn">复制全部</button>
+    </div>
+    <div class="result-box" id="resultBox">
+      <div class="empty-tip">点击上方按钮开始生成</div>
+    </div>
+  </div>
+
+  <!-- ===== 线路规划区 ===== -->
+  <div class="section line-builder">
+    <div class="section-title">线路规划区（可选）</div>
+    <textarea id="lineArea" placeholder="在这里粘贴或编辑你的线路规划，例如：&#10;一号线：永庆门 → 鼓楼西 → 大南关 → 中央广场 → ...&#10;二号线：北岸码头 → 望江塔 → ..."></textarea>
+    <div class="hint">提示：把生成的站名复制到这里，手动编排成线路图。每个站名一行，用顿号或箭头分隔即可。</div>
+  </div>
+
+  <footer class="footer">本程序为 gamma 版本 · 适配 PC 端 · 站名用字来源于全国真实地铁站名字频统计</footer>
+
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== 词库 ==========
+const P1_SHORT = [
+  '东','西','南','北','前','后','上','下','中',
+  '大','小','长','高','新','老','古',
+  '青','红','白','金','碧','翠','紫',
+  '山','江','河','湖','海','溪',
+  '松','柏','柳','枫','梅','兰','竹','菊','荷',
+  '龙','凤','鹤','燕','莺','鹭',
+  '安','康','福','兴','盛','昌','隆',
+  '和','平','秀','雅','瑞','馨',
+  '城','市','街','桥','门','楼','苑','府',
+  '文','书','花','香','玉','宝',
+  '沙','石','岛','湾','港','坡',
+  '双','三','四','五','六','七','八','九','十',
+  '王','李','张','刘','陈','杨','赵','黄','周','吴',
+  '徐','孙','马','朱','胡','林','郭','何','高','梁'
+];
+
+const P1_LONG_SUF = [
+  '东','西','南','北','前','后','上','下',
+  '大','小','新','老','古','长','高',
+  '青','金','碧','山','江','河','湖','海',
+  '王','李','张','刘','陈','杨','赵'
+];
+
+const P2 = [
+  '青山','碧水','绿水','翠湖','明湖','静湖','清溪','秀溪','碧溪','澄江',
+  '临江','望江','滨江','沿江','江浦','江湾','江畔','江滨','江北','江南',
+  '靠山','依山','环山','越山','山麓','山岚','山影','山前','山后','山南',
+  '临海','滨海','近海','望海','海澜','海韵','海风','海霞','海角','海湾',
+  '金沙','银沙','黄沙','白沙','沙洲','沙湾','沙堤','沙河',
+  '飞云','流云','归云','凌云','彩云','碧云','青云','白云','朝云','苍云',
+  '听雨','观澜','听涛','望岳','凌波','漱玉','枕流','步月','踏雪','寻梅',
+  '栖霞','饮虹','栖凤','卧龙','飞鸿','归雁','落霞','惊鸿','游龙','孤鹜',
+  '春风','夏雨','秋月','冬雪','朝阳','夕阳','明月','繁星','蓝天','碧空',
+  '花香','鸟语','蝉鸣','蝶舞','莺啼','燕归','鹤鸣','凤鸣','龙吟','虎啸',
+  '梧桐','杨柳','松柏','桃李','杏林','竹园','梅园','菊园','荷塘','莲池',
+  '牡丹','芍药','蔷薇','茉莉','芙蓉','紫荆','银杏','樟树','榕荫','桂香',
+  '凤凰','麒麟','龙凤','双鹤','紫燕','金莺','彩蝶','瑞麟','祥龙','玉凤',
+  '中山','人民','中央','新华','解放','胜利','和平','建设','光明','幸福',
+  '工人','少年','文化','体育','世纪','国际','环球','东方','西方','南方',
+  '古城','新城','旧城','老街','新街','大街','长街','深巷','小巷','胡同',
+  '双桥','石桥','木桥','廊桥','拱桥','新桥','古桥','天桥','银桥','金桥',
+  '书苑','画舫','琴台','诗廊','茶园','酒肆','棋院','墨香','砚池','笔锋',
+  '城东','城西','城南','城北','城央','城廓','关外','关内','塞北','岭南',
+  '河南','河北','山东','山西','湖南','湖北','广东','广西',
+  '王家','李家','张家','刘家','陈家','杨家','赵家','黄家','周家','吴家',
+  '徐家','孙家','马家','朱家','胡家','林家','郭家','何家','高家','梁家',
+  '大学','中学','小学','科技','工程','交通','医科','农业','林业','纺织',
+  '钢铁','机械','电子','信息','数据','智能','航天','航海','能源','化工',
+  '兴隆','昌盛','繁荣','富强','康乐','安宁','永宁','长治','久安','太和',
+  '昌明','景泰','永昌','广运','大庆','富安','永乐','太平','万安','广宁',
+  '古渡','古塔','古寺','古井','古桥','古城','古镇','古村','新渡','新塔',
+  '新寺','新井','新桥','新镇','新村','新街','新市',
+  '红枫','翠竹','碧桃','紫藤','白桦','金桂','银柳','墨兰','丹枫','素梅',
+  '乌衣','朱雀','玄武','青龙','白虎','紫禁','皇城','帝都','京华','帝京',
+  '故城','旧府','新府','行宫','别苑','御园','禁苑','皇苑','王城'
+];
+
+const DEFAULT_SUFFIXES = [
+  '路','街','桥','门','站','广场','公园','城','村','口',
+  '湾','湖','河','山','岗','岭','洲','岛','港','坡',
+  '坪','塘','溪','池','沟','渠','涧','洼','洞','沙',
+  '楼','园','苑','庄','庙','寺','祠','寨','营','堡',
+  '府','店','巷','道','集','棚','台','角','里','户',
+  '坊','场','埠','埔','坝','墩','垅','围','陂','陵',
+  '郢','铺','堂','镇','丘','井','屯','卫','甸','矶'
+];
+
+const TYPE_SUFFIX = {
+  road:     ['路','街','道','巷','大街','大路','大道','直街','横街','南路','北路','东路','西路'],
+  landmark: ['公园','广场','中心','车站','机场','码头','体育馆','博物馆','图书馆','剧院','影院','商场','市场','医院','大学','中学','小学','科技馆','展览馆','纪念馆','文化宫','少年宫','市民中心','行政中心','政务中心','商务中心','金融中心','体育中心'],
+  district: ['村','街','巷','里','坊','门','庄','屯','堡','寨','镇','城','区','片','口','台','户','营','卫','铺','集'],
+  nature:   ['山','岭','岗','峰','崖','谷','沟','涧','坡','坪','河','江','湖','海','湾','港','溪','泉','潭','池','洲','岛','屿','沙','塘','洼','洞','坝','渠','口']
+};
+
+const REAL_PLACES = new Set([
+  '北京','上海','广州','深圳','南京','武汉','成都','重庆','天津','杭州',
+  '苏州','西安','长沙','青岛','大连','宁波','厦门','福州','济南','郑州',
+  '昆明','贵阳','合肥','南昌','石家庄','太原','沈阳','长春','哈尔滨',
+  '人民广场','中山公园','中央公园','世纪公园','文化广场','体育中心',
+  '火车站','汽车站','飞机场','国际机场','市民中心','市政府',
+  '天安门','王府井','西单','东单','复兴门','建国门','永安里','国贸',
+  '徐家汇','南京路','淮海路','长安街','复兴路','西藏路','四川路',
+  '黄浦江','珠江','长江','黄河','西湖','太湖','滇池','洱海',
+  '故宫','长城','天坛','颐和园','圆明园','雍和宫','白云山','越秀山',
+  '浦东','浦西','虹桥','漕河','莘庄','宝山','嘉定','松江','青浦','奉贤',
+  '白云','天河','越秀','荔湾','海珠','黄埔','番禺','花都','南沙','从化',
+  '朝阳','海淀','丰台','石景山','通州','顺义','昌平','大兴','怀柔','平谷',
+  '中山门','和平门','新华路','解放路','胜利路','光明路','幸福路'
+]);
+
+// ========== 状态 ==========
+let selectedSuffixes = new Set(DEFAULT_SUFFIXES);
+let customSuffixSet = new Set();
+
+// ========== 工具 ==========
+const $ = id => document.getElementById(id);
+const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+
+// ========== 后缀网格 ==========
+function renderSuffixGrid() {
+  const grid = $('suffixGrid');
+  grid.innerHTML = '';
+  const all = [...DEFAULT_SUFFIXES, ...customSuffixSet];
+  all.forEach(suf => {
+    const lbl = document.createElement('label');
+    const checked = selectedSuffixes.has(suf);
+    if (checked) lbl.classList.add('checked');
+    lbl.innerHTML = `<input type="checkbox" value="${suf}" ${checked?'checked':''}> ${suf}`;
+    lbl.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) { selectedSuffixes.add(suf); lbl.classList.add('checked'); }
+      else { selectedSuffixes.delete(suf); lbl.classList.remove('checked'); }
+      updateSuffixInfo();
+    });
+    grid.appendChild(lbl);
+  });
+  updateSuffixInfo();
+}
+
+function updateSuffixInfo() {
+  const arr = [...selectedSuffixes];
+  $('suffixCount').textContent = arr.length;
+  $('suffixList').textContent = arr.join('');
+}
+
+$('selAll').addEventListener('click', () => {
+  selectedSuffixes = new Set([...DEFAULT_SUFFIXES, ...customSuffixSet]);
+  renderSuffixGrid();
+});
+$('selNone').addEventListener('click', () => {
+  selectedSuffixes.clear();
+  renderSuffixGrid();
+});
+
+$('addSuffix').addEventListener('click', () => {
+  const v = $('customSuffix').value.trim();
+  if (!v) return;
+  customSuffixSet.add(v);
+  selectedSuffixes.add(v);
+  $('customSuffix').value = '';
+  renderSuffixGrid();
+});
+
+// ========== 单选高亮 ==========
+function bindRadioHighlight(groupName, containerId) {
+  document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+    r.addEventListener('change', () => {
+      document.querySelectorAll(`#${containerId} label`).forEach(l => l.classList.remove('active'));
+      r.closest('label').classList.add('active');
+    });
+  });
+}
+bindRadioHighlight('nameType', 'typeGroup');
+bindRadioHighlight('nameLen', 'lenGroup');
+document.querySelector('#typeGroup label').classList.add('active');
+document.querySelector('#lenGroup label').classList.add('active');
+
+// ========== 核心生成逻辑 ==========
+function isPlausible(name) {
+  if (REAL_PLACES.has(name)) return false;
+  if (name.length < 2) return false;
+  if (/[，。、；：！？·\/\-]/.test(name)) return false;
+  return true;
+}
+
+function getPrefix(prefixLen, suffix) {
+  const isModifiedRoad = /^(大|南|北|东|西|前|后|上|下|直|横)/.test(suffix);
+
+  if (prefixLen === 1) {
+    if (isModifiedRoad) return rand(P1_LONG_SUF);
+    return rand(P1_SHORT);
+  }
+
+  if (prefixLen === 2) {
+    if (isModifiedRoad) {
+      for (let i = 0; i < 5; i++) {
+        const c = rand(P2);
+        if (c.length <= 2) return c;
+      }
+      return rand(P2);
+    }
+    if (Math.random() < 0.85) return rand(P2);
+    return makeP1Pair();
+  }
+
+  if (prefixLen === 3) {
+    if (Math.random() < 0.65) return rand(P2) + rand(P1_SHORT);
+    return rand(P1_SHORT) + rand(P2);
+  }
+
+  return rand(P2) + rand(P2);
+}
+
+function makeP1Pair() {
+  for (let i = 0; i < 10; i++) {
+    const a = rand(P1_SHORT), b = rand(P1_SHORT);
+    if (a === b) continue;
+    const c = a + b;
+    if (/^(东|西|南|北|中)(东|西|南|北|中)/.test(c)) continue;
+    if (/^(大|小|长|高|新|老|古)(大|小|长|高|新|老|古)/.test(c)) continue;
+    if (/^(青|红|白|金|碧|翠|紫)(青|红|白|金|碧|翠|紫)/.test(c)) continue;
+    if (/^(山|水|江|河|湖|海|溪)(山|水|江|河|湖|海|溪)/.test(c)) continue;
+    if (/^(松|柏|柳|枫|梅|兰|竹|菊|荷)(松|柏|柳|枫|梅|兰|竹|菊|荷)/.test(c)) continue;
+    if (/^(龙|凤|鹤|燕|莺|鹭)(龙|凤|鹤|燕|莺|鹭)/.test(c)) continue;
+    if (/^(安|康|福|兴|盛|昌|隆)(安|康|福|兴|盛|昌|隆)/.test(c)) continue;
+    if (/^(和|平|秀|雅|瑞|馨)(和|平|秀|雅|瑞|馨)/.test(c)) continue;
+    if (/^(城|市|街|桥|门|楼|苑|府)(城|市|街|桥|门|楼|苑|府)/.test(c)) continue;
+    if (/^(文|书|花|香|玉|宝)(文|书|花|香|玉|宝)/.test(c)) continue;
+    if (/^(沙|石|岛|湾|港|坡)(沙|石|岛|湾|港|坡)/.test(c)) continue;
+    if (/^(双|三|四|五|六|七|八|九|十)(双|三|四|五|六|七|八|九|十)/.test(c)) continue;
+    if (/^(王|李|张|刘|陈|杨|赵|黄|周|吴)(王|李|张|刘|陈|杨|赵|黄|周|吴)/.test(c)) continue;
+    return c;
+  }
+  return rand(P2);
+}
+
+function getSuffixPool(type) {
+  if (type === 'mixed') return [...selectedSuffixes];
+  return TYPE_SUFFIX[type] || [...selectedSuffixes];
+}
+
+function generateName(type, nameLen) {
+  const suffixPool = getSuffixPool(type);
+
+  for (let attempt = 0; attempt < 500; attempt++) {
+    const suffix = rand(suffixPool);
+    const sufLen = suffix.length;
+
+    let totalTarget = nameLen;
+    if (Math.random() < 0.08) totalTarget += Math.random() < 0.5 ? -1 : 1;
+    totalTarget = Math.max(2, Math.min(5, totalTarget));
+
+    const prefixLen = totalTarget - sufLen;
+    if (prefixLen < 1) continue;
+
+    const prefix = getPrefix(prefixLen, suffix);
+    if (!prefix) continue;
+
+    const name = prefix + suffix;
+    if (name.length < 2 || name.length > 5) continue;
+    if (isPlausible(name)) return name;
+  }
+
+  return rand(P2) + rand(['路','街','桥','门','公园','广场','城','村','湾','湖','河','山','园','苑','庄','楼']);
+}
+
+// ========== 生成按钮 ==========
+let totalGenerated = 0;
+const resultBox = $('resultBox');
+
+$('genBtn').addEventListener('click', () => {
+  const count = Math.min(500, Math.max(1, parseInt($('genCount').value) || 20));
+  const type = document.querySelector('input[name="nameType"]:checked').value;
+  const nameLen = parseInt(document.querySelector('input[name="nameLen"]:checked').value);
+
+  const results = new Set();
+  const thisBatch = [];
+  let safety = 0;
+
+  while (thisBatch.length < count && safety < count * 200) {
+    safety++;
+    const name = generateName(type, nameLen);
+    if (results.has(name)) continue;
+    results.add(name);
+    thisBatch.push(name);
+  }
+
+  totalGenerated += thisBatch.length;
+  $('genTotal').textContent = totalGenerated;
+
+  resultBox.innerHTML = '<div class="result-list">' +
+    thisBatch.map(n => `<div class="result-item">${n}</div>`).join('') +
+    '</div>';
+  resultBox.dataset.text = thisBatch.join('\n');
+});
+
+// ========== 复制 ==========
+$('copyBtn').addEventListener('click', () => {
+  const text = resultBox.dataset.text || '';
+  if (!text) return;
+  const btn = $('copyBtn');
+  const onSuccess = () => {
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => btn.textContent = '复制全部', 1500);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+  function fallbackCopy() {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => btn.textContent = '复制全部', 1500);
+  }
+});
+
+// ========== Toast ==========
+function showToast(msg) {
+  const toast = $('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ========== 初始化 ==========
+renderSuffixGrid();
+</script>
+</body>
+</html>
