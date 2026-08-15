@@ -57,9 +57,10 @@
 
     .nav-links a {
       font-size: 14px;
-      color: #666;
+      font-weight: 700;
+      color: #1a1a1a;
       text-decoration: none;
-      transition: color .25s ease, transform .25s ease;
+      transition: opacity .25s ease, transform .25s ease;
       position: relative;
       padding: 4px 2px;
       border-radius: 4px;
@@ -77,13 +78,8 @@
       transition: width .3s ease;
     }
 
-    .nav-links a:hover { color: #1a1a1a; }
+    .nav-links a:hover { opacity: 0.6; }
     .nav-links a:hover::after { width: 100%; }
-
-    /* ===== 导航链接点击动画 ===== */
-    .nav-links a:active {
-      transform: scale(0.88);
-    }
 
     /* 点击时的波纹效果 */
     .nav-links a {
@@ -106,10 +102,9 @@
       }
     }
 
-    /* 导航链接激活态（点击后高亮） */
+    /* 导航链接激活态（下划线，无背景高亮） */
     .nav-links a.active {
       color: #1a1a1a;
-      font-weight: 600;
     }
 
     .nav-links a.active::after {
@@ -395,15 +390,44 @@
     #community .section-title + .section-title { animation-delay: 0.8s; }
     #about .section-title { animation-delay: 1.0s; }
 
-    /* ===== 目标区域高亮闪烁动画 ===== */
-    @keyframes sectionHighlight {
-      0%   { background: rgba(0,0,0,0.04); border-radius: 8px; }
-      50%  { background: rgba(0,0,0,0.06); border-radius: 8px; }
-      100% { background: transparent; }
+    /* ===== 回到顶部按钮 ===== */
+    #backToTop {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 998;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1),
+                  background .25s ease, box-shadow .25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
     }
 
-    .section-highlight {
-      animation: sectionHighlight 1.2s ease-out;
+    #backToTop.visible {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #backToTop:hover {
+      background: #333;
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
+    }
+
+    #backToTop:active {
+      transform: scale(0.92);
     }
 
     /* ===== 响应式 ===== */
@@ -411,6 +435,7 @@
       .nav { padding: 16px 20px; }
       .container { padding: 56px 20px 40px; }
       .hero-title { font-size: 32px; }
+      #backToTop { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
     }
 
     /* 减少动画偏好（无障碍） */
@@ -527,6 +552,9 @@
     喵喵喵
   </footer>
 
+  <!-- 回到顶部按钮 -->
+  <button id="backToTop" title="回到顶部">↑</button>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -551,7 +579,7 @@
       t._timer = setTimeout(() => t.classList.remove('show'), 2000);
     }
 
-    // ===== 导航链接点击动画 + 平滑滚动 + 目标高亮 =====
+    // ===== 导航链接点击：波纹 + 平滑滚动 =====
     document.querySelectorAll('.nav-anchor').forEach(link => {
       link.addEventListener('click', function(e) {
         const targetId = this.getAttribute('href').slice(1);
@@ -560,38 +588,21 @@
 
         e.preventDefault();
 
-        // 1. 先移除所有激活态
-        document.querySelectorAll('.nav-anchor').forEach(a => a.classList.remove('active'));
-        // 2. 给当前点击的加上激活态
-        this.classList.add('active');
-
-        // 3. 计算偏移量（导航栏高度 + 一点余量）
+        // 计算偏移量（导航栏高度 + 一点余量）
         const navHeight = document.querySelector('.nav').offsetHeight;
         const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
 
-        // 4. 平滑滚动到目标位置
+        // 平滑滚动到目标位置
         window.scrollTo({
           top: targetTop,
           behavior: 'smooth'
         });
-
-        // 5. 给目标区域加高亮闪烁动画
-        targetEl.classList.remove('section-highlight');
-        // 强制重排，让动画重新触发
-        void targetEl.offsetWidth;
-        targetEl.classList.add('section-highlight');
-
-        // 6. 1.5s 后移除激活态
-        setTimeout(() => {
-          this.classList.remove('active');
-        }, 1500);
       });
     });
 
     // ===== 导航链接波纹效果 =====
     document.querySelectorAll('.nav-anchor').forEach(link => {
       link.addEventListener('click', function(e) {
-        // 创建波纹元素
         const ripple = document.createElement('span');
         ripple.classList.add('ripple');
 
@@ -602,9 +613,96 @@
         ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
 
         this.appendChild(ripple);
-
-        // 动画结束后移除
         setTimeout(() => ripple.remove(), 500);
+      });
+    });
+
+    // ===== 滚动时自动高亮当前所在区域的导航链接 =====
+    const sectionIds = ['projects', 'tools', 'community', 'about'];
+    const navLinks = {};
+    document.querySelectorAll('.nav-anchor').forEach(a => {
+      navLinks[a.getAttribute('href').slice(1)] = a;
+    });
+
+    // 预计算各 section 距文档顶部的偏移（offsetTop 递归累加，兼容 offsetParent 不同的情况）
+    function getDocTop(el) {
+      let top = 0;
+      while (el) {
+        top += el.offsetTop;
+        el = el.offsetParent;
+      }
+      return top;
+    }
+
+    const sectionTops = {};
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) sectionTops[id] = getDocTop(el);
+    });
+
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + 120; // 视口偏移量（导航栏高度 + 余量）
+      let currentId = sectionIds[0];
+
+      // 从上往下遍历，找到最后一个 top <= scrollPos 的 section
+      for (const id of sectionIds) {
+        if (sectionTops[id] !== undefined && sectionTops[id] <= scrollPos) {
+          currentId = id;
+        }
+      }
+
+      // 滚动到最底部时强制激活"关于我"
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 40) {
+        currentId = 'about';
+      }
+
+      // 在最顶部时激活第一个
+      if (window.scrollY < 60) {
+        currentId = sectionIds[0];
+      }
+
+      Object.values(navLinks).forEach(a => a.classList.remove('active'));
+      if (navLinks[currentId]) navLinks[currentId].classList.add('active');
+    }
+
+    // 用 scroll 事件 + 节流
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateActiveNav();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // 初始调用
+    updateActiveNav();
+
+    // ===== 回到顶部按钮 =====
+    const backToTopBtn = document.getElementById('backToTop');
+
+    function toggleBackToTop() {
+      if (window.scrollY > 30) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(toggleBackToTop);
+    }, { passive: true });
+
+    // 初始检查
+    toggleBackToTop();
+
+    // 点击回到顶部
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
       });
     });
 
@@ -629,30 +727,6 @@
       el.style.transform = 'translateY(16px)';
       el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
       observer.observe(el);
-    });
-
-    // ===== 滚动时自动高亮当前所在区域的导航链接 =====
-    const sections = ['projects', 'tools', 'community', 'about'];
-    const navLinks = {};
-    document.querySelectorAll('.nav-anchor').forEach(a => {
-      navLinks[a.getAttribute('href').slice(1)] = a;
-    });
-
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // 清除所有
-          Object.values(navLinks).forEach(a => a.classList.remove('active'));
-          // 高亮当前
-          const id = entry.target.id;
-          if (navLinks[id]) navLinks[id].classList.add('active');
-        }
-      });
-    }, { threshold: 0.3 });
-
-    sections.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) sectionObserver.observe(el);
     });
   </script>
 
