@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>南浦Xi · 个人导航</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style>
@@ -14,12 +14,14 @@
       color: #1a1a1a;
       line-height: 1.6;
       min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
     }
 
-    input, textarea, select {
-      font-size: 16px; /* 防止iOS自动放大 */
-    }
+    /* 滚动条美化 */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ccc; }
 
     /* ===== 导航栏 ===== */
     .nav {
@@ -29,6 +31,13 @@
       padding: 20px 48px;
       max-width: 960px;
       margin: 0 auto;
+      opacity: 0;
+      transform: translateY(-12px);
+      animation: navIn 0.6s ease-out 0.1s forwards;
+    }
+
+    @keyframes navIn {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .nav-brand {
@@ -36,13 +45,14 @@
       font-weight: 700;
       color: #1a1a1a;
       text-decoration: none;
-      white-space: nowrap;
+      transition: opacity .25s ease;
     }
+
+    .nav-brand:hover { opacity: 0.6; }
 
     .nav-links {
       display: flex;
       gap: 28px;
-      align-items: center;
     }
 
     .nav-links a {
@@ -50,43 +60,55 @@
       font-weight: 700;
       color: #1a1a1a;
       text-decoration: none;
-      transition: opacity .2s;
-      white-space: nowrap;
+      transition: opacity .25s ease, transform .25s ease;
+      position: relative;
+      padding: 4px 2px;
+      border-radius: 4px;
+    }
+
+    /* 导航链接下划线动画 */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #1a1a1a;
+      transition: width .3s ease;
     }
 
     .nav-links a:hover { opacity: 0.6; }
+    .nav-links a:hover::after { width: 100%; }
 
-    .nav-btn {
-      padding: 6px 16px;
-      border-radius: 8px;
-      border: 1.5px solid #1a1a1a;
-      background: #fff;
+    /* 点击时的波纹效果 */
+    .nav-links a {
+      overflow: hidden;
+    }
+
+    .nav-links a .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.08);
+      transform: scale(0);
+      animation: rippleExpand 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rippleExpand {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* 导航链接激活态（下划线，无背景高亮） */
+    .nav-links a.active {
       color: #1a1a1a;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
     }
 
-    .nav-btn:hover {
-      background: #1a1a1a;
-      color: #fff;
-    }
-
-    .nav-btn-primary {
-      background: #1a1a1a;
-      color: #fff;
-    }
-
-    .nav-btn-primary:hover {
-      opacity: 0.85;
-    }
-
-    .nav-user {
-      font-size: 13px;
-      color: #666;
-      font-weight: 600;
+    .nav-links a.active::after {
+      width: 100%;
     }
 
     /* ===== 主内容 ===== */
@@ -97,19 +119,27 @@
       text-align: center;
     }
 
+    /* ===== Hero 区域入场动画 ===== */
     .hero-title {
       font-size: 42px;
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.7s ease-out 0.3s forwards;
     }
 
     .hero-sub {
       font-size: 16px;
       color: #888;
       margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.7s ease-out 0.45s forwards;
     }
 
+    /* 标签逐个入场 */
     .tags {
       display: flex;
       flex-wrap: wrap;
@@ -124,21 +154,45 @@
       background: #f3f3f5;
       font-size: 13px;
       color: #555;
+      opacity: 0;
+      transform: translateY(12px) scale(0.9);
+      animation: tagIn 0.5s ease-out forwards;
+    }
+
+    .tag:nth-child(1) { animation-delay: 0.6s; }
+    .tag:nth-child(2) { animation-delay: 0.7s; }
+    .tag:nth-child(3) { animation-delay: 0.8s; }
+    .tag:nth-child(4) { animation-delay: 0.9s; }
+
+    @keyframes tagIn {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .tag {
+      transition: transform .25s ease, background .25s ease, color .25s ease;
+    }
+    .tag:hover {
+      transform: scale(1.06);
+      background: #e8e8ec;
+      color: #333;
     }
 
     /* ===== 分区标题 ===== */
     .section-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #111;
-      text-transform: none;
-      letter-spacing: 0.5px;
-      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 2px;
       margin-bottom: 20px;
       text-align: left;
-      line-height: 1.4;
-      border-left: 4px solid #111;
-      padding-left: 12px;
+      opacity: 0;
+      transform: translateX(-12px);
+      animation: fadeRight 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeRight {
+      to { opacity: 1; transform: translateX(0); }
     }
 
     /* ===== 卡片 ===== */
@@ -158,12 +212,24 @@
       border: 1px solid #f0f0f0;
       text-decoration: none;
       color: inherit;
-      transition: transform .15s, box-shadow .15s;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.6s ease-out forwards;
+      transition: transform .3s cubic-bezier(.25,.8,.25,1),
+                  box-shadow .3s cubic-bezier(.25,.8,.25,1),
+                  border-color .3s ease,
+                  background .3s ease;
     }
 
+    .card-grid .card:nth-child(1) { animation-delay: 0.7s; }
+    .card-grid .card:nth-child(2) { animation-delay: 0.85s; }
+    .card-grid .card:nth-child(3) { animation-delay: 1.0s; }
+
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,.06);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      border-color: #e4e4e8;
+      background: #fff;
     }
 
     .card-header {
@@ -173,7 +239,14 @@
       margin-bottom: 6px;
     }
 
-    .card-icon { font-size: 20px; }
+    .card-icon {
+      font-size: 20px;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .card:hover .card-icon {
+      transform: scale(1.2) rotate(-5deg);
+    }
 
     .card-title {
       font-size: 16px;
@@ -196,6 +269,11 @@
       font-size: 11px;
       font-weight: 600;
       vertical-align: middle;
+      transition: transform .25s ease;
+    }
+
+    .card:hover .card-badge {
+      transform: scale(1.08);
     }
 
     .card-badge-new {
@@ -203,12 +281,54 @@
       color: #e65100;
     }
 
-    /* ===== Toast ===== */
+    /* ===== 社群卡片（可点击复制） ===== */
+    .copy-card {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .copy-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(0,0,0,0.04);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .5s ease, height .5s ease, opacity .5s ease;
+      opacity: 0;
+    }
+
+    .copy-card:active::before {
+      width: 300px;
+      height: 300px;
+      opacity: 1;
+    }
+
+    .copy-card:active {
+      transform: scale(0.98);
+    }
+
+    .copy-hint {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 4px;
+      transition: color .25s ease;
+    }
+
+    .copy-card:hover .copy-hint {
+      color: #888;
+    }
+
+    /* ===== Toast 提示 ===== */
     .toast {
       position: fixed;
       bottom: 40px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
+      transform: translateX(-50%) translateY(20px) scale(0.95);
       padding: 10px 22px;
       border-radius: 8px;
       background: #333;
@@ -216,18 +336,61 @@
       font-size: 14px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .3s, transform .3s;
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
       z-index: 999;
-      max-width: 90vw;
-      text-align: center;
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    /* ===== 回到顶部 ===== */
+    /* ===== 关于我 ===== */
+    .about-text {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.6s ease-out 1.1s forwards;
+    }
+
+    .about-text a {
+      color: #333;
+      text-decoration: underline;
+      transition: color .2s;
+    }
+
+    .about-text a:hover { color: #000; }
+
+    /* ===== 页脚 ===== */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: #ccc;
+      opacity: 0;
+      animation: fadeIn 0.6s ease-out 1.3s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ===== 通用动画关键帧 ===== */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== 分区整体入场延迟 ===== */
+    #projects .section-title { animation-delay: 0.55s; }
+    #tools .section-title { animation-delay: 0.65s; }
+    #community .section-title { animation-delay: 0.75s; }
+    #community .section-title + .section-title { animation-delay: 0.8s; }
+    #about .section-title { animation-delay: 1.0s; }
+
+    /* ===== 回到顶部按钮 ===== */
     #backToTop {
       position: fixed;
       bottom: 32px;
@@ -238,330 +401,49 @@
       background: #1a1a1a;
       color: #fff;
       border: none;
-      font-size: 20px;
       cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s, transform .3s;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
       z-index: 998;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1),
+                  background .25s ease, box-shadow .25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
     }
 
     #backToTop.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    #backToTop:hover {
-      transform: scale(1.08);
-    }
-
-    /* ===== 登录弹窗 ===== */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
       display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s;
-      z-index: 1000;
-      padding: 16px;
-    }
-
-    .modal-overlay.active {
       opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: #fff;
-      border-radius: 16px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      transform: translateY(12px);
-      transition: transform .25s;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-overlay.active .modal {
       transform: translateY(0);
     }
 
-    .modal h3 {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 20px;
-      text-align: center;
+    #backToTop:hover {
+      background: #333;
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
     }
 
-    .modal input {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      border: 1.5px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color .2s;
-      -webkit-appearance: none;
+    #backToTop:active {
+      transform: scale(0.92);
     }
 
-    .modal input:focus {
-      border-color: #1a1a1a;
-    }
-
-    .modal button.submit-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #1a1a1a;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: opacity .2s;
-      -webkit-appearance: none;
-    }
-
-    .modal button.submit-btn:hover {
-      opacity: 0.85;
-    }
-
-    .modal .switch-text {
-      text-align: center;
-      font-size: 13px;
-      color: #888;
-    }
-
-    .modal .switch-text a {
-      color: #1a1a1a;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .modal .error-text {
-      font-size: 13px;
-      color: #e53935;
-      text-align: center;
-      margin-bottom: 10px;
-      min-height: 18px;
-    }
-
-    /* ===== 留言板 ===== */
-    #loginPrompt {
-      text-align: center;
-      padding: 20px;
-      color: #888;
-      font-size: 14px;
-    }
-
-    #loginPrompt a {
-      color: #1a1a1a;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    #msgArea { display: none; }
-
-    #msgContent {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-      resize: vertical;
-      outline: none;
-      -webkit-appearance: none;
-    }
-
-    #msgContent:focus {
-      border-color: #1a1a1a;
-    }
-
-    #msgBtn {
-      padding: 12px 28px;
-      font-size: 15px;
-      border-radius: 8px;
-      border: none;
-      background: #1a1a1a;
-      color: #fff;
-      cursor: pointer;
-      -webkit-appearance: none;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 32px 24px;
-      font-size: 12px;
-      color: #ccc;
-    }
-
-    /* ===== 留言条目 ===== */
-    .msg-item {
-      padding: 12px 14px;
-      border: 1px solid #f0f0f0;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      background: #fafafa;
-      position: relative;
-    }
-
-    .msg-name {
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .msg-time {
-      font-size: 11px;
-      color: #bbb;
-      margin-left: 8px;
-    }
-
-    .msg-content {
-      font-size: 14px;
-      color: #444;
-      margin-top: 4px;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-    }
-
-    .delBtn {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      color: #ccc;
-      padding: 4px 8px;
-      line-height: 1;
-    }
-
-    .delBtn:active {
-      color: #e53935;
-    }
-
-    /* ===== 移动端适配 ===== */
+    /* ===== 响应式 ===== */
     @media (max-width: 600px) {
-      .nav {
-        padding: 12px 16px;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .nav-brand {
-        font-size: 16px;
-      }
-      .nav-links {
-        gap: 14px;
-        flex-wrap: wrap;
-      }
-      .nav-links a {
-        font-size: 13px;
-      }
-      .nav-btn {
-        padding: 5px 12px;
-        font-size: 12px;
-      }
-      .container {
-        padding: 40px 16px 40px;
-      }
-      .hero-title {
-        font-size: 30px;
-      }
-      .hero-sub {
-        font-size: 14px;
-      }
-      .tags {
-        gap: 8px;
-        margin-bottom: 48px;
-      }
-      .tag {
-        font-size: 12px;
-        padding: 5px 12px;
-      }
-      .section-title {
-        font-size: 17px;
-        padding-left: 10px;
-        border-left-width: 3px;
-        margin-bottom: 16px;
-      }
-      .card {
-        padding: 16px 18px;
-      }
-      .card-title {
-        font-size: 15px;
-      }
-      .card-desc {
-        font-size: 12px;
-      }
-      #msgContent {
-        font-size: 16px;
-      }
-      #msgBtn {
-        width: 100%;
-        padding: 14px;
-        font-size: 16px;
-      }
-      .modal {
-        padding: 24px 20px;
-      }
-      .modal input {
-        padding: 12px;
-        font-size: 16px;
-      }
-      .modal button.submit-btn {
-        padding: 14px;
-        font-size: 16px;
-      }
-      #rememberRow {
-        flex-wrap: wrap;
-      }
-      #rememberRow select {
-        font-size: 14px;
-        padding: 8px;
-      }
-      #rememberRow label {
-        font-size: 13px;
-      }
-      #backToTop {
-        width: 42px;
-        height: 42px;
-        font-size: 18px;
-        bottom: 20px;
-        right: 20px;
-      }
-      .footer {
-        font-size: 11px;
-        padding: 24px 16px;
-      }
-      .msg-name {
-        font-size: 13px;
-      }
-      .msg-content {
-        font-size: 14px;
-      }
+      .nav { padding: 16px 20px; }
+      .container { padding: 56px 20px 40px; }
+      .hero-title { font-size: 32px; }
+      #backToTop { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
     }
 
-    @media (max-width: 380px) {
-      .nav-links {
-        gap: 10px;
-      }
-      .nav-links a {
-        font-size: 12px;
-      }
-      .hero-title {
-        font-size: 26px;
+    /* 减少动画偏好（无障碍） */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
@@ -572,16 +454,18 @@
   <nav class="nav">
     <a href="index.html" class="nav-brand">南浦Xi</a>
     <div class="nav-links">
-      <a href="#projects">项目</a>
-      <a href="#tools">工具</a>
-      <a href="sponsor.html" target="_blank" rel="noopener">赞助</a>
-      <a href="more.html">更多</a>
-      <span id="navAuth"></span>
+      <a href="#projects" class="nav-anchor">项目</a>
+      <a href="#tools" class="nav-anchor">工具</a>
+      <a href="#community" class="nav-anchor">社群</a>
+      <a href="#about" class="nav-anchor">关于我</a>
+      <a href="sponsor.html" class="nav-anchor">赞助</a>
     </div>
   </nav>
 
+  <!-- 主内容 -->
   <main class="container">
 
+    <!-- Hero -->
     <h1 class="hero-title">南浦Xi</h1>
     <p class="hero-sub">我是南浦Xi喵</p>
     <div class="tags">
@@ -595,7 +479,7 @@
     <div id="projects">
       <p class="section-title">🚀 项目</p>
       <div class="card-grid">
-        <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
+        <a href="https://www.bilibili.com" target="_blank" rel="noopener" class="card">
           <div class="card-header">
             <span class="card-icon">🔗</span>
             <span class="card-title">AARC</span>
@@ -618,212 +502,233 @@
           <p class="card-desc">基于全国真实地铁站名字频统计，一键生成合理可用的架空站名</p>
         </a>
       </div>
-      <p class="section-title" style="color:#ddd; font-size:14px; border:none; padding-left:0;">更多工具正在开发中~</p>
+      <p class="section-title" style="color:#ddd;">更多工具正在开发中~</p>
     </div>
 
-    <!-- 留言板 -->
-    <div style="max-width: 520px; margin: 0 auto 60px; text-align: left;">
-      <p class="section-title">📝 留言板</p>
-
-      <div id="loginPrompt">
-        请先 <a id="goLogin">登录</a> 后留言
+    <!-- 社群 -->
+    <div id="community">
+      <p class="section-title">💬 社群</p>
+      <p class="section-title" style="color:#ddd; font-size:12px; text-transform:none; letter-spacing:0;">点击卡片即可复制群号 / 频道号</p>
+      <div class="card-grid">
+        <div class="card copy-card" data-copy="695369973">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">van-豆射手的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 695369973</p>
+          <p class="copy-hint">点击复制群号</p>
+        </div>
+        <div class="card copy-card" data-copy="487819503">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">南浦Xi的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 487819503</p>
+          <p class="copy-hint">点击复制群号</p>
+        </div>
+        <div class="card copy-card" data-copy="南浦Xi的频道">
+          <div class="card-header">
+            <span class="card-icon">📡</span>
+            <span class="card-title">QQ频道</span>
+          </div>
+          <p class="card-desc">QQ频道，欢迎加入讨论</p>
+          <p class="copy-hint">点击复制频道名</p>
+        </div>
       </div>
+    </div>
 
-      <div id="msgArea">
-        <textarea id="msgContent" placeholder="说点什么吧..." rows="3"></textarea>
-        <button id="msgBtn">发送留言</button>
+    <!-- 关于我 -->
+    <div id="about">
+      <p class="section-title">🐱 关于我</p>
+      <div class="about-text">
+        <p>我是南浦Xi喵，一个喜欢轨道交通、架空世界设定的小up主，不定期更新视频喵 🎬</p>
+        <p style="margin-top:8px;">想破500粉！欢迎关注我~</p>
       </div>
-
-      <div id="msgList" style="margin-top:20px;"></div>
     </div>
 
   </main>
 
+  <!-- 页脚 -->
   <footer class="footer">
     喵喵喵
   </footer>
 
+  <!-- 回到顶部按钮 -->
   <button id="backToTop" title="回到顶部">↑</button>
+
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- 登录/注册弹窗 -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal">
-      <h3 id="modalTitle">登录</h3>
-      <p class="error-text" id="authError"></p>
-      <input id="authUser" placeholder="用户名" autocomplete="username">
-      <input id="authPass" type="password" placeholder="密码" autocomplete="current-password">
-      <!-- 登录时长选择 -->
-      <div id="rememberRow" style="display:none; align-items:center; gap:10px; margin-top:4px; margin-bottom:8px;">
-        <label for="rememberSelect" style="font-size:13px; color:#555; white-space:nowrap;">登录状态保持</label>
-        <select id="rememberSelect" style="flex:1; padding:6px 8px; border-radius:8px; border:1px solid #ddd;">
-          <option value="3h">3小时</option>
-          <option value="24h">24小时</option>
-          <option value="7d">7天</option>
-          <option value="30d" selected>30天</option>
-          <option value="365d">365天</option>
-        </select>
-      </div>
-      <div style="font-size:11px; color:#bbb; margin-bottom:12px;">仅在自己的设备上选择较长时间</div>
-      <button class="submit-btn" id="authSubmit">登录</button>
-      <div class="switch-text">
-        <span id="switchText">没有账号？</span><a id="switchBtn">去注册</a>
-      </div>
-    </div>
-  </div>
-
   <script>
-    let isLoginMode = true;
-
-    // ===== XSS 转义 =====
-    function escapeHtml(text) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-      return text.replace(/[&<>"']/g, m => map[m]);
-    }
+    // ===== 点击复制功能 =====
+    document.querySelectorAll('.copy-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const text = card.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('已复制：' + text);
+        }).catch(() => {
+          showToast('复制失败，请手动复制');
+        });
+      });
+    });
 
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2000);
     }
 
-    // 回到顶部
-    const backToTopBtn = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      backToTopBtn.classList.toggle('visible', window.scrollY > 30);
-    });
-    backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    // ===== 导航链接点击：波纹 + 平滑滚动 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
 
-    // ===== 登录/注册弹窗 =====
-    function openModal() {
-      isLoginMode = true;
-      document.getElementById("modalTitle").textContent = "登录";
-      document.getElementById("authSubmit").textContent = "登录";
-      document.getElementById("switchText").textContent = "没有账号？";
-      document.getElementById("switchBtn").textContent = "去注册";
-      document.getElementById("authError").textContent = "";
-      document.getElementById("rememberRow").style.display = "flex";
-      document.getElementById("authUser").value = "";
-      document.getElementById("authPass").value = "";
-      document.getElementById("authModal").classList.add("active");
-    }
+        e.preventDefault();
 
-    function closeModal() {
-      document.getElementById("authModal").classList.remove("active");
-    }
+        // 计算偏移量（导航栏高度 + 一点余量）
+        const navHeight = document.querySelector('.nav').offsetHeight;
+        const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
 
-    document.getElementById("switchBtn").onclick = () => {
-      isLoginMode = !isLoginMode;
-      document.getElementById("modalTitle").textContent = isLoginMode ? "登录" : "注册";
-      document.getElementById("authSubmit").textContent = isLoginMode ? "登录" : "注册";
-      document.getElementById("switchText").textContent = isLoginMode ? "没有账号？" : "已有账号？";
-      document.getElementById("switchBtn").textContent = isLoginMode ? "去注册" : "去登录";
-      document.getElementById("rememberRow").style.display = isLoginMode ? "flex" : "none";
-      document.getElementById("authError").textContent = "";
-    };
-
-    document.getElementById("authSubmit").onclick = async () => {
-      const username = document.getElementById("authUser").value.trim();
-      const password = document.getElementById("authPass").value;
-      const errBox = document.getElementById("authError");
-
-      if (!username || !password) { errBox.textContent = "请填写用户名和密码"; return; }
-
-      const url = isLoginMode ? "/api/login" : "/api/register";
-      const body = isLoginMode
-        ? { username, password, remember: document.getElementById("rememberSelect").value }
-        : { username, password };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        errBox.textContent = data.error || "操作失败";
-        return;
-      }
-
-      closeModal();
-      location.reload();
-    };
-
-    document.getElementById("goLogin").onclick = openModal;
-
-    document.getElementById("authModal").addEventListener("click", (e) => {
-      if (e.target === document.getElementById("authModal")) closeModal();
-    });
-
-    // ESC 关闭弹窗
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeModal();
-    });
-
-    // ===== 用户状态 =====
-    async function checkAuth() {
-      const res = await fetch("/api/me");
-      const user = await res.json();
-      const navAuth = document.getElementById("navAuth");
-      if (user) {
-        navAuth.innerHTML = `<span class="nav-user">${escapeHtml(user.username)}</span> <button class="nav-btn" id="logoutBtn">登出</button>`;
-        document.getElementById("logoutBtn").onclick = async () => {
-          await fetch("/api/logout", { method: "POST" });
-          location.reload();
-        };
-        document.getElementById("loginPrompt").style.display = "none";
-        document.getElementById("msgArea").style.display = "block";
-      } else {
-        navAuth.innerHTML = `<button class="nav-btn nav-btn-primary" id="navLoginBtn">登录</button>`;
-        document.getElementById("navLoginBtn").onclick = openModal;
-        document.getElementById("loginPrompt").style.display = "block";
-        document.getElementById("msgArea").style.display = "none";
-      }
-    }
-
-    // ===== 留言板 =====
-    async function loadMessages() {
-      const res = await fetch("/api/messages");
-      const list = await res.json();
-      const box = document.getElementById("msgList");
-      if (list.length === 0) {
-        box.innerHTML = '<p style="color:#bbb;font-size:13px;">还没有留言，来抢沙发吧~</p>';
-        return;
-      }
-      box.innerHTML = list.map(m => `
-        <div class="msg-item">
-          <strong class="msg-name">${escapeHtml(m.name)}</strong>
-          <span class="msg-time">${m.created_at}</span>
-          ${m.isMine ? `<button class="delBtn" data-id="${m.id}" title="删除">×</button>` : ""}
-          <p class="msg-content">${escapeHtml(m.content)}</p>
-        </div>
-      `).join("");
-
-      document.querySelectorAll('.delBtn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('确定删除这条留言吗？')) return;
-          await fetch(`/api/messages/${btn.dataset.id}`, { method: 'DELETE' });
-          loadMessages();
+        // 平滑滚动到目标位置
+        window.scrollTo({
+          top: targetTop,
+          behavior: 'smooth'
         });
       });
-    }
-
-    document.getElementById("msgBtn").addEventListener("click", async () => {
-      const content = document.getElementById("msgContent").value.trim();
-      if (!content) { alert("内容不能为空！"); return; }
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content })
-      });
-      document.getElementById("msgContent").value = "";
-      loadMessages();
     });
 
-    checkAuth();
-    loadMessages();
+    // ===== 导航链接波纹效果 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+      });
+    });
+
+    // ===== 滚动时自动高亮当前所在区域的导航链接 =====
+    const sectionIds = ['projects', 'tools', 'community', 'about'];
+    const navLinks = {};
+    document.querySelectorAll('.nav-anchor').forEach(a => {
+      navLinks[a.getAttribute('href').slice(1)] = a;
+    });
+
+    // 预计算各 section 距文档顶部的偏移（offsetTop 递归累加，兼容 offsetParent 不同的情况）
+    function getDocTop(el) {
+      let top = 0;
+      while (el) {
+        top += el.offsetTop;
+        el = el.offsetParent;
+      }
+      return top;
+    }
+
+    const sectionTops = {};
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) sectionTops[id] = getDocTop(el);
+    });
+
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + 120; // 视口偏移量（导航栏高度 + 余量）
+      let currentId = sectionIds[0];
+
+      // 从上往下遍历，找到最后一个 top <= scrollPos 的 section
+      for (const id of sectionIds) {
+        if (sectionTops[id] !== undefined && sectionTops[id] <= scrollPos) {
+          currentId = id;
+        }
+      }
+
+      // 滚动到最底部时强制激活"关于我"
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 40) {
+        currentId = 'about';
+      }
+
+      // 在最顶部时激活第一个
+      if (window.scrollY < 60) {
+        currentId = sectionIds[0];
+      }
+
+      Object.values(navLinks).forEach(a => a.classList.remove('active'));
+      if (navLinks[currentId]) navLinks[currentId].classList.add('active');
+    }
+
+    // 用 scroll 事件 + 节流
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateActiveNav();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // 初始调用
+    updateActiveNav();
+
+    // ===== 回到顶部按钮 =====
+    const backToTopBtn = document.getElementById('backToTop');
+
+    function toggleBackToTop() {
+      if (window.scrollY > 30) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(toggleBackToTop);
+    }, { passive: true });
+
+    // 初始检查
+    toggleBackToTop();
+
+    // 点击回到顶部
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // ===== 滚动入场动画（IntersectionObserver） =====
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.copy-card, #about .about-text').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+      observer.observe(el);
+    });
   </script>
 
 </body>
