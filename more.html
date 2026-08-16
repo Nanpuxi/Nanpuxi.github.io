@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>更多 · 南浦Xi</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    input, textarea, select {
+      font-size: 16px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { opacity: 0.6; }
+
+    .nav-btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #1a1a1a;
+      background: #fff;
+      color: #1a1a1a;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .nav-btn-primary {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .nav-user {
+      font-size: 13px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      text-align: left;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+      line-height: 1.4;
+      border-left: 4px solid #111;
+      padding-left: 12px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 56px;
+    }
+
+    .card {
+      display: block;
+      padding: 20px 22px;
+      border-radius: 12px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .15s, box-shadow .15s;
+      cursor: default;
+    }
+
+    .card.clickable {
+      cursor: pointer;
+    }
+
+    .card.clickable:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-icon { font-size: 20px; }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .copy-hint {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 4px;
+    }
+
+    .about-text {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 22px;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s, transform .3s;
+      z-index: 999;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    /* ===== 移动端适配 ===== */
+    @media (max-width: 600px) {
+      .nav {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .nav-brand {
+        font-size: 16px;
+      }
+      .nav-links {
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .nav-links a {
+        font-size: 13px;
+      }
+      .nav-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+      }
+      .container {
+        padding: 40px 16px;
+      }
+      .section-title {
+        font-size: 17px;
+        padding-left: 10px;
+        border-left-width: 3px;
+        margin-bottom: 16px;
+      }
+      .card {
+        padding: 16px 18px;
+      }
+      .card-title {
+        font-size: 15px;
+      }
+      .card-desc {
+        font-size: 12px;
+      }
+      .copy-hint {
+        font-size: 11px;
+      }
+      .about-text {
+        font-size: 13px;
+      }
+      .footer {
+        font-size: 11px;
+        padding: 24px 16px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .nav-links {
+        gap: 10px;
+      }
+      .nav-links a {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="sponsor.html" target="_blank" rel="noopener">赞助</a>
+      <a href="more.html">更多</a>
+      <span id="navAuth"></span>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- 社群 -->
+    <div id="community">
+      <p class="section-title">💬 社群</p>
+      <p style="font-size:13px; color:#999; margin-bottom:16px;">点击卡片即可复制群号 / 频道号</p>
+      <div class="card-grid">
+        <div class="card clickable copy-card" data-copy="695369973">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">van-豆射手的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 695369973</p>
+          <p class="copy-hint">点击复制群号</p>
+        </div>
+        <div class="card clickable copy-card" data-copy="487819503">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">南浦Xi的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 487819503</p>
+          <p class="copy-hint">点击复制群号</p>
+        </div>
+        <div class="card clickable copy-card" data-copy="pd60907944">
+          <div class="card-header">
+            <span class="card-icon">📡</span>
+            <span class="card-title">van-豆射手的频道</span>
+          </div>
+          <p class="card-desc">QQ频道号 · pd60907944</p>
+          <p class="copy-hint">点击复制频道号</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关于我 -->
+    <div id="about">
+      <p class="section-title">🐱 关于我</p>
+      <div class="about-text">
+        <p>我是南浦Xi喵，一个喜欢轨道交通、架空世界设定的小up主，不定期更新视频喵 🎬</p>
+        <p style="margin-top:8px;">想破500粉！欢迎关注我~</p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    喵喵喵
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // 复制功能
+    document.querySelectorAll('.copy-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const text = card.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => showToast('已复制：' + text)).catch(() => showToast('复制失败'));
+      });
+    });
+
+    // 导航栏登录状态
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/me");
+        const user = await res.json();
+        const navAuth = document.getElementById("navAuth");
+        if (user) {
+          navAuth.innerHTML = `<span class="nav-user">${user.username}</span> <button class="nav-btn" onclick="fetch('/api/logout',{method:'POST'}).then(()=>location.reload())">登出</button>`;
+        } else {
+          navAuth.innerHTML = `<button class="nav-btn nav-btn-primary" onclick="location.href='index.html'">登录</button>`;
+        }
+      } catch(e) {}
+    }
+    checkAuth();
+  </script>
+
+</body>
+</html>

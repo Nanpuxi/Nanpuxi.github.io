@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>南浦Xi · 个人导航</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    input, textarea, select {
+      font-size: 16px; /* 防止iOS自动放大 */
+    }
+
+    /* ===== 导航栏 ===== */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { opacity: 0.6; }
+
+    .nav-btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #1a1a1a;
+      background: #fff;
+      color: #1a1a1a;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .nav-btn-primary {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .nav-btn-primary:hover {
+      opacity: 0.85;
+    }
+
+    .nav-user {
+      font-size: 13px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    /* ===== 主内容 ===== */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 64px;
+    }
+
+    .tag {
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: #f3f3f5;
+      font-size: 13px;
+      color: #555;
+    }
+
+    /* ===== 分区标题 ===== */
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+      line-height: 1.4;
+      border-left: 4px solid #111;
+      padding-left: 12px;
+    }
+
+    /* ===== 卡片 ===== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      text-align: left;
+      margin-bottom: 56px;
+    }
+
+    .card {
+      display: block;
+      padding: 20px 22px;
+      border-radius: 12px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-icon { font-size: 20px; }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .card-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 11px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .card-badge-new {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 22px;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s, transform .3s;
+      z-index: 999;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== 回到顶部 ===== */
+    #backToTop {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s, transform .3s;
+      z-index: 998;
+    }
+
+    #backToTop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #backToTop:hover {
+      transform: scale(1.08);
+    }
+
+    /* ===== 登录弹窗 ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      transform: translateY(12px);
+      transition: transform .25s;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+
+    .modal input:focus {
+      border-color: #1a1a1a;
+    }
+
+    .modal button.submit-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: opacity .2s;
+      -webkit-appearance: none;
+    }
+
+    .modal button.submit-btn:hover {
+      opacity: 0.85;
+    }
+
+    .modal .switch-text {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .modal .switch-text a {
+      color: #1a1a1a;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .modal .error-text {
+      font-size: 13px;
+      color: #e53935;
+      text-align: center;
+      margin-bottom: 10px;
+      min-height: 18px;
+    }
+
+    /* ===== 留言板 ===== */
+    #loginPrompt {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    #loginPrompt a {
+      color: #1a1a1a;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    #msgArea { display: none; }
+
+    #msgContent {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    #msgContent:focus {
+      border-color: #1a1a1a;
+    }
+
+    #msgBtn {
+      padding: 12px 28px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: none;
+      background: #1a1a1a;
+      color: #fff;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    /* ===== 留言条目 ===== */
+    .msg-item {
+      padding: 12px 14px;
+      border: 1px solid #f0f0f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .msg-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: #bbb;
+      margin-left: 8px;
+    }
+
+    .msg-content {
+      font-size: 14px;
+      color: #444;
+      margin-top: 4px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .delBtn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #ccc;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
+    .delBtn:active {
+      color: #e53935;
+    }
+
+    /* ===== 移动端适配 ===== */
+    @media (max-width: 600px) {
+      .nav {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .nav-brand {
+        font-size: 16px;
+      }
+      .nav-links {
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .nav-links a {
+        font-size: 13px;
+      }
+      .nav-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+      }
+      .container {
+        padding: 40px 16px 40px;
+      }
+      .hero-title {
+        font-size: 30px;
+      }
+      .hero-sub {
+        font-size: 14px;
+      }
+      .tags {
+        gap: 8px;
+        margin-bottom: 48px;
+      }
+      .tag {
+        font-size: 12px;
+        padding: 5px 12px;
+      }
+      .section-title {
+        font-size: 17px;
+        padding-left: 10px;
+        border-left-width: 3px;
+        margin-bottom: 16px;
+      }
+      .card {
+        padding: 16px 18px;
+      }
+      .card-title {
+        font-size: 15px;
+      }
+      .card-desc {
+        font-size: 12px;
+      }
+      #msgContent {
+        font-size: 16px;
+      }
+      #msgBtn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+      }
+      .modal {
+        padding: 24px 20px;
+      }
+      .modal input {
+        padding: 12px;
+        font-size: 16px;
+      }
+      .modal button.submit-btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+      #rememberRow {
+        flex-wrap: wrap;
+      }
+      #rememberRow select {
+        font-size: 14px;
+        padding: 8px;
+      }
+      #rememberRow label {
+        font-size: 13px;
+      }
+      #backToTop {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        bottom: 20px;
+        right: 20px;
+      }
+      .footer {
+        font-size: 11px;
+        padding: 24px 16px;
+      }
+      .msg-name {
+        font-size: 13px;
+      }
+      .msg-content {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .nav-links {
+        gap: 10px;
+      }
+      .nav-links a {
+        font-size: 12px;
+      }
+      .hero-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="#projects">项目</a>
+      <a href="#tools">工具</a>
+      <a href="sponsor.html" target="_blank" rel="noopener">赞助</a>
+      <a href="more.html">更多</a>
+      <span id="navAuth"></span>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <h1 class="hero-title">南浦Xi</h1>
+    <p class="hero-sub">我是南浦Xi喵</p>
+    <div class="tags">
+      <span class="tag">3C成员</span>
+      <span class="tag">小up主</span>
+      <span class="tag">喵喵喵</span>
+      <span class="tag">喵喵喵喵</span>
+    </div>
+
+    <!-- 项目 -->
+    <div id="projects">
+      <p class="section-title">🚀 项目</p>
+      <div class="card-grid">
+        <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">AARC</span>
+          </div>
+          <p class="card-desc">帮Au宣传</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- 工具 -->
+    <div id="tools">
+      <p class="section-title">🛠️ 工具</p>
+      <div class="card-grid">
+        <a href="metro.html" class="card">
+          <div class="card-header">
+            <span class="card-icon">🚇</span>
+            <span class="card-title">架空地铁站名生成器</span>
+            <span class="card-badge card-badge-new">新上线</span>
+          </div>
+          <p class="card-desc">基于全国真实地铁站名字频统计，一键生成合理可用的架空站名</p>
+        </a>
+      </div>
+      <p class="section-title" style="color:#ddd; font-size:14px; border:none; padding-left:0;">更多工具正在开发中~</p>
+    </div>
+
+    <!-- 留言板 -->
+    <div style="max-width: 520px; margin: 0 auto 60px; text-align: left;">
+      <p class="section-title">📝 留言板</p>
+
+      <div id="loginPrompt">
+        请先 <a id="goLogin">登录</a> 后留言
+      </div>
+
+      <div id="msgArea">
+        <textarea id="msgContent" placeholder="说点什么吧..." rows="3"></textarea>
+        <button id="msgBtn">发送留言</button>
+      </div>
+
+      <div id="msgList" style="margin-top:20px;"></div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    喵喵喵
+  </footer>
+
+  <button id="backToTop" title="回到顶部">↑</button>
+  <div class="toast" id="toast"></div>
+
+  <!-- 登录/注册弹窗 -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <h3 id="modalTitle">登录</h3>
+      <p class="error-text" id="authError"></p>
+      <input id="authUser" placeholder="用户名" autocomplete="username">
+      <input id="authPass" type="password" placeholder="密码" autocomplete="current-password">
+      <!-- 登录时长选择 -->
+      <div id="rememberRow" style="display:none; align-items:center; gap:10px; margin-top:4px; margin-bottom:8px;">
+        <label for="rememberSelect" style="font-size:13px; color:#555; white-space:nowrap;">登录状态保持</label>
+        <select id="rememberSelect" style="flex:1; padding:6px 8px; border-radius:8px; border:1px solid #ddd;">
+          <option value="3h">3小时</option>
+          <option value="24h">24小时</option>
+          <option value="7d">7天</option>
+          <option value="30d" selected>30天</option>
+          <option value="365d">365天</option>
+        </select>
+      </div>
+      <div style="font-size:11px; color:#bbb; margin-bottom:12px;">仅在自己的设备上选择较长时间</div>
+      <button class="submit-btn" id="authSubmit">登录</button>
+      <div class="switch-text">
+        <span id="switchText">没有账号？</span><a id="switchBtn">去注册</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isLoginMode = true;
+
+    // ===== XSS 转义 =====
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // 回到顶部
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backToTopBtn.classList.toggle('visible', window.scrollY > 30);
+    });
+    backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ===== 登录/注册弹窗 =====
+    function openModal() {
+      isLoginMode = true;
+      document.getElementById("modalTitle").textContent = "登录";
+      document.getElementById("authSubmit").textContent = "登录";
+      document.getElementById("switchText").textContent = "没有账号？";
+      document.getElementById("switchBtn").textContent = "去注册";
+      document.getElementById("authError").textContent = "";
+      document.getElementById("rememberRow").style.display = "flex";
+      document.getElementById("authUser").value = "";
+      document.getElementById("authPass").value = "";
+      document.getElementById("authModal").classList.add("active");
+    }
+
+    function closeModal() {
+      document.getElementById("authModal").classList.remove("active");
+    }
+
+    document.getElementById("switchBtn").onclick = () => {
+      isLoginMode = !isLoginMode;
+      document.getElementById("modalTitle").textContent = isLoginMode ? "登录" : "注册";
+      document.getElementById("authSubmit").textContent = isLoginMode ? "登录" : "注册";
+      document.getElementById("switchText").textContent = isLoginMode ? "没有账号？" : "已有账号？";
+      document.getElementById("switchBtn").textContent = isLoginMode ? "去注册" : "去登录";
+      document.getElementById("rememberRow").style.display = isLoginMode ? "flex" : "none";
+      document.getElementById("authError").textContent = "";
+    };
+
+    document.getElementById("authSubmit").onclick = async () => {
+      const username = document.getElementById("authUser").value.trim();
+      const password = document.getElementById("authPass").value;
+      const errBox = document.getElementById("authError");
+
+      if (!username || !password) { errBox.textContent = "请填写用户名和密码"; return; }
+
+      const url = isLoginMode ? "/api/login" : "/api/register";
+      const body = isLoginMode
+        ? { username, password, remember: document.getElementById("rememberSelect").value }
+        : { username, password };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errBox.textContent = data.error || "操作失败";
+        return;
+      }
+
+      closeModal();
+      location.reload();
+    };
+
+    document.getElementById("goLogin").onclick = openModal;
+
+    document.getElementById("authModal").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("authModal")) closeModal();
+    });
+
+    // ESC 关闭弹窗
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    // ===== 用户状态 =====
+    async function checkAuth() {
+      const res = await fetch("/api/me");
+      const user = await res.json();
+      const navAuth = document.getElementById("navAuth");
+      if (user) {
+        navAuth.innerHTML = `<span class="nav-user">${escapeHtml(user.username)}</span> <button class="nav-btn" id="logoutBtn">登出</button>`;
+        document.getElementById("logoutBtn").onclick = async () => {
+          await fetch("/api/logout", { method: "POST" });
+          location.reload();
+        };
+        document.getElementById("loginPrompt").style.display = "none";
+        document.getElementById("msgArea").style.display = "block";
+      } else {
+        navAuth.innerHTML = `<button class="nav-btn nav-btn-primary" id="navLoginBtn">登录</button>`;
+        document.getElementById("navLoginBtn").onclick = openModal;
+        document.getElementById("loginPrompt").style.display = "block";
+        document.getElementById("msgArea").style.display = "none";
+      }
+    }
+
+    // ===== 留言板 =====
+    async function loadMessages() {
+      const res = await fetch("/api/messages");
+      const list = await res.json();
+      const box = document.getElementById("msgList");
+      if (list.length === 0) {
+        box.innerHTML = '<p style="color:#bbb;font-size:13px;">还没有留言，来抢沙发吧~</p>';
+        return;
+      }
+      box.innerHTML = list.map(m => `
+        <div class="msg-item">
+          <strong class="msg-name">${escapeHtml(m.name)}</strong>
+          <span class="msg-time">${m.created_at}</span>
+          ${m.isMine ? `<button class="delBtn" data-id="${m.id}" title="删除">×</button>` : ""}
+          <p class="msg-content">${escapeHtml(m.content)}</p>
+        </div>
+      `).join("");
+
+      document.querySelectorAll('.delBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('确定删除这条留言吗？')) return;
+          await fetch(`/api/messages/${btn.dataset.id}`, { method: 'DELETE' });
+          loadMessages();
+        });
+      });
+    }
+
+    document.getElementById("msgBtn").addEventListener("click", async () => {
+      const content = document.getElementById("msgContent").value.trim();
+      if (!content) { alert("内容不能为空！"); return; }
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content })
+      });
+      document.getElementById("msgContent").value = "";
+      loadMessages();
+    });
+
+    checkAuth();
+    loadMessages();
+  </script>
+
+</body>
+</html>

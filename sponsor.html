@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赞助南浦Xi · 个人导航</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===== 导航栏 ===== */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-decoration: none;
+      transition: opacity .2s;
+      position: relative;
+    }
+
+    .nav-links a:hover { opacity: 0.6; }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #1a1a1a;
+    }
+
+    /* ===== 主内容 ===== */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px 60px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 48px;
+    }
+
+    /* ===== 赞助卡片 ===== */
+    .sponsor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .sponsor-card {
+      padding: 32px 24px;
+      border-radius: 16px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .sponsor-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
+    }
+
+    .sponsor-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .sponsor-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .sponsor-card-desc {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .qrcode-placeholder {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 12px;
+      border-radius: 12px;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #bbb;
+      overflow: hidden;
+    }
+
+    .qrcode-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sponsor-hint {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    /* ===== 爱发电区域 ===== */
+    .afdian-section {
+      margin-top: 16px;
+      padding: 36px 24px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+      border: 1px solid #ffe0b2;
+    }
+
+    .afdian-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+    }
+
+    .afdian-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .afdian-desc {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .afdian-btn {
+      display: inline-block;
+      padding: 12px 32px;
+      border-radius: 10px;
+      background: #ffd54f;
+      color: #5d4037;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .afdian-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,213,79,.5);
+    }
+
+    .afdian-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ===== 感谢语 ===== */
+    .thanks-text {
+      margin-top: 48px;
+      font-size: 15px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .thanks-text .heart {
+      color: #e53935;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    /* ===== 页脚 ===== */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    /* ===== 回到顶部按钮 ===== */
+    .back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+      transition: opacity .3s, transform .3s;
+      z-index: 100;
+    }
+
+    .back-to-top.visible {
+      display: flex;
+      animation: fadeInUp .3s ease;
+    }
+
+    .back-to-top:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(0,0,0,.3);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== 入场动画 ===== */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUpCustom .6s cubic-bezier(.25,.8,.25,1) forwards;
+    }
+
+    @keyframes fadeInUpCustom {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delay-1 { animation-delay: .15s; }
+    .delay-2 { animation-delay: .30s; }
+    .delay-3 { animation-delay: .45s; }
+    .delay-4 { animation-delay: .60s; }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 600px) {
+      .nav { padding: 16px 20px; }
+      .container { padding: 40px 20px; }
+      .hero-title { font-size: 32px; }
+      .sponsor-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="sponsor.html" class="active">赞助</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="container">
+
+    <h1 class="hero-title fade-in-up">☕ 请我喝杯奶茶</h1>
+    <p class="hero-sub fade-in-up delay-1">你的支持是我更新的最大动力~</p>
+
+    <!-- 微信 + 支付宝 -->
+    <div class="sponsor-grid fade-in-up delay-2">
+      <!-- 微信 -->
+      <div class="sponsor-card">
+        <div class="sponsor-icon">💚</div>
+        <div class="sponsor-card-title">微信支付</div>
+        <div class="sponsor-card-desc">扫码用微信向我打赏</div>
+        <div class="qrcode-placeholder" id="wechatQr">
+          <img src="wechat_qr.png" alt="微信收款码">
+        </div>
+        <div class="sponsor-hint">长按/扫码即可转账</div>
+      </div>
+
+      <!-- 支付宝 -->
+      <div class="sponsor-card">
+        <div class="sponsor-icon">💙</div>
+        <div class="sponsor-card-title">支付宝</div>
+        <div class="sponsor-card-desc">扫码用支付宝向我打赏</div>
+        <div class="qrcode-placeholder" id="alipayQr">
+          <img src="alipay_qr.png" alt="支付宝收款码">
+        </div>
+        <div class="sponsor-hint">长按/扫码即可转账</div>
+      </div>
+    </div>
+
+    <!-- 爱发电 -->
+    <div class="afdian-section fade-in-up delay-3">
+      <div class="afdian-icon">⚡</div>
+      <div class="afdian-title">爱发电 · 月度赞助</div>
+      <div class="afdian-desc">支持我持续产出内容，还能解锁专属福利~</div>
+      <a href="https://www.ifdian.net/a/nanpuxi" target="_blank" rel="noopener" class="afdian-btn">
+        ⚡ 去爱发电赞助
+      </a>
+    </div>
+
+    <!-- 感谢语 -->
+    <div class="thanks-text fade-in-up delay-4">
+      <p>你的支持是我创作最大的动力 <span class="heart">❤️</span></p>
+    </div>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    喵喵喵 · 感谢支持
+  </footer>
+
+  <!-- 回到顶部按钮 -->
+  <button class="back-to-top" id="backToTop" title="回到顶部">↑</button>
+
+  <script>
+    // 回到顶部
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    });
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 收款码图片兜底：如果图片加载失败，显示占位文字
+    function setupQrFallback(id, label) {
+      const container = document.getElementById(id);
+      const img = container.querySelector('img');
+      if (!img) return;
+      img.addEventListener('error', () => {
+        container.innerHTML = '<span>' + label + '</span>';
+      });
+    }
+    setupQrFallback('wechatQr', '微信收款码');
+    setupQrFallback('alipayQr', '支付宝收款码');
+  </script>
+
+</body>
+</html>

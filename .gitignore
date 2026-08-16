@@ -1,0 +1,8 @@
+﻿node_modules/
+data.db
+server.js
+app.js
+package.json
+package-lock.json
+*.log
+.env
