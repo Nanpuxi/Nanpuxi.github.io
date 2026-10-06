@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算钱工具箱 · 房贷 / 个税 / 汇率 / 比价</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --panel:#fff; --text:#1f2328; --muted:#6b7280; --border:#e3e6ea;
+    --brand:#2f6fed; --brand-soft:#eaf1ff; --ok:#1a7f45; --err:#c0392b;
+    --warn:#b26a00; --soft:#f2f4f7; --radius:12px;
+  }
+  html[data-theme="dark"] {
+    --bg:#14171c; --panel:#1b1f26; --text:#e6e9ef; --muted:#9aa3b2; --border:#2b313b;
+    --brand:#6f9bff; --brand-soft:#22304d; --ok:#4ec98a; --err:#ff7a6b;
+    --warn:#e0a44a; --soft:#22262e;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--text);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    transition:background .2s,color .2s;
+  }
+  .wrap { max-width:980px; margin:0 auto; padding:28px 20px 70px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  h1 { font-size:22px; margin:0; letter-spacing:.5px; }
+  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+  .theme-btn {
+    background:var(--panel); color:var(--text); border:1px solid var(--border);
+    border-radius:999px; padding:7px 14px; cursor:pointer; font-size:13px;
+  }
+  .theme-btn:hover { border-color:var(--brand); }
+
+  nav.tabs { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0 18px; }
+  nav.tabs button {
+    background:transparent; border:1px solid var(--border); color:var(--muted);
+    padding:7px 15px; border-radius:999px; cursor:pointer; font-size:14px; transition:all .15s;
+  }
+  nav.tabs button:hover { color:var(--text); border-color:var(--brand); }
+  nav.tabs button.active {
+    background:var(--brand-soft); color:var(--brand); border-color:var(--brand); font-weight:600;
+  }
+
+  .tool { display:none; }
+  .tool.active { display:block; }
+
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px; }
+  .card h2 { margin:0 0 4px; font-size:16px; }
+  .card h3 { margin:18px 0 8px; font-size:14px; }
+  .hint { color:var(--muted); font-size:12.5px; margin-bottom:14px; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:760px) { .grid-2,.grid-3 { grid-template-columns:1fr; } }
+
+  label.field { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  input[type="text"], select {
+    width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:9px 11px; font-size:14px; outline:none;
+    font-family:inherit;
+  }
+  input[type="text"] { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; }
+  input[type="text"]:focus, select:focus { border-color:var(--brand); }
+  select { cursor:pointer; }
+
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px; }
+  button.act { background:var(--brand); color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13.5px; }
+  button.act:hover { filter:brightness(1.08); }
+  button.ghost { background:transparent; color:var(--text); border:1px solid var(--border); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13.5px; }
+  button.ghost:hover { border-color:var(--brand); color:var(--brand); }
+  button.mini { padding:4px 9px; font-size:12px; }
+
+  .status { font-size:12.5px; margin-left:4px; }
+  .status.ok { color:var(--ok); }
+  .status.err { color:var(--err); }
+
+  .kv { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:6px; }
+  .kv .box { background:var(--soft); border-radius:10px; padding:12px 14px; }
+  .kv .box .k { font-size:12px; color:var(--muted); }
+  .kv .box .v { font-size:19px; font-weight:600; margin-top:2px; word-break:break-all; }
+  .kv .box .v small { font-size:12px; font-weight:400; color:var(--muted); }
+  .hl { color:var(--brand); }
+
+  .table-wrap { max-height:340px; overflow:auto; border:1px solid var(--border); border-radius:10px; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { padding:7px 10px; border-bottom:1px solid var(--border); text-align:right; white-space:nowrap; }
+  th { color:var(--muted); font-weight:500; position:sticky; top:0; background:var(--panel); text-align:right; }
+  th:first-child,td:first-child { text-align:left; }
+  tbody tr:last-child td { border-bottom:none; }
+
+  .chk { display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13.5px; }
+  .chk input[type="checkbox"] { width:16px; height:16px; accent-color:var(--brand); cursor:pointer; }
+  .chk .sp { margin-left:auto; color:var(--muted); font-size:12.5px; }
+
+  .plan-row { border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
+  .plan-row .top { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .plan-row .top input { flex:1; }
+  .best { border-color:var(--ok); background:var(--soft); }
+  .tag { font-size:11.5px; background:var(--ok); color:#fff; padding:2px 7px; border-radius:999px; }
+
+  .note { font-size:12px; color:var(--muted); line-height:1.7; margin-top:10px; }
+  .note b { color:var(--warn); }
+  footer { color:var(--muted); font-size:12.5px; text-align:center; margin-top:40px; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>算钱工具箱</h1>
+      <div class="sub">房贷 · 个税 · 汇率 · 比价 · 单位 · 定投 —— 全部在你浏览器里算,不上传任何数据</div>
+    </div>
+    <button class="theme-btn" id="themeBtn">🌙 暗色</button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-target="loan" class="active">房贷月供</button>
+    <button data-target="tax">个税 / 年终奖</button>
+    <button data-target="fx">汇率换算</button>
+    <button data-target="deal">折扣比价</button>
+    <button data-target="unit">单位换算</button>
+    <button data-target="invest">复利定投</button>
+  </nav>
+
+  <main>
+    <!-- ========== 房贷 ========== -->
+    <section class="tool active" id="tool-loan">
+      <div class="card">
+        <h2>房贷月供计算器</h2>
+        <div class="hint">支持等额本息 / 等额本金,可模拟提前还款,并给出逐年还款明细。</div>
+        <div class="grid-3">
+          <div><label class="field">贷款金额(万元)</label><input type="text" id="lnAmt" value="100" inputmode="decimal"></div>
+          <div><label class="field">年利率(%)</label><input type="text" id="lnRate" value="3.5" inputmode="decimal"></div>
+          <div><label class="field">贷款年限</label><input type="text" id="lnYears" value="30" inputmode="decimal"></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div>
+            <label class="field">还款方式</label>
+            <select id="lnType">
+              <option value="bx" selected>等额本息(月供固定)</option>
+              <option value="bj">等额本金(月供递减)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field">提前还款(万元,可留空)</label>
+            <input type="text" id="lnPre" placeholder="例如 20" inputmode="decimal">
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div>
+            <label class="field">提前还款时间(第几个月)</label>
+            <input type="text" id="lnPreM" value="36" inputmode="decimal">
+          </div>
+          <div>
+            <label class="field">提前还款后</label>
+            <select id="lnPreMode">
+              <option value="less" selected>减少月供(期限不变)</option>
+              <option value="short">缩短期限(月供不变)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button class="act" id="lnCalc">计算</button>
+          <button class="ghost" id="lnReset">重置</button>
+          <span class="status" id="lnStatus"></span>
+        </div>
+
+        <div id="lnOut" style="display:none;">
+          <h3>结果</h3>
+          <div class="kv" id="lnKv"></div>
+          <h3>逐年还款明细</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>年份</th><th>当年还款</th><th>其中本金</th><th>其中利息</th><th>年末剩余本金</th></tr></thead>
+              <tbody id="lnTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">月利率按 <b>年利率 ÷ 12</b> 计算,结果未含可能出现的利率调整、残值与手续费,请以贷款银行实际还款计划为准。</div>
+      </div>
+    </section>
+
+    <!-- ========== 个税 ========== -->
+    <section class="tool" id="tool-tax">
+      <div class="card">
+        <h2>工资个税 / 年终奖计税</h2>
+        <div class="hint">按累计预扣法算全年 12 个月到手工资,并比较年终奖「单独计税」与「并入综合所得」哪种更省。</div>
+        <div class="grid-2">
+          <div><label class="field">税前月薪(元)</label><input type="text" id="txSalary" value="15000" inputmode="decimal"></div>
+          <div><label class="field">年终奖(元,可留空)</label><input type="text" id="txBonus" placeholder="例如 30000" inputmode="decimal"></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div><label class="field">五险一金个人缴纳比例(%)</label><input type="text" id="txSocial" value="22.5" inputmode="decimal"></div>
+          <div><label class="field">其他扣除(元/月)</label><input type="text" id="txOther" value="0" inputmode="decimal"></div>
+        </div>
+
+        <h3>专项附加扣除(勾选,自动累加)</h3>
+        <div class="grid-2">
+          <div>
+            <label class="chk"><input type="checkbox" id="sd1" data-amt="2000" data-mult="1"><span>子女教育(2000 元/月/人)</span><span class="sp">×<input type="text" id="sd1n" value="1" style="width:48px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
+            <label class="chk"><input type="checkbox" id="sd2" data-amt="2000" data-mult="1"><span>3 岁以下婴幼儿照护(2000 元/月/人)</span><span class="sp">×<input type="text" id="sd2n" value="1" style="width:48px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
+            <label class="chk"><input type="checkbox" id="sd3" data-amt="400"><span>继续教育(学历 400 元/月)</span><span class="sp">400</span></label>
+            <label class="chk"><input type="checkbox" id="sd4" data-amt="3600" data-once="1"><span>职业资格继续教育(3600 元/年)</span><span class="sp">300/月</span></label>
+          </div>
+          <div>
+            <label class="chk"><input type="checkbox" id="sd5" data-amt="1000"><span>住房贷款利息(1000 元/月)</span><span class="sp">1000</span></label>
+            <label class="chk"><input type="checkbox" id="sd6" data-amt="1500"><span>住房租金(1500 元/月)</span>
+              <select id="sd6v" style="width:auto;display:inline-block;padding:2px 4px;font-size:12.5px;">
+                <option value="1500" selected>直辖市/省会 1500</option>
+                <option value="1100">市辖区户籍人口&gt;100万 1100</option>
+                <option value="800">其他 800</option>
+              </select></label>
+            <label class="chk"><input type="checkbox" id="sd7" data-amt="3000"><span>赡养老人(独生子女 3000 元/月)</span>
+              <select id="sd7v" style="width:auto;display:inline-block;padding:2px 4px;font-size:12.5px;">
+                <option value="3000" selected>独生子女 3000</option>
+                <option value="1500">非独生分摊 1500</option>
+              </select></label>
+            <label class="chk"><input type="checkbox" id="sd8" data-amt="0"><span>大病医疗(按年填,元)</span><span class="sp"><input type="text" id="sd8v" value="0" style="width:64px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
+          </div>
+        </div>
+        <div class="row">
+          <span style="font-size:13px;color:var(--muted);">专项附加扣除合计:</span>
+          <strong id="txSum" style="font-size:15px;">0</strong>
+          <span style="font-size:13px;color:var(--muted);">元/月</span>
+          <button class="act" id="txCalc" style="margin-left:auto;">计算</button>
+          <span class="status" id="txStatus"></span>
+        </div>
+
+        <div id="txOut" style="display:none;">
+          <h3>结果</h3>
+          <div class="kv" id="txKv"></div>
+          <h3>全年 12 个月到手明细</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>月份</th><th>应发</th><th>五险一金</th><th>个税</th><th>到手</th></tr></thead>
+              <tbody id="txTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          按现行规则计算:基本减除费用 <b>5000 元/月</b>,年度汇算减除 <b>60000 元/年</b>;五险一金比例默认 22.5%(养老 8% + 医疗 2% + 失业 0.5% + 公积金 12%),请按你所在地与基数核对。<br>
+          年终奖单独计税政策现行有效期至 <b>2027 年 12 月 31 日</b>。大病医疗为年度据实扣除,超 1.5 万元部分限额 8 万元,此处按月摊入展示。结果为估算,汇算清缴以税务机关口径为准。
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 汇率 ========== -->
+    <section class="tool" id="tool-fx">
+      <div class="card">
+        <h2>汇率换算</h2>
+        <div class="hint">内置 26 种货币对人民币参考汇率,可一键联网更新,也可手动改任意汇率。</div>
+        <div class="grid-3">
+          <div>
+            <label class="field">金额</label>
+            <input type="text" id="fxAmt" value="100" inputmode="decimal">
+          </div>
+          <div>
+            <label class="field">从</label>
+            <select id="fxFrom"></select>
+          </div>
+          <div>
+            <label class="field">到</label>
+            <select id="fxTo"></select>
+          </div>
+        </div>
+        <div class="row">
+          <button class="act" id="fxSwap">⇄ 交换</button>
+          <button class="ghost" id="fxUpdate">联网更新汇率</button>
+          <span class="status" id="fxStatus"></span>
+        </div>
+
+        <div class="kv" style="margin-top:16px;" id="fxKv"></div>
+
+        <h3>全部币种对人民币(1 外币 = ? 人民币)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>币种</th><th>代码</th><th>汇率</th><th>操作</th></tr></thead>
+            <tbody id="fxTable"></tbody>
+          </table>
+        </div>
+        <div class="note">内置汇率为 <b>2026-10-06</b> 人民币汇率中间价(国家外汇管理局口径)参考值,仅供参考,实际成交以银行牌价为准。点击「联网更新汇率」会向公开汇率接口请求最新数据;失败时会自动保留当前值。</div>
+      </div>
+    </section>
+
+    <!-- ========== 折扣比价 ========== -->
+    <section class="tool" id="tool-deal">
+      <div class="card">
+        <h2>折扣 / 满减 / 优惠券比价</h2>
+        <div class="hint">同一件商品,把不同优惠方案摆在一起比,直接告诉你哪个到手最便宜、相当于打了几折。</div>
+        <div class="grid-2">
+          <div><label class="field">商品原价(元)</label><input type="text" id="dlPrice" value="599" inputmode="decimal"></div>
+          <div><label class="field">计算顺序</label><input type="text" value="折扣 → 满减 → 优惠券" disabled style="color:var(--muted);"></div>
+        </div>
+
+        <h3>优惠方案</h3>
+        <div id="dlPlans"></div>
+        <div class="row">
+          <button class="ghost" id="dlAdd">+ 添加方案</button>
+          <button class="act" id="dlCalc">比价</button>
+          <button class="ghost" id="dlDemo">载入示例</button>
+          <span class="status" id="dlStatus"></span>
+        </div>
+
+        <div id="dlOut" style="display:none;">
+          <h3>比价结果(由便宜到贵)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>方案</th><th>折后</th><th>满减</th><th>用券</th><th>到手价</th><th>相当于</th></tr></thead>
+              <tbody id="dlTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">格式:折扣填 <b>8.5</b> 表示八五折,不打折填 <b>10</b>;满减填 <b>满300减50</b>,多档用逗号分隔,自动取满足条件的最大一档;优惠券填 <b>满200减20</b>,无门槛直接填 <b>减20</b>。留空表示不使用该项优惠。</div>
+      </div>
+    </section>
+
+    <!-- ========== 单位换算 ========== -->
+    <section class="tool" id="tool-unit">
+      <div class="card">
+        <h2>单位换算</h2>
+        <div class="hint">选类别 → 选单位 → 输入数值,双向实时换算。</div>
+        <div class="grid-3">
+          <div><label class="field">类别</label><select id="unCat"></select></div>
+          <div><label class="field">从</label><select id="unFrom"></select></div>
+          <div><label class="field">到</label><select id="unTo"></select></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div><label class="field" id="unL1">数值</label><input type="text" id="unA" value="1" inputmode="decimal"></div>
+          <div><label class="field" id="unL2">结果</label><input type="text" id="unB" inputmode="decimal"></div>
+        </div>
+        <div class="row">
+          <button class="ghost" id="unSwap">⇄ 交换单位</button>
+          <button class="ghost" id="unCopy">复制结果</button>
+          <span class="status" id="unStatus"></span>
+        </div>
+        <h3>该单位可换算成</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>单位</th><th>数值</th></tr></thead>
+            <tbody id="unTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 复利定投 ========== -->
+    <section class="tool" id="tool-invest">
+      <div class="card">
+        <h2>复利 / 定投计算器</h2>
+        <div class="hint">按月复利、每月末投入,算清本金、收益与收益率。</div>
+        <div class="grid-2">
+          <div><label class="field">初始本金(元)</label><input type="text" id="ivInit" value="10000" inputmode="decimal"></div>
+          <div><label class="field">每月定投(元)</label><input type="text" id="ivMonthly" value="2000" inputmode="decimal"></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div><label class="field">预期年化收益率(%)</label><input type="text" id="ivRate" value="6" inputmode="decimal"></div>
+          <div><label class="field">投资年限</label><input type="text" id="ivYears" value="10" inputmode="decimal"></div>
+        </div>
+        <div class="row">
+          <button class="act" id="ivCalc">计算</button>
+          <button class="ghost" id="ivReset">重置</button>
+          <span class="status" id="ivStatus"></span>
+        </div>
+
+        <div id="ivOut" style="display:none;">
+          <h3>结果</h3>
+          <div class="kv" id="ivKv"></div>
+          <h3>逐年明细</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>年末</th><th>累计投入</th><th>账户总额</th><th>累计收益</th><th>收益率</th></tr></thead>
+              <tbody id="ivTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">假定收益率恒定、按月复利且每月末投入,未考虑费率、税收与通胀。<b>预期收益不等于实际收益</b>,投资有风险。</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    单个 HTML 文件 · 零依赖 · 离线可用(仅汇率更新需联网)<br>
+    所有计算都在本地完成,输入的数据不会离开你的浏览器
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ============ 主题 ============ */
+  var themeBtn = $("themeBtn");
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = t === "dark" ? "☀️ 亮色" : "🌙 暗色";
+    try { localStorage.setItem("toolbox-theme", t); } catch (e) {}
+  }
+  try {
+    var saved = localStorage.getItem("toolbox-theme");
+    applyTheme(saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  } catch (e) { applyTheme("light"); }
+  themeBtn.addEventListener("click", function () {
+    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
+  /* ============ Tab ============ */
+  $("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-target]");
+    if (!btn) return;
+    var t = btn.getAttribute("data-target");
+    Array.prototype.forEach.call(document.querySelectorAll("nav.tabs button"), function (b) {
+      b.classList.toggle("active", b === btn);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".tool"), function (s) {
+      s.classList.toggle("active", s.id === "tool-" + t);
+    });
+  });
+
+  /* ============ 通用 ============ */
+  function num(id, def) {
+    var el = typeof id === "string" ? $(id) : id;
+    if (!el) return def === undefined ? 0 : def;
+    var v = parseFloat(String(el.value).replace(/[,，\s%]/g, ""));
+    return isNaN(v) ? (def === undefined ? 0 : def) : v;
+  }
+  function money(n, dec) {
+    var d = dec === undefined ? 2 : dec;
+    if (!isFinite(n)) return "-";
+    return Number(n).toLocaleString("zh-CN", { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function wan(n) { return money(n / 10000, 2); }
+  function setStatus(id, msg, isErr) {
+    var el = $(id);
+    el.textContent = msg || "";
+    el.className = "status " + (isErr ? "err" : "ok");
+    if (msg) setTimeout(function () { if (el.textContent === msg) el.textContent = ""; }, 3000);
+  }
+  function copyText(text, statusId, okMsg) {
+    if (!text) { setStatus(statusId, "没有可复制的内容", true); return; }
+    var done = function () { setStatus(statusId, okMsg || "已复制"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fb(); });
+    } else fb();
+    function fb() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { setStatus(statusId, "复制失败,请手动选中", true); }
+      document.body.removeChild(ta);
+    }
+  }
+  function box(k, v, hl) {
+    return '<div class="box"><div class="k">' + k + '</div><div class="v' + (hl ? ' hl' : '') + '">' + v + '</div></div>';
+  }
+
+  /* ============================================================
+     1. 房贷
+     ============================================================ */
+  function simulateLoan(principal, annualRate, months, type, preMonth, preAmt, preMode) {
+    var r = annualRate / 100 / 12;
+    var M;
+    if (type === "bx") {
+      M = r === 0 ? principal / months : principal * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
+    } else {
+      M = null;
+    }
+    var basePrincipal = principal / months;   // 等额本金的固定本金部分
+    var balance = principal;
+    var totalInterest = 0, totalPaid = 0;
+    var rows = [];
+    var curM = M;
+    var paidMonths = 0;
+    var limit = months * 2 + 2;
+    var preDone = false;
+    var savedInterest = null;
+
+    for (var m = 1; m <= limit && balance > 0.005; m++) {
+      var interest = balance * r;
+      var principalPart;
+      if (type === "bx") {
+        principalPart = curM - interest;
+      } else {
+        principalPart = basePrincipal;
+      }
+      if (principalPart > balance) principalPart = balance;
+
+      // 提前还款
+      if (!preDone && preAmt > 0 && m === preMonth && balance - principalPart > 0.005) {
+        var extra = Math.min(preAmt, balance - principalPart);
+        principalPart += extra;
+        preDone = true;
+      }
+
+      var pay = principalPart + interest;
+      balance -= principalPart;
+      totalInterest += interest;
+      totalPaid += pay;
+      paidMonths = m;
+      rows.push({ m: m, pay: pay, p: principalPart, i: interest, bal: balance, mp: type === "bx" ? curM : pay });
+
+      // 提前还款后调整月供 / 期限
+      if (preDone && !savedInterest && m === preMonth && balance > 0.005) {
+        if (type === "bx") {
+          if (preMode === "less") {
+            var left = months - m;
+            curM = r === 0 ? balance / left : balance * r * Math.pow(1 + r, left) / (Math.pow(1 + r, left) - 1);
+          } else {
+            // 月供不变,求新剩余期数
+            var need = Math.log(curM / (curM - balance * r)) / Math.log(1 + r);
+            need = Math.ceil(need);
+            curM = r === 0 ? balance / need : balance * r * Math.pow(1 + r, need) / (Math.pow(1 + r, need) - 1);
+            months = m + need;
+          }
+        } else {
+          // 等额本金:重算剩余期的固定本金
+          var leftM = preMode === "less" ? months - m : Math.max(1, Math.round(months - m));
+          basePrincipal = balance / leftM;
+        }
+      }
+      if (type !== "bx" && preDone && preMode === "short" && m === preMonth) {
+        // 等额本金缩短期限:保持首月还款额,反推期数,简化为按剩余本金/原月本金
+        var nm = Math.ceil(balance / (principal / months));
+        basePrincipal = balance / nm;
+        months = m + nm;
+      }
+    }
+    return { rows: rows, totalInterest: totalInterest, totalPaid: totalPaid, months: paidMonths, firstPay: rows.length ? rows[0].mp : 0, lastPay: rows.length ? rows[rows.length - 1].pay : 0 };
+  }
+
+  function calcLoan() {
+    var amtW = num("lnAmt"), rate = num("lnRate"), years = num("lnYears");
+    if (amtW <= 0 || years <= 0) { setStatus("lnStatus", "请填写贷款金额和年限", true); return; }
+    var P = amtW * 10000;
+    var n = Math.round(years * 12);
+    if (n < 1 || n > 600) { setStatus("lnStatus", "年限请填 1–50 之间", true); return; }
+    var type = $("lnType").value;
+    var preAmt = num("lnPre") * 10000;
+    var preM = Math.round(num("lnPreM"));
+    var preMode = $("lnPreMode").value;
+    if (preAmt > 0 && (preM < 1 || preM >= n)) {
+      setStatus("lnStatus", "提前还款月份需在 1 到 " + (n - 1) + " 之间", true); return;
+    }
+
+    var base = simulateLoan(P, rate, n, type, 0, 0, preMode);
+    var cur = preAmt > 0 ? simulateLoan(P, rate, n, type, preM, preAmt, preMode) : base;
+
+    var kv = "";
+    if (preAmt > 0) {
+      var after = cur.rows[preM];   // 提前还款后的第一期
+      kv += box(type === "bx" ? "原月供" : "提前还款前月供", money(cur.firstPay) + " <small>元</small>");
+      kv += box(type === "bx" ? "新月供" : "提前还款后月供",
+                money(after ? (type === "bx" ? after.mp : after.pay) : cur.firstPay) + " <small>元</small>", true);
+      kv += box("末月月供", money(cur.lastPay) + " <small>元</small>");
+    } else if (type === "bj") {
+      kv += box("首月月供", money(cur.firstPay) + " <small>元</small>", true);
+      kv += box("末月月供", money(cur.lastPay) + " <small>元</small>");
+      kv += box("每月递减约", money((cur.firstPay - cur.lastPay) / Math.max(1, cur.months - 1)) + " <small>元</small>");
+    } else {
+      kv += box("月供(固定)", money(cur.firstPay) + " <small>元</small>", true);
+    }
+    kv += box("支付利息总额", wan(cur.totalInterest) + " <small>万元</small>");
+    kv += box("本息合计", wan(cur.totalPaid) + " <small>万元</small>");
+    kv += box("实际还款期数", cur.months + " <small>期 / " + (cur.months / 12).toFixed(1) + " 年</small>");
+    if (preAmt > 0) {
+      kv += box("节省利息", wan(base.totalInterest - cur.totalInterest) + " <small>万元</small>", true);
+      kv += box("提前还清", "第 " + cur.months + " <small>期</small>");
+    }
+    $("lnKv").innerHTML = kv;
+
+    // 按年汇总
+    var years = [];
+    var acc = null;
+    for (var i = 0; i < cur.rows.length; i++) {
+      var y = Math.floor((cur.rows[i].m - 1) / 12);
+      if (!acc || acc.y !== y) {
+        if (acc) years.push(acc);
+        acc = { y: y, pay: 0, p: 0, i: 0, bal: 0 };
+      }
+      acc.pay += cur.rows[i].pay;
+      acc.p += cur.rows[i].p;
+      acc.i += cur.rows[i].i;
+      acc.bal = cur.rows[i].bal;
+    }
+    if (acc) years.push(acc);
+
+    var html = "";
+    for (var j = 0; j < years.length; j++) {
+      var o = years[j];
+      html += "<tr><td>第 " + (o.y + 1) + " 年</td><td>" + money(o.pay) + "</td><td>" + money(o.p) +
+              "</td><td>" + money(o.i) + "</td><td>" + money(o.bal < 0 ? 0 : o.bal) + "</td></tr>";
+    }
+    html += '<tr style="font-weight:600;"><td>合计</td><td>' + money(cur.totalPaid) + "</td><td>" +
+            money(P) + "</td><td>" + money(cur.totalInterest) + "</td><td>0.00</td></tr>";
+    $("lnTable").innerHTML = html;
+    $("lnOut").style.display = "block";
+    setStatus("lnStatus", "计算完成");
+  }
+  $("lnCalc").addEventListener("click", calcLoan);
+  $("lnReset").addEventListener("click", function () {
+    $("lnAmt").value = "100"; $("lnRate").value = "3.5"; $("lnYears").value = "30";
+    $("lnPre").value = ""; $("lnPreM").value = "36";
+    $("lnType").value = "bx"; $("lnPreMode").value = "less";
+    $("lnOut").style.display = "none";
+  });
+
+  /* ============================================================
+     2. 个税
+     ============================================================ */
+  var YEAR_TAX = [
+    [36000, 0.03, 0], [144000, 0.10, 2520], [300000, 0.20, 16920],
+    [420000, 0.25, 31920], [660000, 0.30, 52920], [960000, 0.35, 85920],
+    [Infinity, 0.45, 181920]
+  ];
+  var MONTH_TAX = [
+    [3000, 0.03, 0], [12000, 0.10, 210], [25000, 0.20, 1410],
+    [35000, 0.25, 2660], [55000, 0.30, 4410], [80000, 0.35, 7160],
+    [Infinity, 0.45, 15160]
+  ];
+  function taxBy(t, x) {
+    if (x <= 0) return 0;
+    for (var i = 0; i < t.length; i++) {
+      if (x <= t[i][0]) return Math.max(0, x * t[i][1] - t[i][2]);
+    }
+    return 0;
+  }
+  // 全年一次性奖金单独计税:用「奖金 ÷ 12」定税率档位,再对奖金全额计税
+  function bonusSepTax(bonus) {
+    var x = bonus / 12;
+    for (var i = 0; i < MONTH_TAX.length; i++) {
+      if (x <= MONTH_TAX[i][0]) return Math.max(0, bonus * MONTH_TAX[i][1] - MONTH_TAX[i][2]);
+    }
+    return 0;
+  }
+
+  function specialDeduction() {
+    var s = 0;
+    if ($("sd1").checked) s += 2000 * Math.max(0, num("sd1n"));
+    if ($("sd2").checked) s += 2000 * Math.max(0, num("sd2n"));
+    if ($("sd3").checked) s += 400;
+    if ($("sd4").checked) s += 3600 / 12;
+    if ($("sd5").checked) s += 1000;
+    if ($("sd6").checked) s += parseFloat($("sd6v").value) || 0;
+    if ($("sd7").checked) s += parseFloat($("sd7v").value) || 0;
+    if ($("sd8").checked) {
+      var medical = num("sd8v");
+      var over = Math.max(0, medical - 15000);
+      s += Math.min(over, 80000) / 12;
+    }
+    return s;
+  }
+  ["sd1", "sd2", "sd3", "sd4", "sd5", "sd6", "sd7", "sd8", "sd1n", "sd2n", "sd6v", "sd7v", "sd8v"].forEach(function (id) {
+    $(id).addEventListener("input", function () { $("txSum").textContent = money(specialDeduction(), 0); });
+    $(id).addEventListener("change", function () { $("txSum").textContent = money(specialDeduction(), 0); });
+  });
+  $("txSum").textContent = money(specialDeduction(), 0);
+
+  function calcTax() {
+    var salary = num("txSalary");
+    var bonus = num("txBonus");
+    var socialRate = num("txSocial") / 100;
+    var other = num("txOther");
+    var special = specialDeduction();
+    if (salary <= 0) { setStatus("txStatus", "请填写税前月薪", true); return; }
+
+    var social = salary * socialRate;
+    var monthly = [];
+    var prevCum = 0, cumTaxPaid = 0, yearTax = 0, netTotal = 0;
+    for (var i = 1; i <= 12; i++) {
+      var cumIncome = salary * i;
+      var cumBase = 5000 * i;
+      var cumSocial = social * i;
+      var cumSpecial = (special + other) * i;
+      var cumTaxable = Math.max(0, cumIncome - cumBase - cumSocial - cumSpecial);
+      var cumTax = taxBy(YEAR_TAX, cumTaxable);
+      var mTax = Math.max(0, cumTax - prevCum);
+      prevCum = cumTax;
+      cumTaxPaid += mTax;
+      yearTax += mTax;
+      var net = salary - social - mTax;
+      netTotal += net;
+      monthly.push({ m: i, gross: salary, social: social, tax: mTax, net: net });
+    }
+
+    // 年终奖两种计税方式
+    var bonusSep = 0, bonusMerge = 0, bestWay = "none", bonusTax = 0;
+    if (bonus > 0) {
+      bonusSep = bonusSepTax(bonus);
+      var annualTaxableWith = Math.max(0, salary * 12 - 60000 - social * 12 - (special + other) * 12 + bonus);
+      var totalTaxMerge = taxBy(YEAR_TAX, annualTaxableWith);
+      bonusMerge = Math.max(0, totalTaxMerge - cumTaxPaid);
+      bonusTax = Math.min(bonusSep, bonusMerge);
+      bestWay = bonusSep <= bonusMerge ? "sep" : "merge";
+    }
+
+    var totalIncome = salary * 12 + bonus;
+    var totalTax = yearTax + bonusTax;
+    var totalNet = netTotal + (bonus - bonusTax);
+
+    var kv = "";
+    kv += box("每月到手(第 1 月)", money(monthly[0].net) + " <small>元</small>", true);
+    kv += box("每月到手(第 12 月)", money(monthly[11].net) + " <small>元</small>");
+    kv += box("全年到手(含年终奖)", money(totalNet) + " <small>元</small>", true);
+    kv += box("全年个税合计", money(totalTax) + " <small>元</small>");
+    kv += box("实际税负率", (totalIncome > 0 ? (totalTax / totalIncome * 100).toFixed(2) : "0.00") + " <small>%</small>");
+    kv += box("全年五险一金", money(social * 12) + " <small>元</small>");
+    $("txKv").innerHTML = kv;
+
+    var extra = "";
+    if (bonus > 0) {
+      var word = bestWay === "sep" ? "单独计税" : "并入综合所得";
+      extra = '<div style="margin-top:12px;padding:12px 14px;background:var(--soft);border-radius:10px;font-size:13.5px;line-height:1.9;">' +
+        "<b>年终奖 " + money(bonus, 0) + " 元,推荐:" + word + "</b><br>" +
+        "单独计税 → 个税 " + money(bonusSep) + " 元" + (bestWay === "sep" ? " <span class='tag'>更省</span>" : "") + "<br>" +
+        "并入综合所得 → 个税 " + money(bonusMerge) + " 元" + (bestWay === "merge" ? " <span class='tag'>更省</span>" : "") + "<br>" +
+        "两种方式相差 <b>" + money(Math.abs(bonusSep - bonusMerge)) + "</b> 元</div>";
+    }
+    $("txKv").innerHTML += extra;
+
+    var html = "";
+    for (var j = 0; j < monthly.length; j++) {
+      var o = monthly[j];
+      html += "<tr><td>" + o.m + " 月</td><td>" + money(o.gross) + "</td><td>" + money(o.social) +
+              "</td><td>" + money(o.tax) + "</td><td><b>" + money(o.net) + "</b></td></tr>";
+    }
+    html += '<tr style="font-weight:600;"><td>合计</td><td>' + money(salary * 12) + "</td><td>" +
+            money(social * 12) + "</td><td>" + money(yearTax) + "</td><td>" + money(netTotal) + "</td></tr>";
+    $("txTable").innerHTML = html;
+    $("txOut").style.display = "block";
+    setStatus("txStatus", "计算完成");
+  }
+  $("txCalc").addEventListener("click", calcTax);
+
+  /* ============================================================
+     3. 汇率
+     ============================================================ */
+  // 1 外币 = X 人民币(2026-10-06 中间价)
+  var FX_DEFAULT = [
+    ["CNY", "人民币", 1],
+    ["USD", "美元", 6.7351], ["EUR", "欧元", 7.6215], ["JPY", "日元", 0.042727],
+    ["HKD", "港元", 0.858420], ["GBP", "英镑", 8.8918], ["AUD", "澳元", 4.6959],
+    ["SGD", "新加坡元", 5.2607], ["CHF", "瑞士法郎", 8.0608], ["CAD", "加元", 4.7341],
+    ["KRW", "韩元", 0.004958], ["NZD", "新西兰元", 3.7899], ["MOP", "澳门元", 0.832986],
+    ["MYR", "马来西亚林吉特", 1.6483], ["RUB", "俄罗斯卢布", 0.079958], ["ZAR", "南非兰特", 0.410004],
+    ["AED", "阿联酋迪拉姆", 1.8292], ["SAR", "沙特里亚尔", 1.7892], ["HUF", "匈牙利福林", 0.020784],
+    ["PLN", "波兰兹罗提", 1.7465], ["DKK", "丹麦克朗", 1.0195], ["SEK", "瑞典克朗", 0.672314],
+    ["NOK", "挪威克朗", 0.699741], ["TRY", "土耳其里拉", 0.137159], ["MXN", "墨西哥比索", 0.372787],
+    ["THB", "泰铢", 0.199996]
+  ];
+  var FX = {};
+  var FX_NAME = {};
+  FX_DEFAULT.forEach(function (r) { FX[r[0]] = r[2]; FX_NAME[r[0]] = r[1]; });
+
+  var fxFrom = $("fxFrom"), fxTo = $("fxTo");
+  FX_DEFAULT.forEach(function (r) {
+    fxFrom.add(new Option(r[1] + " " + r[0], r[0]));
+    fxTo.add(new Option(r[1] + " " + r[0], r[0]));
+  });
+  fxFrom.value = "USD"; fxTo.value = "CNY";
+
+  function fxConvert(amt, from, to) {
+    return amt * FX[from] / FX[to];
+  }
+  function fxRender() {
+    var amt = num("fxAmt");
+    var f = fxFrom.value, t = fxTo.value;
+    var out = fxConvert(amt, f, t);
+    var rate = FX[f] / FX[t];
+    var dec = Math.abs(out) >= 100 ? 2 : (Math.abs(out) >= 1 ? 4 : 6);
+    $("fxKv").innerHTML =
+      box(amt + " " + f + " =", money(out, dec) + " <small>" + t + "</small>", true) +
+      box("汇率 1 " + f + " =", money(rate, 6) + " <small>" + t + "</small>") +
+      box("反向 1 " + t + " =", money(1 / rate, 6) + " <small>" + f + "</small>");
+    $("fxKv").innerHTML += '<div style="grid-column:1/-1;"><button class="ghost mini" id="fxCopy">复制结果</button></div>';
+    var cb = $("fxCopy");
+    if (cb) cb.addEventListener("click", function () { copyText(String(out), "fxStatus", "已复制换算结果"); });
+    renderFxTable();
+  }
+  function renderFxTable() {
+    var html = "";
+    FX_DEFAULT.forEach(function (r) {
+      var code = r[0];
+      if (code === "CNY") return;
+      html += "<tr><td>" + r[1] + "</td><td>" + code + "</td>" +
+        '<td><input type="text" data-code="' + code + '" value="' + FX[code] + '" style="padding:4px 7px;font-size:12.5px;"></td>' +
+        "<td>" + money(FX[code], 6) + "</td></tr>";
+    });
+    $("fxTable").innerHTML = html;
+    Array.prototype.forEach.call($("fxTable").querySelectorAll("input[data-code]"), function (inp) {
+      inp.addEventListener("change", function () {
+        var v = parseFloat(inp.value);
+        if (isNaN(v) || v <= 0) { inp.value = FX[inp.getAttribute("data-code")]; return; }
+        FX[inp.getAttribute("data-code")] = v;
+        fxRender();
+        setStatus("fxStatus", "已更新 " + inp.getAttribute("data-code"));
+      });
+    });
+  }
+  ["fxAmt"].forEach(function (id) { $(id).addEventListener("input", fxRender); });
+  fxFrom.addEventListener("change", fxRender);
+  fxTo.addEventListener("change", fxRender);
+  $("fxSwap").addEventListener("click", function () {
+    var a = fxFrom.value; fxFrom.value = fxTo.value; fxTo.value = a; fxRender();
+  });
+  $("fxUpdate").addEventListener("click", function () {
+    setStatus("fxStatus", "正在获取…");
+    var sources = [
+      { url: "https://open.er-api.com/v6/latest/CNY", parse: function (d) { return d && d.rates ? d.rates : null; }, base: "CNY" },
+      { url: "https://api.frankfurter.app/latest?from=CNY", parse: function (d) { return d && d.rates ? d.rates : null; }, base: "CNY" }
+    ];
+    var i = 0;
+    function tryNext() {
+      if (i >= sources.length) { setStatus("fxStatus", "联网失败,仍使用当前汇率", true); return; }
+      var s = sources[i++];
+      fetch(s.url).then(function (r) { return r.json(); }).then(function (d) {
+        var rates = s.parse(d);
+        if (!rates) throw new Error("bad");
+        var count = 0;
+        Object.keys(FX).forEach(function (code) {
+          if (code === "CNY") return;
+          if (rates[code] && rates[code] > 0) { FX[code] = 1 / rates[code]; count++; }
+        });
+        if (!count) throw new Error("none");
+        fxRender();
+        setStatus("fxStatus", "已更新 " + count + " 个币种");
+      }).catch(function () { tryNext(); });
+    }
+    tryNext();
+  });
+  fxRender();
+
+  /* ============================================================
+     4. 折扣比价
+     ============================================================ */
+  var dlPlans = $("dlPlans");
+  var planCount = 0;
+  function addPlan(name, disc, tiers, coupon) {
+    planCount++;
+    var id = planCount;
+    var div = document.createElement("div");
+    div.className = "plan-row";
+    div.setAttribute("data-id", id);
+    div.innerHTML =
+      '<div class="top">' +
+        '<input type="text" class="p-name" placeholder="方案名称,如 官方旗舰店" value="' + (name || "") + '">' +
+        '<button class="ghost mini p-del">删除</button>' +
+      "</div>" +
+      '<div class="grid-3">' +
+        '<div><label class="field">折扣(10 = 不打折)</label><input type="text" class="p-disc" placeholder="如 8.5" value="' + (disc || "") + '" inputmode="decimal"></div>' +
+        '<div><label class="field">满减档位</label><input type="text" class="p-tier" placeholder="满300减50, 满600减120" value="' + (tiers || "") + '"></div>' +
+        '<div><label class="field">优惠券</label><input type="text" class="p-coupon" placeholder="满200减20 或 减20" value="' + (coupon || "") + '"></div>' +
+      "</div>";
+    dlPlans.appendChild(div);
+    div.querySelector(".p-del").addEventListener("click", function () {
+      div.remove();
+      if (!dlPlans.children.length) addPlan("", "", "", "");
+    });
+  }
+  addPlan("", "", "", "");
+  addPlan("", "", "", "");
+
+  function parseTiers(str) {
+    var out = [];
+    var re = /满\s*(\d+(?:\.\d+)?)\s*减\s*(\d+(?:\.\d+)?)/g, m;
+    while ((m = re.exec(str)) !== null) out.push([parseFloat(m[1]), parseFloat(m[2])]);
+    return out;
+  }
+  function parseCoupon(str) {
+    if (!str) return null;
+    var s = str.replace(/\s/g, "");
+    var m = s.match(/^(?:满(\d+(?:\.\d+)?))?减(\d+(?:\.\d+)?)$/);
+    if (!m) return null;
+    return { min: m[1] ? parseFloat(m[1]) : 0, cut: parseFloat(m[2]) };
+  }
+  function calcPlan(price, disc, tierStr, couponStr) {
+    var afterDisc = price * (disc > 0 && disc <= 10 ? disc / 10 : 1);
+    var cutTier = 0;
+    var tiers = parseTiers(tierStr || "");
+    tiers.forEach(function (t) { if (afterDisc >= t[0] && t[1] > cutTier) cutTier = t[1]; });
+    var afterTier = Math.max(0, afterDisc - cutTier);
+    var cp = parseCoupon(couponStr || "");
+    var cutCoupon = 0;
+    if (cp && afterTier >= cp.min) cutCoupon = cp.cut;
+    var final = Math.max(0, afterTier - cutCoupon);
+    return { afterDisc: afterDisc, cutTier: cutTier, cutCoupon: cutCoupon, final: final, rate: price > 0 ? final / price * 10 : 0 };
+  }
+  $("dlAdd").addEventListener("click", function () { addPlan("", "", "", ""); });
+  $("dlDemo").addEventListener("click", function () {
+    dlPlans.innerHTML = "";
+    $("dlPrice").value = "599";
+    addPlan("官方店:直接打折", "8.5", "", "");
+    addPlan("平台:满减叠加", "10", "满300减50, 满600减120", "满200减20");
+    addPlan("直播间:大额券", "9", "", "减80");
+    setStatus("dlStatus", "已载入示例,点「比价」看结果");
+  });
+  $("dlCalc").addEventListener("click", function () {
+    var price = num("dlPrice");
+    if (price <= 0) { setStatus("dlStatus", "请填写商品原价", true); return; }
+    var rows = Array.prototype.slice.call(dlPlans.children).map(function (row) {
+      var name = row.querySelector(".p-name").value || "未命名方案";
+      var r = calcPlan(price, num(row.querySelector(".p-disc")), row.querySelector(".p-tier").value, row.querySelector(".p-coupon").value);
+      return { name: name, r: r, row: row };
+    });
+    rows.sort(function (a, b) { return a.r.final - b.r.final; });
+    var html = "";
+    rows.forEach(function (o, idx) {
+      var best = idx === 0;
+      o.row.classList.toggle("best", best);
+      html += "<tr" + (best ? ' style="font-weight:600;"' : "") + "><td>" + o.name +
+        (best ? ' <span class="tag">最便宜</span>' : "") + "</td><td>" + money(o.r.afterDisc) +
+        "</td><td>-" + money(o.r.cutTier) + "</td><td>-" + money(o.r.cutCoupon) +
+        "</td><td><b>" + money(o.r.final) + "</b></td><td>" + o.r.rate.toFixed(2) + " 折</td></tr>";
+    });
+    if (rows.length > 1) {
+      var gap = rows[1].r.final - rows[0].r.final;
+      html += '<tr><td colspan="6" style="text-align:left;color:var(--muted);">最优方案比第二名便宜 ' +
+        money(gap) + " 元</td></tr>";
+    }
+    $("dlTable").innerHTML = html;
+    $("dlOut").style.display = "block";
+    setStatus("dlStatus", "比价完成");
+  });
+
+  /* ============================================================
+     5. 单位换算
+     ============================================================ */
+  var UNITS = {
+    "长度": [["米", 1], ["千米", 1000], ["分米", 0.1], ["厘米", 0.01], ["毫米", 0.001], ["微米", 1e-6],
+             ["英寸", 0.0254], ["英尺", 0.3048], ["码", 0.9144], ["英里", 1609.344], ["海里", 1852],
+             ["市里", 500], ["市尺", 1 / 3], ["市寸", 1 / 30]],
+    "重量": [["千克", 1], ["克", 0.001], ["毫克", 1e-6], ["吨", 1000], ["磅", 0.45359237],
+             ["盎司", 0.028349523125], ["市斤", 0.5], ["市两", 0.05], ["克拉", 0.0002]],
+    "面积": [["平方米", 1], ["平方千米", 1e6], ["平方厘米", 1e-4], ["公顷", 10000], ["亩", 666.6666667],
+             ["英亩", 4046.8564224], ["平方英尺", 0.09290304], ["平方英寸", 0.00064516], ["平方英里", 2589988.11]],
+    "体积": [["升", 1], ["毫升", 0.001], ["立方米", 1000], ["立方厘米", 0.001], ["立方英尺", 28.316846592],
+             ["美制加仑", 3.785411784], ["英制加仑", 4.54609], ["美制品脱", 0.473176473]],
+    "时间": [["秒", 1], ["分钟", 60], ["小时", 3600], ["天", 86400], ["周", 604800], ["月(30天)", 2592000], ["年(365天)", 31536000]],
+    "速度": [["米/秒", 1], ["千米/小时", 1 / 3.6], ["英里/小时", 0.44704], ["节", 0.5144444444], ["英尺/秒", 0.3048]],
+    "数据存储": [["字节", 1], ["比特", 0.125], ["KB(10³)", 1e3], ["MB(10⁶)", 1e6], ["GB(10⁹)", 1e9], ["TB(10¹²)", 1e12],
+                 ["KiB(2¹⁰)", 1024], ["MiB(2²⁰)", 1048576], ["GiB(2³⁰)", 1073741824], ["TiB(2⁴⁰)", 1099511627776]],
+    "温度": "TEMP"
+  };
+  var TEMP_UNITS = ["摄氏度", "华氏度", "开尔文"];
+  function toCelsius(u, v) {
+    if (u === "摄氏度") return v;
+    if (u === "华氏度") return (v - 32) * 5 / 9;
+    return v - 273.15;
+  }
+  function fromCelsius(u, c) {
+    if (u === "摄氏度") return c;
+    if (u === "华氏度") return c * 9 / 5 + 32;
+    return c + 273.15;
+  }
+  function unitList(cat) { return cat === "温度" ? TEMP_UNITS : UNITS[cat].map(function (x) { return x[0]; }); }
+  function unitFactor(cat, name) {
+    var f = UNITS[cat].filter(function (x) { return x[0] === name; })[0];
+    return f ? f[1] : 1;
+  }
+  function convert(cat, val, from, to) {
+    if (cat === "温度") return fromCelsius(to, toCelsius(from, val));
+    return val * unitFactor(cat, from) / unitFactor(cat, to);
+  }
+
+  var unCat = $("unCat"), unFrom = $("unFrom"), unTo = $("unTo");
+  Object.keys(UNITS).forEach(function (c) { unCat.add(new Option(c, c)); });
+  function fillUnits() {
+    var list = unitList(unCat.value);
+    unFrom.innerHTML = ""; unTo.innerHTML = "";
+    list.forEach(function (u) { unFrom.add(new Option(u, u)); unTo.add(new Option(u, u)); });
+    unFrom.value = list[0];
+    unTo.value = list[1] || list[0];
+  }
+  function unRender() {
+    var cat = unCat.value, a = num("unA"), f = unFrom.value, t = unTo.value;
+    var b = convert(cat, a, f, t);
+    $("unB").value = Number(b.toPrecision(10)).toString();
+    $("unL1").textContent = f;
+    $("unL2").textContent = t;
+    var html = "";
+    unitList(cat).forEach(function (u) {
+      var v = convert(cat, a, f, u);
+      html += "<tr" + (u === t ? ' style="font-weight:600;"' : "") + "><td>" + u + "</td><td>" +
+        Number(v.toPrecision(10)).toString() + "</td></tr>";
+    });
+    $("unTable").innerHTML = html;
+  }
+  unCat.addEventListener("change", function () { fillUnits(); unRender(); });
+  unFrom.addEventListener("change", unRender);
+  unTo.addEventListener("change", unRender);
+  $("unA").addEventListener("input", unRender);
+  $("unB").addEventListener("input", function () {
+    var cat = unCat.value, b = num("unB"), f = unFrom.value, t = unTo.value;
+    var a = convert(cat, b, t, f);
+    $("unA").value = Number(a.toPrecision(10)).toString();
+    var html = "";
+    unitList(cat).forEach(function (u) {
+      var v = convert(cat, num("unA"), f, u);
+      html += "<tr" + (u === t ? ' style="font-weight:600;"' : "") + "><td>" + u + "</td><td>" +
+        Number(v.toPrecision(10)).toString() + "</td></tr>";
+    });
+    $("unTable").innerHTML = html;
+  });
+  $("unSwap").addEventListener("click", function () {
+    var a = unFrom.value; unFrom.value = unTo.value; unTo.value = a; unRender();
+  });
+  $("unCopy").addEventListener("click", function () { copyText($("unB").value, "unStatus", "已复制换算结果"); });
+  unCat.value = "长度"; fillUnits(); unRender();
+
+  /* ============================================================
+     6. 复利定投
+     ============================================================ */
+  function calcInvest() {
+    var init = num("ivInit"), monthly = num("ivMonthly"), rate = num("ivRate"), years = num("ivYears");
+    if (years <= 0) { setStatus("ivStatus", "请填写投资年限", true); return; }
+    var n = Math.round(years * 12);
+    var r = rate / 100 / 12;
+    var bal = init, invested = init;
+    var yearRows = [];
+    for (var m = 1; m <= n; m++) {
+      bal = bal * (1 + r) + monthly;
+      invested += monthly;
+      if (m % 12 === 0) yearRows.push({ y: m / 12, invested: invested, bal: bal });
+    }
+    var profit = bal - invested;
+    var kv = "";
+    kv += box("期末总额", money(bal) + " <small>元</small>", true);
+    kv += box("累计投入", money(invested) + " <small>元</small>");
+    kv += box("累计收益", money(profit) + " <small>元</small>", true);
+    kv += box("收益率", (invested > 0 ? (profit / invested * 100).toFixed(2) : "0.00") + " <small>%</small>");
+    kv += box("本金占比", (bal > 0 ? (invested / bal * 100).toFixed(1) : "0.0") + " <small>%</small>");
+    kv += box("单利对比(不 reinvest)", money(init + monthly * n + (init + monthly * n) * (rate / 100) * years / 2, 0) + " <small>元</small>");
+    $("ivKv").innerHTML = kv;
+
+    var html = "";
+    yearRows.forEach(function (o) {
+      var p = o.bal - o.invested;
+      html += "<tr><td>第 " + o.y + " 年</td><td>" + money(o.invested) + "</td><td><b>" + money(o.bal) +
+        "</b></td><td>" + money(p) + "</td><td>" + (o.invested > 0 ? (p / o.invested * 100).toFixed(2) : "0.00") + "%</td></tr>";
+    });
+    $("ivTable").innerHTML = html;
+    $("ivOut").style.display = "block";
+    setStatus("ivStatus", "计算完成");
+  }
+  $("ivCalc").addEventListener("click", calcInvest);
+  $("ivReset").addEventListener("click", function () {
+    $("ivInit").value = "10000"; $("ivMonthly").value = "2000";
+    $("ivRate").value = "6"; $("ivYears").value = "10";
+    $("ivOut").style.display = "none";
+  });
+})();
+</script>
+</body>
+</html>
