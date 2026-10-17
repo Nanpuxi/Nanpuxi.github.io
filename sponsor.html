@@ -5,15 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>赞助南浦Xi</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- 主题初始化：在渲染前同步读取偏好，避免深色模式闪烁 -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var dark = saved ? saved === 'dark' : systemDark;
+      if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
   <style>
+    /* ===== 主题配色变量 ===== */
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --text-soft: #666;
+      --text-mute: #888;
+      --text-faint: #aaa;
+      --card-bg: #fafafa;
+      --card-border: #f0f0f0;
+      --card-border-hover: #e4e4e8;
+      --placeholder-bg: #f0f0f0;
+      --placeholder-color: #bbb;
+      --afdian-bg-from: #fff8e1;
+      --afdian-bg-to: #fff3e0;
+      --afdian-border: #ffe0b2;
+      --afdian-btn: #ffd54f;
+      --afdian-btn-fg: #5d4037;
+      --afdian-shadow: rgba(255,213,79,0.5);
+      --heart: #e53935;
+      --btn-bg: #1a1a1a;
+      --btn-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #15161a;
+      --text: #e8e8ea;
+      --text-soft: #a8a8ae;
+      --text-mute: #8a8a92;
+      --text-faint: #6a6a72;
+      --card-bg: #1e1f24;
+      --card-border: #2a2b31;
+      --card-border-hover: #383940;
+      --placeholder-bg: #26272d;
+      --placeholder-color: #6a6a72;
+      --afdian-bg-from: #2c2618;
+      --afdian-bg-to: #2a2418;
+      --afdian-border: #4a3c20;
+      --afdian-btn: #b8922e;
+      --afdian-btn-fg: #1a1208;
+      --afdian-shadow: rgba(184,146,46,0.35);
+      --heart: #ff6b6b;
+      --btn-bg: #e8e8ea;
+      --btn-color: #15161a;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: #ffffff;
-      color: #1a1a1a;
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
+      transition: background .35s ease, color .35s ease;
     }
 
     /* ===== 导航栏 ===== */
@@ -29,7 +87,7 @@
     .nav-brand {
       font-size: 18px;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--text);
       text-decoration: none;
     }
 
@@ -41,7 +99,7 @@
     .nav-links a {
       font-size: 14px;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--text);
       text-decoration: none;
       transition: opacity .2s;
       position: relative;
@@ -56,7 +114,7 @@
       left: 0;
       width: 100%;
       height: 2px;
-      background: #1a1a1a;
+      background: var(--text);
     }
 
     /* ===== 主内容 ===== */
@@ -76,7 +134,7 @@
 
     .hero-sub {
       font-size: 16px;
-      color: #888;
+      color: var(--text-mute);
       margin-bottom: 48px;
     }
 
@@ -91,14 +149,15 @@
     .sponsor-card {
       padding: 32px 24px;
       border-radius: 16px;
-      background: #fafafa;
-      border: 1px solid #f0f0f0;
-      transition: transform .2s, box-shadow .2s;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      transition: transform .2s, box-shadow .2s, background .2s, border-color .2s;
     }
 
     .sponsor-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+      border-color: var(--card-border-hover);
     }
 
     .sponsor-icon {
@@ -114,7 +173,7 @@
 
     .sponsor-card-desc {
       font-size: 13px;
-      color: #888;
+      color: var(--text-mute);
       margin-bottom: 20px;
     }
 
@@ -123,12 +182,12 @@
       height: 160px;
       margin: 0 auto 12px;
       border-radius: 12px;
-      background: #f0f0f0;
+      background: var(--placeholder-bg);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 13px;
-      color: #bbb;
+      color: var(--placeholder-color);
       overflow: hidden;
     }
 
@@ -140,7 +199,7 @@
 
     .sponsor-hint {
       font-size: 12px;
-      color: #ccc;
+      color: var(--text-faint);
     }
 
     /* ===== 爱发电区域 ===== */
@@ -148,8 +207,9 @@
       margin-top: 16px;
       padding: 36px 24px;
       border-radius: 16px;
-      background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
-      border: 1px solid #ffe0b2;
+      background: linear-gradient(135deg, var(--afdian-bg-from) 0%, var(--afdian-bg-to) 100%);
+      border: 1px solid var(--afdian-border);
+      transition: background .35s ease, border-color .35s ease;
     }
 
     .afdian-icon {
@@ -165,7 +225,7 @@
 
     .afdian-desc {
       font-size: 14px;
-      color: #888;
+      color: var(--text-mute);
       margin-bottom: 20px;
     }
 
@@ -173,17 +233,17 @@
       display: inline-block;
       padding: 12px 32px;
       border-radius: 10px;
-      background: #ffd54f;
-      color: #5d4037;
+      background: var(--afdian-btn);
+      color: var(--afdian-btn-fg);
       font-size: 15px;
       font-weight: 700;
       text-decoration: none;
-      transition: transform .15s, box-shadow .15s;
+      transition: transform .15s, box-shadow .15s, background .35s ease, color .35s ease;
     }
 
     .afdian-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255,213,79,.5);
+      box-shadow: 0 6px 20px var(--afdian-shadow);
     }
 
     .afdian-btn:active {
@@ -194,12 +254,12 @@
     .thanks-text {
       margin-top: 48px;
       font-size: 15px;
-      color: #888;
+      color: var(--text-mute);
       line-height: 1.8;
     }
 
     .thanks-text .heart {
-      color: #e53935;
+      color: var(--heart);
       animation: heartbeat 1.2s ease-in-out infinite;
       display: inline-block;
     }
@@ -214,7 +274,7 @@
       text-align: center;
       padding: 32px 24px;
       font-size: 12px;
-      color: #ccc;
+      color: var(--text-faint);
     }
 
     /* ===== 回到顶部按钮 ===== */
@@ -225,8 +285,8 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: #1a1a1a;
-      color: #fff;
+      background: var(--btn-bg);
+      color: var(--btn-color);
       border: none;
       font-size: 20px;
       cursor: pointer;
@@ -234,7 +294,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 12px rgba(0,0,0,.2);
-      transition: opacity .3s, transform .3s;
+      transition: opacity .3s, transform .3s, background .35s ease, color .35s ease;
       z-index: 100;
     }
 
@@ -244,6 +304,7 @@
     }
 
     .back-to-top:hover {
+      filter: brightness(1.15);
       transform: scale(1.08);
       box-shadow: 0 6px 20px rgba(0,0,0,.3);
     }
@@ -276,6 +337,38 @@
       .hero-title { font-size: 32px; }
       .sponsor-grid { grid-template-columns: 1fr; }
     }
+
+    /* ===== 深色模式切换按钮 ===== */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: transform .25s ease, background .25s ease, border-color .25s ease;
+      margin-left: 8px;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--card-border-hover);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.92);
+    }
+
+    .theme-toggle .icon-sun { display: none; }
+    html[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+    html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   </style>
 </head>
 <body>
@@ -286,6 +379,10 @@
     <div class="nav-links">
       <a href="index.html">首页</a>
       <a href="sponsor.html" class="active">赞助</a>
+      <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+      </button>
     </div>
   </nav>
 
@@ -370,6 +467,35 @@
     }
     setupQrFallback('wechatQr', '微信收款码');
     setupQrFallback('alipayQr', '支付宝收款码');
+
+    // ===== 深色模式切换 =====
+    (function () {
+      var btn = document.getElementById('themeToggle');
+      var root = document.documentElement;
+      var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+        } else {
+          root.removeAttribute('data-theme');
+        }
+      }
+
+      // 跟随系统主题变化（仅当用户未手动选择时）
+      systemDark.addEventListener('change', function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem('theme'); } catch (err) {}
+        if (!saved) applyTheme(e.matches ? 'dark' : 'light');
+      });
+
+      btn.addEventListener('click', function () {
+        var isDark = root.getAttribute('data-theme') === 'dark';
+        var next = isDark ? 'light' : 'dark';
+        applyTheme(next);
+        try { localStorage.setItem('theme', next); } catch (err) {}
+      });
+    })();
   </script>
 
 </body>

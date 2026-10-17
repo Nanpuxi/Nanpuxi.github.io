@@ -5,23 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>南浦Xi · 个人导航</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- 主题初始化：在渲染前同步读取偏好，避免深色模式闪烁 -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var dark = saved ? saved === 'dark' : systemDark;
+      if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+
   <style>
+    /* ===== 主题配色变量 ===== */
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --text-soft: #666;
+      --text-mute: #888;
+      --text-faint: #aaa;
+      --card-bg: #fafafa;
+      --card-border: #f0f0f0;
+      --card-border-hover: #e4e4e8;
+      --tag-bg: #f3f3f5;
+      --tag-bg-hover: #e8e8ec;
+      --scrollbar: #e0e0e0;
+      --scrollbar-hover: #ccc;
+      --badge-bg: #fff3e0;
+      --badge-red-bg: #ff9898;
+      --badge-red-fg: #a40000;
+      --copy-ripple: rgba(0,0,0,0.04);
+    }
+
+    html[data-theme="dark"] {
+      --bg: #15161a;
+      --text: #e8e8ea;
+      --text-soft: #a8a8ae;
+      --text-mute: #8a8a92;
+      --text-faint: #6a6a72;
+      --card-bg: #1e1f24;
+      --card-border: #2a2b31;
+      --card-border-hover: #383940;
+      --tag-bg: #26272d;
+      --tag-bg-hover: #32333b;
+      --scrollbar: #2e2f36;
+      --scrollbar-hover: #44464e;
+      --badge-bg: #3a3220;
+      --badge-red-bg: #5c2b2b;
+      --badge-red-fg: #ffb3b3;
+      --copy-ripple: rgba(255,255,255,0.06);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: #ffffff;
-      color: #1a1a1a;
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
       scroll-behavior: smooth;
+      transition: background .35s ease, color .35s ease;
     }
 
     /* 滚动条美化 */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #ccc; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
     /* ===== 导航栏 ===== */
     .nav {
@@ -43,7 +95,7 @@
     .nav-brand {
       font-size: 18px;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--text);
       text-decoration: none;
       transition: opacity .25s ease;
     }
@@ -58,7 +110,7 @@
     .nav-links a {
       font-size: 14px;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--text);
       text-decoration: none;
       transition: opacity .25s ease, transform .25s ease;
       position: relative;
@@ -74,7 +126,7 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: #1a1a1a;
+      background: var(--text);
       transition: width .3s ease;
     }
 
@@ -89,7 +141,7 @@
     .nav-links a .ripple {
       position: absolute;
       border-radius: 50%;
-      background: rgba(0,0,0,0.08);
+      background: var(--copy-ripple);
       transform: scale(0);
       animation: rippleExpand 0.5s ease-out forwards;
       pointer-events: none;
@@ -104,7 +156,7 @@
 
     /* 导航链接激活态（下划线，无背景高亮） */
     .nav-links a.active {
-      color: #1a1a1a;
+      color: var(--text);
     }
 
     .nav-links a.active::after {
@@ -132,7 +184,7 @@
 
     .hero-sub {
       font-size: 16px;
-      color: #888;
+      color: var(--text-mute);
       margin-bottom: 28px;
       opacity: 0;
       transform: translateY(16px);
@@ -151,9 +203,9 @@
     .tag {
       padding: 6px 16px;
       border-radius: 20px;
-      background: #f3f3f5;
+      background: var(--tag-bg);
       font-size: 13px;
-      color: #555;
+      color: var(--text-soft);
       opacity: 0;
       transform: translateY(12px) scale(0.9);
       animation: tagIn 0.5s ease-out forwards;
@@ -173,15 +225,15 @@
     }
     .tag:hover {
       transform: scale(1.06);
-      background: #e8e8ec;
-      color: #333;
+      background: var(--tag-bg-hover);
+      color: var(--text);
     }
 
     /* ===== 分区标题 ===== */
     .section-title {
       font-size: 13px;
       font-weight: 600;
-      color: #aaa;
+      color: var(--text-faint);
       text-transform: uppercase;
       letter-spacing: 2px;
       margin-bottom: 20px;
@@ -208,8 +260,8 @@
       display: block;
       padding: 20px 22px;
       border-radius: 12px;
-      background: #fafafa;
-      border: 1px solid #f0f0f0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       text-decoration: none;
       color: inherit;
       opacity: 0;
@@ -227,9 +279,9 @@
 
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
-      border-color: #e4e4e8;
-      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      border-color: var(--card-border-hover);
+      background: var(--card-bg);
     }
 
     .card-header {
@@ -255,7 +307,7 @@
 
     .card-desc {
       font-size: 13px;
-      color: #888;
+      color: var(--text-mute);
       line-height: 1.5;
     }
 
@@ -264,8 +316,8 @@
       margin-left: 8px;
       padding: 1px 8px;
       border-radius: 10px;
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: var(--badge-red-bg);
+      color: var(--badge-red-fg);
       font-size: 11px;
       font-weight: 600;
       vertical-align: middle;
@@ -277,8 +329,8 @@
     }
 
     .card-badge-new {
-      background: #fff3e0;
-      color: #e65100;
+      background: var(--badge-bg);
+      color: var(--text);
     }
 
     /* ===== 社群卡片（可点击复制） ===== */
@@ -295,7 +347,7 @@
       left: 50%;
       width: 0;
       height: 0;
-      background: rgba(0,0,0,0.04);
+      background: var(--copy-ripple);
       border-radius: 50%;
       transform: translate(-50%, -50%);
       transition: width .5s ease, height .5s ease, opacity .5s ease;
@@ -314,13 +366,13 @@
 
     .copy-hint {
       font-size: 12px;
-      color: #bbb;
+      color: var(--text-mute);
       margin-top: 4px;
       transition: color .25s ease;
     }
 
     .copy-card:hover .copy-hint {
-      color: #888;
+      color: var(--text-soft);
     }
 
     /* ===== Toast 提示 ===== */
@@ -340,6 +392,12 @@
       z-index: 999;
     }
 
+    html[data-theme="dark"] .toast {
+      background: #2c2d33;
+      color: var(--text);
+      box-shadow: 0 6px 24px rgba(0,0,0,.4);
+    }
+
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0) scale(1);
@@ -348,7 +406,7 @@
     /* ===== 关于我 ===== */
     .about-text {
       font-size: 14px;
-      color: #666;
+      color: var(--text-soft);
       line-height: 1.8;
       text-align: left;
       opacity: 0;
@@ -357,19 +415,19 @@
     }
 
     .about-text a {
-      color: #333;
+      color: var(--text);
       text-decoration: underline;
       transition: color .2s;
     }
 
-    .about-text a:hover { color: #000; }
+    .about-text a:hover { color: var(--text-soft); }
 
     /* ===== 页脚 ===== */
     .footer {
       text-align: center;
       padding: 32px 24px;
       font-size: 12px;
-      color: #ccc;
+      color: var(--text-faint);
       opacity: 0;
       animation: fadeIn 0.6s ease-out 1.3s forwards;
     }
@@ -398,8 +456,8 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: #1a1a1a;
-      color: #fff;
+      background: var(--text);
+      color: var(--bg);
       border: none;
       cursor: pointer;
       display: none;
@@ -421,7 +479,7 @@
     }
 
     #backToTop:hover {
-      background: #333;
+      filter: brightness(1.15);
       transform: translateY(-2px) scale(1.08);
       box-shadow: 0 8px 24px rgba(0,0,0,.22);
     }
@@ -446,6 +504,38 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* ===== 深色模式切换按钮 ===== */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: transform .25s ease, background .25s ease, border-color .25s ease;
+      margin-left: 8px;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--card-border-hover);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.92);
+    }
+
+    .theme-toggle .icon-sun { display: none; }
+    html[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+    html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   </style>
 </head>
 <body>
@@ -459,6 +549,10 @@
       <a href="#community" class="nav-anchor">社群</a>
       <a href="#about" class="nav-anchor">关于我</a>
       <a href="sponsor.html" class="nav-anchor">赞助</a>
+      <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+      </button>
     </div>
   </nav>
 
@@ -495,7 +589,7 @@
       <div class="card-grid">
         <a href="place/" class="card">
           <div class="card-header">
-            <span class="card-icon">🚇</span>
+            <span class="card-icon">  </span>
             <span class="card-title">地名生成器</span>
             <span class="card-badge">好用</span>
           </div>
@@ -750,6 +844,35 @@
       el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
       observer.observe(el);
     });
+
+    // ===== 深色模式切换 =====
+    (function () {
+      var btn = document.getElementById('themeToggle');
+      var root = document.documentElement;
+      var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+        } else {
+          root.removeAttribute('data-theme');
+        }
+      }
+
+      // 跟随系统主题变化（仅当用户未手动选择时）
+      systemDark.addEventListener('change', function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem('theme'); } catch (err) {}
+        if (!saved) applyTheme(e.matches ? 'dark' : 'light');
+      });
+
+      btn.addEventListener('click', function () {
+        var isDark = root.getAttribute('data-theme') === 'dark';
+        var next = isDark ? 'light' : 'dark';
+        applyTheme(next);
+        try { localStorage.setItem('theme', next); } catch (err) {}
+      });
+    })();
   </script>
 
 </body>
