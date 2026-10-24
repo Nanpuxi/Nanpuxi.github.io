@@ -48,8 +48,7 @@
   .file-name:hover{color:var(--primary);}
   .file-size{font-size:12px;color:var(--sub);}
   .file-actions{display:flex;gap:6px;justify-content:flex-end;}
-  .file-actions a,.file-actions button{font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none;border:none;cursor:pointer;color:#fff;}
-  .file-actions a{background:var(--green);}
+  .file-actions a,.file-actions button,.dl-btn{font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none;border:none;cursor:pointer;color:#fff;background:var(--green);}
   .file-actions .rename{background:#f59e0b;}
   .file-actions .del{background:var(--red);}
   .empty{padding:40px;text-align:center;color:var(--sub);}
@@ -57,7 +56,6 @@
   .new-folder-row{display:none;padding:10px 20px;background:#f0f7ff;border-bottom:1px solid var(--border);align-items:center;gap:10px;}
   .new-folder-row input{padding:6px 10px;border:1px solid var(--primary);border-radius:6px;font-size:13px;}
 
-  /* 弹窗通用 */
   .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center;padding:20px;}
   .modal.open{display:flex;}
   .modal-content{background:#fff;border-radius:12px;max-width:700px;width:100%;max-height:85vh;overflow:auto;padding:24px;position:relative;}
@@ -124,14 +122,13 @@
 </div>
 
 <script>
-// ===== 配置 =====
 const WORKER = 'https://sweet-shape-6382.3906951201.workers.dev';
 let currentPath = '';
 let allItems = [];
 let currentUser = null;
+let currentRole = null;
 let isRegister = false;
 
-// ===== 工具函数 =====
 const showMsg = (el, text, color) => { el.textContent = text; el.style.color = color; };
 const formatSize = b => !b ? '-' : b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(2) + ' MB';
 const fileIcon = n => {
@@ -149,10 +146,17 @@ async function checkAuth() {
     const data = await res.json();
     if (data.ok) {
       currentUser = data.username;
+      currentRole = data.role || 'guest';
       document.getElementById('auth-modal').classList.remove('open');
-      document.getElementById('upload-btn').disabled = false;
-      document.getElementById('upload-btn').textContent = '⬆ 上传（' + currentUser + '）';
-      document.getElementById('user-bar').innerHTML = currentUser + ' <button id="logout-btn">退出</button>';
+      if (currentRole === 'guest') {
+        document.getElementById('upload-btn').disabled = true;
+        document.getElementById('upload-btn').textContent = '👁 访客模式（只读）';
+        document.getElementById('user-bar').innerHTML = currentUser + ' <span style="color:#f59e0b;">[访客]</span> <button id="logout-btn">退出</button>';
+      } else {
+        document.getElementById('upload-btn').disabled = false;
+        document.getElementById('upload-btn').textContent = '⬆ 上传（' + currentUser + '）';
+        document.getElementById('user-bar').innerHTML = currentUser + (currentRole === 'admin' ? ' <span style="color:var(--primary);">[管理员]</span>' : '') + ' <button id="logout-btn">退出</button>';
+      }
       document.getElementById('logout-btn').onclick = logout;
     } else {
       document.getElementById('auth-modal').classList.add('open');
@@ -160,11 +164,6 @@ async function checkAuth() {
     }
     loadFiles();
   } catch(e) { console.error(e); }
-}
-
-function authFields() {
-  return { username: document.getElementById('auth-username').value.trim(),
-           password: document.getElementById('auth-password').value };
 }
 
 document.getElementById('auth-switch').onclick = () => {
@@ -176,11 +175,12 @@ document.getElementById('auth-switch').onclick = () => {
 };
 
 document.getElementById('auth-submit').onclick = async () => {
-  const { username, password } = authFields();
-  if (!username || !password) { showMsg(document.getElementById('auth-msg'), '⚠️ 请填写完整', 'orange'); return; }
+  const u = document.getElementById('auth-username').value.trim();
+  const p = document.getElementById('auth-password').value;
+  if (!u || !p) { showMsg(document.getElementById('auth-msg'), '⚠️ 请填写完整', 'orange'); return; }
   const res = await fetch(`${WORKER}/${isRegister ? 'auth/register' : 'auth/login'}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username: u, password: p })
   });
   const d = await res.json();
   if (d.ok) { checkAuth(); }
@@ -189,7 +189,7 @@ document.getElementById('auth-submit').onclick = async () => {
 
 async function logout() {
   await fetch(`${WORKER}/auth/logout`, { method: 'POST', credentials: 'include' });
-  currentUser = null;
+  currentUser = null; currentRole = null;
   document.getElementById('auth-modal').classList.add('open');
   document.getElementById('user-bar').textContent = '未登录';
   checkAuth();
@@ -203,7 +203,6 @@ function renderBreadcrumb(crumb) {
     return `${sep}<a onclick="navigate('${c.path}')">${c.name}</a>`;
   }).join('');
 }
-
 function navigate(path) { currentPath = path; loadFiles(); }
 window.navigate = navigate;
 
@@ -225,22 +224,22 @@ function renderFiles(filter = '') {
   const container = document.getElementById('files-container');
   if (allItems.length === 0) { container.innerHTML = '<div class="empty">📭 此目录为空</div>'; return; }
   const f = filter.toLowerCase();
-  const manage = currentUser ? true : false;
+  const canWrite = currentRole && currentRole !== 'guest';
   container.innerHTML = allItems.map(item => {
     const match = !f || item.name.toLowerCase().includes(f);
     if (item.type === 'dir') {
       return `<div class="file-row ${match ? '' : 'hidden'}">
         <span class="file-name" onclick="navigate('${currentPath ? currentPath + '/' + item.name : item.name}')">📁 ${item.name}</span>
         <span class="file-size">文件夹</span>
-        <span class="file-actions">${manage ? `<button class="del" onclick="deleteFolder('${item.name}')">🗑 删除</button>` : ''}</span>
+        <span class="file-actions">${canWrite ? `<button class="del" onclick="deleteFolder('${item.name}')">🗑 删除</button>` : ''}</span>
       </div>`;
     }
-    return `<div class="file-row ${match ? '' : 'hidden'}">
-      <span class="file-name" onclick="preview('${item.url}','${item.name}')">${fileIcon(item.name)} ${item.name}</span>
+    return `<div class="file-row ${match ? '' : 'hidden'}" data-name="${item.name}" data-sha="${item.sha}">
+      <span class="file-name" onclick="preview('${item.name}')">${fileIcon(item.name)} ${item.name}</span>
       <span class="file-size">${formatSize(item.size)}</span>
       <span class="file-actions">
-        <a href="${item.url}" download="${item.name}">⬇</a>
-        ${manage ? `<button class="rename" onclick="renameFile('${item.name}')">✏️</button>
+        <button class="dl-btn" data-name="${item.name}" data-path="${currentPath}">⬇</button>
+        ${canWrite ? `<button class="rename" onclick="renameFile('${item.name}')">✏️</button>
         <button class="del" onclick="deleteFile('${item.name}','${item.sha}')">🗑</button>` : ''}
       </span>
     </div>`;
@@ -248,6 +247,30 @@ function renderFiles(filter = '') {
 }
 
 document.getElementById('search-input').addEventListener('input', e => renderFiles(e.target.value));
+
+// ===== 下载（需登录）=====
+document.addEventListener('click', async e => {
+  if (e.target.classList.contains('dl-btn')) {
+    const name = e.target.dataset.name;
+    const p = e.target.dataset.path;
+    const dlPath = p ? `${p}/${name}` : name;
+    const origText = e.target.textContent;
+    e.target.textContent = '⏳';
+    e.target.disabled = true;
+    try {
+      const res = await fetch(`${WORKER}/${encodeURIComponent(dlPath)}?action=download`, { credentials: 'include' });
+      if (res.status === 401) { alert('请先登录以下载文件'); return; }
+      if (!res.ok) { alert('下载失败'); return; }
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch(err) { alert('下载失败: ' + err.message); }
+    finally { e.target.textContent = origText; e.target.disabled = false; }
+  }
+});
 
 // ===== 上传 =====
 document.getElementById('upload-btn').addEventListener('click', async () => {
@@ -280,7 +303,7 @@ async function deleteFile(name, sha) {
 }
 window.deleteFile = deleteFile;
 
-// ===== 删除文件夹（递归）=====
+// ===== 删除文件夹 =====
 async function deleteFolder(name) {
   if (!confirm(`⚠️ 确定删除文件夹「${name}」及其所有内容？`)) return;
   await recursiveDelete(name, currentPath);
@@ -337,21 +360,26 @@ document.getElementById('new-folder-ok').onclick = async () => {
   } else alert('❌ ' + d.message);
 };
 
-// ===== 预览 =====
-async function preview(url, name) {
+// ===== 预览（需登录）=====
+async function preview(name) {
+  const sessRes = await fetch(`${WORKER}/auth/me`, { credentials: 'include' });
+  const sessData = await sessRes.json();
+  if (!sessData.ok) { alert('请先登录以预览文件'); return; }
   const ext = getExt(name);
   const body = document.getElementById('preview-body');
   document.getElementById('preview-modal').classList.add('open');
+  const dlPath = currentPath ? `${currentPath}/${name}` : name;
   if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) {
-    body.innerHTML = `<img src="${url}" alt="${name}">`;
+    body.innerHTML = `<img src="${WORKER}/${encodeURIComponent(dlPath)}?action=download" alt="${name}">`;
   } else if (['json','txt','md','csv','js','css','html'].includes(ext)) {
     try {
-      const res = await fetch(url);
+      const res = await fetch(`${WORKER}/${encodeURIComponent(dlPath)}?action=download`, { credentials: 'include' });
+      if (!res.ok) { body.innerHTML = '<p>预览失败</p>'; return; }
       const text = await res.text();
       body.innerHTML = `<h3 style="margin-bottom:12px;">${name}</h3><pre>${escapeHtml(text)}</pre>`;
-    } catch(e) { body.innerHTML = `<p>预览失败</p><a href="${url}" download>下载</a>`; }
+    } catch(e) { body.innerHTML = `<p>预览失败</p>`; }
   } else {
-    body.innerHTML = `<h3>${name}</h3><p style="margin:12px 0;color:#666;">此类型不支持预览</p><a href="${url}" download class="btn btn-green">⬇ 下载</a>`;
+    body.innerHTML = `<h3>${name}</h3><p style="margin:12px 0;color:#666;">此类型不支持预览</p><button class="dl-btn" data-name="${name}" data-path="${currentPath}">⬇ 下载</button>`;
   }
 }
 window.preview = preview;
