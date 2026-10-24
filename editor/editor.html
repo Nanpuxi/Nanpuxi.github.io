@@ -5,71 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>📁 文件库 · Nanpuxi</title>
 <style>
-  :root {
-    --bg:#f0f2f5; --card:#fff; --border:#e8e8e8;
-    --text:#1a1a1a; --sub:#888; --primary:#4f46e5; --primary-hover:#4338ca;
-    --green:#16a34a; --red:#dc2626; --radius:10px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);padding:24px;}
-  .container{max-width:900px;margin:0 auto;}
-
-  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-  .header h1{font-size:22px;}
-  #user-bar{font-size:14px;color:var(--sub);}
-  #user-bar button{margin-left:8px;padding:4px 12px;border:none;border-radius:6px;background:var(--red);color:#fff;cursor:pointer;}
-
-  .breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:16px;font-size:14px;color:var(--sub);flex-wrap:wrap;}
-  .breadcrumb a{color:var(--primary);cursor:pointer;text-decoration:none;}
-  .breadcrumb a:hover{text-decoration:underline;}
-  .breadcrumb .sep{color:#ccc;}
-
-  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-  .toolbar input[type=text]{flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;}
-  .toolbar input[type=text]:focus{outline:2px solid rgba(79,70,229,.2);border-color:var(--primary);}
-
-  .upload-box{background:var(--card);padding:16px 20px;border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-  .upload-box input[type=file]{font-size:14px;}
-  .btn{padding:8px 18px;border:none;border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:500;transition:.15s;}
-  .btn:disabled{opacity:.5;cursor:not-allowed;}
-  .btn-primary{background:var(--primary);color:#fff;}
-  .btn-primary:hover:not(:disabled){background:var(--primary-hover);}
-  .btn-green{background:var(--green);color:#fff;}
-  .btn-red{background:var(--red);color:#fff;}
-  .btn-ghost{background:#f3f4f6;color:var(--text);}
-  #upload-msg{font-size:13px;}
-
-  .file-table{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;}
-  .table-header{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;background:#fafafa;border-bottom:1px solid var(--border);font-size:13px;color:var(--sub);font-weight:600;}
-  .file-row{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;border-bottom:1px solid #f5f5f5;align-items:center;transition:background .1s;}
-  .file-row:hover{background:#fafbff;}
-  .file-row.hidden{display:none;}
-  .file-name{font-size:14px;cursor:pointer;word-break:break-all;}
-  .file-name:hover{color:var(--primary);}
-  .file-size{font-size:12px;color:var(--sub);}
-  .file-actions{display:flex;gap:6px;justify-content:flex-end;}
-  .file-actions a,.file-actions button,.dl-btn{font-size:12px;padding:4px 10px;border-radius:6px;text-decoration:none;border:none;cursor:pointer;color:#fff;background:var(--green);}
-  .file-actions .rename{background:#f59e0b;}
-  .file-actions .del{background:var(--red);}
-  .empty{padding:40px;text-align:center;color:var(--sub);}
-
-  .new-folder-row{display:none;padding:10px 20px;background:#f0f7ff;border-bottom:1px solid var(--border);align-items:center;gap:10px;}
-  .new-folder-row input{padding:6px 10px;border:1px solid var(--primary);border-radius:6px;font-size:13px;}
-
-  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center;padding:20px;}
-  .modal.open{display:flex;}
-  .modal-content{background:#fff;border-radius:12px;max-width:700px;width:100%;max-height:85vh;overflow:auto;padding:24px;position:relative;}
-  .modal-close{position:absolute;top:14px;right:18px;font-size:22px;cursor:pointer;color:var(--sub);}
-  #preview-body pre{white-space:pre-wrap;word-break:break-all;font-size:13px;line-height:1.6;}
-  #preview-body img{max-width:100%;border-radius:8px;}
-  .auth-input{width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;}
+:root{--bg:#f0f2f5;--card:#fff;--border:#e8e8e8;--text:#1a1a1a;--sub:#888;--primary:#4f46e5;--green:#16a34a;--red:#dc2626;--radius:10px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);padding:24px;}
+.container{max-width:900px;margin:0 auto;}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.header h1{font-size:22px;}
+#user-bar{font-size:14px;color:var(--sub);}
+#user-bar button{margin-left:8px;padding:4px 12px;border:none;border-radius:6px;background:var(--red);color:#fff;cursor:pointer;}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:16px;font-size:14px;color:var(--sub);flex-wrap:wrap;}
+.breadcrumb a{color:var(--primary);cursor:pointer;text-decoration:none;}
+.breadcrumb a:hover{text-decoration:underline;}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.toolbar input[type=text]{flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;}
+.upload-box{background:var(--card);padding:16px 20px;border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.upload-box input[type=file]{font-size:14px;}
+.btn{padding:8px 18px;border:none;border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:500;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:#f3f4f6;color:var(--text);}
+#upload-msg{font-size:13px;}
+.file-table{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;}
+.table-header{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;background:#fafafa;border-bottom:1px solid var(--border);font-size:13px;color:var(--sub);font-weight:600;}
+.file-row{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;border-bottom:1px solid #f5f5f5;align-items:center;}
+.file-row:hover{background:#fafbff;}
+.file-name{font-size:14px;cursor:pointer;word-break:break-all;}
+.file-name:hover{color:var(--primary);}
+.file-size{font-size:12px;color:var(--sub);}
+.file-actions{display:flex;gap:6px;justify-content:flex-end;}
+.file-actions button,.dl-btn{font-size:12px;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;color:#fff;background:var(--green);}
+.file-actions .rename{background:#f59e0b;}
+.file-actions .del{background:var(--red);}
+.empty{padding:40px;text-align:center;color:var(--sub);}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center;padding:20px;}
+.modal.open{display:flex;}
+.modal-content{background:#fff;border-radius:12px;max-width:360px;width:100%;padding:24px;position:relative;}
+.modal-close{position:absolute;top:14px;right:18px;font-size:22px;cursor:pointer;color:var(--sub);}
+.auth-input{width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;}
 </style>
 </head>
 <body>
 
-<!-- 登录/注册弹窗 -->
 <div class="modal open" id="auth-modal">
-  <div class="modal-content" style="max-width:360px;">
+  <div class="modal-content">
     <h2 id="auth-title" style="margin-bottom:16px;">登录</h2>
     <input type="text" id="auth-username" class="auth-input" placeholder="用户名">
     <input type="password" id="auth-password" class="auth-input" placeholder="密码">
@@ -84,69 +64,33 @@
     <h1>📁 文件库</h1>
     <div id="user-bar">未登录</div>
   </div>
-
   <div class="breadcrumb" id="breadcrumb"></div>
-
-  <div class="toolbar">
-    <input type="text" id="search-input" placeholder="🔍 搜索文件名...">
-    <button class="btn btn-ghost" id="new-folder-btn">📁 新建文件夹</button>
-  </div>
-
-  <div class="new-folder-row" id="new-folder-row">
-    <span>文件夹名:</span>
-    <input type="text" id="new-folder-name" placeholder="my-folder">
-    <button class="btn btn-primary" id="new-folder-ok">创建</button>
-    <button class="btn btn-ghost" id="new-folder-cancel">取消</button>
-  </div>
-
   <div class="upload-box">
     <input type="file" id="upload-file">
     <button class="btn btn-primary" id="upload-btn" disabled>⬆ 上传（需登录）</button>
     <span id="upload-msg"></span>
   </div>
-
   <div class="file-table">
-    <div class="table-header">
-      <span>名称</span><span>大小</span><span style="text-align:right;">操作</span>
-    </div>
+    <div class="table-header"><span>名称</span><span>大小</span><span style="text-align:right;">操作</span></div>
     <div id="files-container"><div class="empty">加载中...</div></div>
-  </div>
-</div>
-
-<!-- 预览弹窗 -->
-<div class="modal" id="preview-modal" onclick="closeModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span class="modal-close" onclick="closeModal()">&times;</span>
-    <div id="preview-body"></div>
   </div>
 </div>
 
 <script>
 const WORKER = 'https://sweet-shape-6382.3906951201.workers.dev';
-let currentPath = '';
-let allItems = [];
-let currentUser = null;
-let currentRole = null;
-let isRegister = false;
+let currentUser = null, currentRole = null, currentPath = '';
+let allItems = [], isRegister = false;
 
-const showMsg = (el, text, color) => { el.textContent = text; el.style.color = color; };
-const formatSize = b => !b ? '-' : b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(2) + ' MB';
-const fileIcon = n => {
-  const ext = n.split('.').pop().toLowerCase();
-  const map = {png:'🖼️',jpg:'🖼️',jpeg:'🖼️',gif:'🖼️',svg:'🖼️',webp:'🖼️',json:'📋',txt:'📄',md:'📝',csv:'📊',js:'📜',html:'🌐',css:'🎨',zip:'🗜️',pdf:'📕',mp3:'🎵',mp4:'🎬'};
-  return map[ext] || '📄';
-};
-const getExt = n => { const p = n.split('.'); return p.length > 1 ? p.pop().toLowerCase() : ''; };
-const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const showMsg = (el,text,color) => { el.textContent=text; el.style.color=color; };
+const formatSize = b => !b ? '-' : b<1024 ? b+' B' : b<1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
 
-// ===== 认证 =====
+// 认证
 async function checkAuth() {
   try {
-    const res = await fetch(`${WORKER}/auth/me`, { credentials: 'include' });
+    const res = await fetch(`${WORKER}/auth/me`, { credentials:'include' });
     const data = await res.json();
     if (data.ok) {
-      currentUser = data.username;
-      currentRole = data.role || 'guest';
+      currentUser = data.username; currentRole = data.role || 'guest';
       document.getElementById('auth-modal').classList.remove('open');
       if (currentRole === 'guest') {
         document.getElementById('upload-btn').disabled = true;
@@ -155,7 +99,7 @@ async function checkAuth() {
       } else {
         document.getElementById('upload-btn').disabled = false;
         document.getElementById('upload-btn').textContent = '⬆ 上传（' + currentUser + '）';
-        document.getElementById('user-bar').innerHTML = currentUser + (currentRole === 'admin' ? ' <span style="color:var(--primary);">[管理员]</span>' : '') + ' <button id="logout-btn">退出</button>';
+        document.getElementById('user-bar').innerHTML = currentUser + (currentRole==='admin'?' <span style="color:var(--primary);">[管理员]</span>':'') + ' <button id="logout-btn">退出</button>';
       }
       document.getElementById('logout-btn').onclick = logout;
     } else {
@@ -177,219 +121,76 @@ document.getElementById('auth-switch').onclick = () => {
 document.getElementById('auth-submit').onclick = async () => {
   const u = document.getElementById('auth-username').value.trim();
   const p = document.getElementById('auth-password').value;
-  if (!u || !p) { showMsg(document.getElementById('auth-msg'), '⚠️ 请填写完整', 'orange'); return; }
+  if (!u || !p) { showMsg(document.getElementById('auth-msg'),'⚠️ 请填写完整','orange'); return; }
   const res = await fetch(`${WORKER}/${isRegister ? 'auth/register' : 'auth/login'}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-    body: JSON.stringify({ username: u, password: p })
+    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+    body: JSON.stringify({ username:u, password:p })
   });
   const d = await res.json();
   if (d.ok) { checkAuth(); }
-  else showMsg(document.getElementById('auth-msg'), '❌ ' + (d.message || '失败'), 'red');
+  else showMsg(document.getElementById('auth-msg'), '❌ ' + (d.message||'失败'), 'red');
 };
 
 async function logout() {
-  await fetch(`${WORKER}/auth/logout`, { method: 'POST', credentials: 'include' });
-  currentUser = null; currentRole = null;
+  await fetch(`${WORKER}/auth/logout`, { method:'POST', credentials:'include' });
+  currentUser=null; currentRole=null;
   document.getElementById('auth-modal').classList.add('open');
   document.getElementById('user-bar').textContent = '未登录';
   checkAuth();
 }
 
-// ===== 面包屑 =====
-function renderBreadcrumb(crumb) {
-  document.getElementById('breadcrumb').innerHTML = crumb.map((c, i) => {
-    const sep = i > 0 ? '<span class="sep"> / </span>' : '';
-    if (i === crumb.length - 1) return `${sep}<span>${c.name}</span>`;
-    return `${sep}<a onclick="navigate('${c.path}')">${c.name}</a>`;
-  }).join('');
-}
-function navigate(path) { currentPath = path; loadFiles(); }
-window.navigate = navigate;
-
-// ===== 加载文件列表 =====
+// 文件列表
 async function loadFiles() {
-  const container = document.getElementById('files-container');
-  container.innerHTML = '<div class="empty">加载中...</div>';
+  const c = document.getElementById('files-container');
+  c.innerHTML = '<div class="empty">加载中...</div>';
   try {
-    const res = await fetch(`${WORKER}/${currentPath}`, { method: 'GET', credentials: 'include' });
+    const res = await fetch(`${WORKER}/${currentPath}`, { credentials:'include' });
     const data = await res.json();
     allItems = data.items || [];
-    renderBreadcrumb(data.breadcrumb || [{ name: 'saves', path: '' }]);
-    renderFiles();
-  } catch(e) { container.innerHTML = `<div class="empty">❌ 加载失败: ${e.message}</div>`; }
+    c.innerHTML = allItems.map(item => {
+      if (item.type === 'dir') {
+        return `<div class="file-row"><span class="file-name">📁 ${item.name}</span><span class="file-size">文件夹</span><span class="file-actions"></span></div>`;
+      }
+      const canWrite = currentRole && currentRole !== 'guest';
+      return `<div class="file-row"><span class="file-name">📄 ${item.name}</span><span class="file-size">${formatSize(item.size)}</span><span class="file-actions"><button class="dl-btn" data-name="${item.name}">⬇</button>${canWrite?`<button class="rename">✏️</button><button class="del">🗑</button>`:''}</span></div>`;
+    }).join('');
+  } catch(e) { c.innerHTML = '<div class="empty">❌ 加载失败</div>'; }
 }
 
-// ===== 渲染列表 =====
-function renderFiles(filter = '') {
-  const container = document.getElementById('files-container');
-  if (allItems.length === 0) { container.innerHTML = '<div class="empty">📭 此目录为空</div>'; return; }
-  const f = filter.toLowerCase();
-  const canWrite = currentRole && currentRole !== 'guest';
-  container.innerHTML = allItems.map(item => {
-    const match = !f || item.name.toLowerCase().includes(f);
-    if (item.type === 'dir') {
-      return `<div class="file-row ${match ? '' : 'hidden'}">
-        <span class="file-name" onclick="navigate('${currentPath ? currentPath + '/' + item.name : item.name}')">📁 ${item.name}</span>
-        <span class="file-size">文件夹</span>
-        <span class="file-actions">${canWrite ? `<button class="del" onclick="deleteFolder('${item.name}')">🗑 删除</button>` : ''}</span>
-      </div>`;
-    }
-    return `<div class="file-row ${match ? '' : 'hidden'}" data-name="${item.name}" data-sha="${item.sha}">
-      <span class="file-name" onclick="preview('${item.name}')">${fileIcon(item.name)} ${item.name}</span>
-      <span class="file-size">${formatSize(item.size)}</span>
-      <span class="file-actions">
-        <button class="dl-btn" data-name="${item.name}" data-path="${currentPath}">⬇</button>
-        ${canWrite ? `<button class="rename" onclick="renameFile('${item.name}')">✏️</button>
-        <button class="del" onclick="deleteFile('${item.name}','${item.sha}')">🗑</button>` : ''}
-      </span>
-    </div>`;
-  }).join('');
-}
-
-document.getElementById('search-input').addEventListener('input', e => renderFiles(e.target.value));
-
-// ===== 下载（需登录）=====
+// 下载
 document.addEventListener('click', async e => {
   if (e.target.classList.contains('dl-btn')) {
     const name = e.target.dataset.name;
-    const p = e.target.dataset.path;
-    const dlPath = p ? `${p}/${name}` : name;
-    const origText = e.target.textContent;
+    const orig = e.target.textContent;
     e.target.textContent = '⏳';
-    e.target.disabled = true;
-    try {
-      const res = await fetch(`${WORKER}/${encodeURIComponent(dlPath)}?action=download`, { credentials: 'include' });
-      if (res.status === 401) { alert('请先登录以下载文件'); return; }
-      if (!res.ok) { alert('下载失败'); return; }
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch(err) { alert('下载失败: ' + err.message); }
-    finally { e.target.textContent = origText; e.target.disabled = false; }
+    const res = await fetch(`${WORKER}/${name}?action=download`, { credentials:'include' });
+    if (res.status === 401) { alert('请先登录'); e.target.textContent=orig; return; }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    URL.revokeObjectURL(a.href);
+    e.target.textContent = orig;
   }
 });
 
-// ===== 上传 =====
-document.getElementById('upload-btn').addEventListener('click', async () => {
+// 上传
+document.getElementById('upload-btn').onclick = async () => {
   const input = document.getElementById('upload-file');
-  const msg = document.getElementById('upload-msg');
-  if (!input.files.length) { showMsg(msg, '⚠️ 请先选择文件', 'orange'); return; }
+  if (!input.files.length) return;
   const file = input.files[0];
-  const safeName = file.name.replace(/[^\w\d\u4e00-\u9fa5\.\-]/g, '_');
-  showMsg(msg, '⏳ 上传中...', '#333');
-  try {
-    const form = new FormData();
-    form.append('file', file);
-    form.append('name', safeName);
-    const res = await fetch(`${WORKER}/${currentPath}`, { method: 'POST', body: form, credentials: 'include' });
-    const data = await res.json();
-    if (data.ok) { showMsg(msg, '✅ ' + data.message, 'green'); input.value = ''; loadFiles(); }
-    else showMsg(msg, '❌ ' + data.message, 'red');
-  } catch(e) { showMsg(msg, '❌ ' + e.message, 'red'); }
-});
-
-// ===== 删除文件 =====
-async function deleteFile(name, sha) {
-  if (!confirm(`确定删除「${name}」？`)) return;
-  const res = await fetch(`${WORKER}/${currentPath}`, {
-    method: 'DELETE', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-    body: JSON.stringify({ name })
-  });
-  const d = await res.json();
-  d.ok ? (alert('✅ 已删除'), loadFiles()) : alert('❌ ' + d.message);
-}
-window.deleteFile = deleteFile;
-
-// ===== 删除文件夹 =====
-async function deleteFolder(name) {
-  if (!confirm(`⚠️ 确定删除文件夹「${name}」及其所有内容？`)) return;
-  await recursiveDelete(name, currentPath);
-  loadFiles();
-}
-window.deleteFolder = deleteFolder;
-
-async function recursiveDelete(folderName, parentPath) {
-  const folderPath = parentPath ? `${parentPath}/${folderName}` : folderName;
-  const res = await fetch(`${WORKER}/${folderPath}`, { method: 'GET', credentials: 'include' });
-  const data = await res.json();
-  for (const item of data.items || []) {
-    if (item.type === 'dir') await recursiveDelete(item.name, folderPath);
-    else await fetch(`${WORKER}/${folderPath}`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, credentials: 'include', body: JSON.stringify({ name: item.name }) });
-  }
-}
-
-// ===== 重命名 =====
-async function renameFile(oldName) {
-  const newName = prompt('重命名为:', oldName);
-  if (!newName || newName === oldName) return;
-  const res = await fetch(`${WORKER}/${currentPath}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-    body: JSON.stringify({ oldName, newName })
-  });
-  const d = await res.json();
-  d.ok ? (alert('✅ ' + d.message), loadFiles()) : alert('❌ ' + d.message);
-}
-window.renameFile = renameFile;
-
-// ===== 新建文件夹 =====
-document.getElementById('new-folder-btn').onclick = () => {
-  const row = document.getElementById('new-folder-row');
-  row.style.display = 'flex';
-  document.getElementById('new-folder-name').focus();
-};
-document.getElementById('new-folder-cancel').onclick = () => {
-  document.getElementById('new-folder-row').style.display = 'none';
-  document.getElementById('new-folder-name').value = '';
-};
-document.getElementById('new-folder-ok').onclick = async () => {
-  const name = document.getElementById('new-folder-name').value.trim();
-  if (!name) return alert('请输入文件夹名');
-  const folderPath = currentPath ? `${currentPath}/${name}` : name;
-  const res = await fetch(`${WORKER}/${folderPath}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-    body: JSON.stringify({ name: '.gitkeep' })
-  });
-  const d = await res.json();
-  if (d.ok) {
-    document.getElementById('new-folder-row').style.display = 'none';
-    document.getElementById('new-folder-name').value = '';
-    loadFiles();
-  } else alert('❌ ' + d.message);
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const res = await fetch(`${WORKER}/${currentPath}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ name:file.name, content:reader.result })
+    });
+    const d = await res.json();
+    if (d.ok) { alert('✅ 上传成功'); loadFiles(); }
+    else alert('❌ ' + d.message);
+  };
+  reader.readAsText(file);
 };
 
-// ===== 预览（需登录）=====
-async function preview(name) {
-  const sessRes = await fetch(`${WORKER}/auth/me`, { credentials: 'include' });
-  const sessData = await sessRes.json();
-  if (!sessData.ok) { alert('请先登录以预览文件'); return; }
-  const ext = getExt(name);
-  const body = document.getElementById('preview-body');
-  document.getElementById('preview-modal').classList.add('open');
-  const dlPath = currentPath ? `${currentPath}/${name}` : name;
-  if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) {
-    body.innerHTML = `<img src="${WORKER}/${encodeURIComponent(dlPath)}?action=download" alt="${name}">`;
-  } else if (['json','txt','md','csv','js','css','html'].includes(ext)) {
-    try {
-      const res = await fetch(`${WORKER}/${encodeURIComponent(dlPath)}?action=download`, { credentials: 'include' });
-      if (!res.ok) { body.innerHTML = '<p>预览失败</p>'; return; }
-      const text = await res.text();
-      body.innerHTML = `<h3 style="margin-bottom:12px;">${name}</h3><pre>${escapeHtml(text)}</pre>`;
-    } catch(e) { body.innerHTML = `<p>预览失败</p>`; }
-  } else {
-    body.innerHTML = `<h3>${name}</h3><p style="margin:12px 0;color:#666;">此类型不支持预览</p><button class="dl-btn" data-name="${name}" data-path="${currentPath}">⬇ 下载</button>`;
-  }
-}
-window.preview = preview;
-
-function closeModal(e) {
-  if (e && e.type === 'click' && e.target !== document.getElementById('preview-modal')) return;
-  document.getElementById('preview-modal').classList.remove('open');
-}
-
-// ===== 启动 =====
 checkAuth();
 </script>
 </body>
