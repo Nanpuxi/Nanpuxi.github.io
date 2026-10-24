@@ -3,193 +3,275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📁 文件库 · Nanpuxi</title>
+<title>文件库</title>
 <style>
-:root{--bg:#f0f2f5;--card:#fff;--border:#e8e8e8;--text:#1a1a1a;--sub:#888;--primary:#4f46e5;--green:#16a34a;--red:#dc2626;--radius:10px;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);padding:24px;}
-.container{max-width:900px;margin:0 auto;}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.header h1{font-size:22px;}
-#user-bar{font-size:14px;color:var(--sub);}
-#user-bar button{margin-left:8px;padding:4px 12px;border:none;border-radius:6px;background:var(--red);color:#fff;cursor:pointer;}
-.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:16px;font-size:14px;color:var(--sub);flex-wrap:wrap;}
-.breadcrumb a{color:var(--primary);cursor:pointer;text-decoration:none;}
-.breadcrumb a:hover{text-decoration:underline;}
-.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.toolbar input[type=text]{flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;}
-.upload-box{background:var(--card);padding:16px 20px;border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-.upload-box input[type=file]{font-size:14px;}
-.btn{padding:8px 18px;border:none;border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:500;}
-.btn:disabled{opacity:.5;cursor:not-allowed;}
-.btn-primary{background:var(--primary);color:#fff;}
-.btn-green{background:var(--green);color:#fff;}
-.btn-red{background:var(--red);color:#fff;}
-.btn-ghost{background:#f3f4f6;color:var(--text);}
-#upload-msg{font-size:13px;}
-.file-table{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;}
-.table-header{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;background:#fafafa;border-bottom:1px solid var(--border);font-size:13px;color:var(--sub);font-weight:600;}
-.file-row{display:grid;grid-template-columns:1fr 100px 160px;padding:12px 20px;border-bottom:1px solid #f5f5f5;align-items:center;}
-.file-row:hover{background:#fafbff;}
-.file-name{font-size:14px;cursor:pointer;word-break:break-all;}
-.file-name:hover{color:var(--primary);}
-.file-size{font-size:12px;color:var(--sub);}
-.file-actions{display:flex;gap:6px;justify-content:flex-end;}
-.file-actions button,.dl-btn{font-size:12px;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;color:#fff;background:var(--green);}
-.file-actions .rename{background:#f59e0b;}
-.file-actions .del{background:var(--red);}
-.empty{padding:40px;text-align:center;color:var(--sub);}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center;padding:20px;}
-.modal.open{display:flex;}
-.modal-content{background:#fff;border-radius:12px;max-width:360px;width:100%;padding:24px;position:relative;}
-.modal-close{position:absolute;top:14px;right:18px;font-size:22px;cursor:pointer;color:var(--sub);}
-.auth-input{width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px; background: #1e293b; border-radius: 12px; }
+.header h1 { font-size: 1.5rem; }
+.auth-area { display: flex; gap: 10px; align-items: center; }
+.auth-area button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+.btn-login { background: #3b82f6; color: white; }
+.btn-register { background: #10b981; color: white; }
+.btn-logout { background: #ef4444; color: white; }
+.btn-upload { background: #8b5cf6; color: white; }
+.status { font-size: 0.85rem; color: #94a3b8; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: #1e293b; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; }
+.modal h2 { margin-bottom: 20px; }
+.modal input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #334155; border-radius: 6px; background: #0f172a; color: #e2e8f0; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; }
+.btn-confirm { background: #3b82f6; color: white; }
+.btn-cancel { background: #475569; color: white; }
+.upload-area { margin-bottom: 20px; padding: 20px; border: 2px dashed #334155; border-radius: 12px; text-align: center; }
+.upload-area input[type="file"] { margin-top: 10px; }
+.files-grid { display: grid; gap: 12px; }
+.file-card { background: #1e293b; padding: 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+.file-card .info { flex: 1; }
+.file-card .name { font-weight: 500; word-break: break-all; }
+.file-card .size { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+.file-card .actions { display: flex; gap: 8px; }
+.file-card button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.btn-download { background: #3b82f6; color: white; }
+.btn-delete { background: #ef4444; color: white; }
+.btn-rename { background: #f59e0b; color: white; }
+.toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 200; display: none; max-width: 350px; }
+.toast.success { background: #10b981; }
+.toast.error { background: #ef4444; }
+.toast.active { display: block; }
 </style>
 </head>
 <body>
-
-<div class="modal open" id="auth-modal">
-  <div class="modal-content">
-    <h2 id="auth-title" style="margin-bottom:16px;">登录</h2>
-    <input type="text" id="auth-username" class="auth-input" placeholder="用户名">
-    <input type="password" id="auth-password" class="auth-input" placeholder="密码">
-    <button id="auth-submit" class="btn btn-primary" style="width:100%;margin-bottom:12px;">登录</button>
-    <p id="auth-switch" style="cursor:pointer;color:var(--primary);text-align:center;font-size:13px;">没有账号？注册</p>
-    <p id="auth-msg" style="text-align:center;font-size:13px;margin-top:8px;"></p>
-  </div>
-</div>
-
 <div class="container">
   <div class="header">
     <h1>📁 文件库</h1>
-    <div id="user-bar">未登录</div>
+    <div class="auth-area">
+      <span class="status" id="statusText">未登录</span>
+      <button class="btn-login" id="loginBtn" onclick="showModal('loginModal')">登录</button>
+      <button class="btn-register" id="registerBtn" onclick="showModal('registerModal')">注册</button>
+      <button class="btn-logout" id="logoutBtn" onclick="logout()" style="display:none">退出</button>
+      <button class="btn-upload" id="uploadBtn" onclick="showModal('uploadModal')" style="display:none">上传</button>
+    </div>
   </div>
-  <div class="breadcrumb" id="breadcrumb"></div>
-  <div class="upload-box">
-    <input type="file" id="upload-file">
-    <button class="btn btn-primary" id="upload-btn" disabled>⬆ 上传（需登录）</button>
-    <span id="upload-msg"></span>
+
+  <div class="upload-area" id="uploadArea" style="display:none">
+    <p>选择文件上传到仓库</p>
+    <input type="file" id="fileInput">
+    <button class="btn-confirm" onclick="doUpload()" style="margin-top:10px;padding:8px 16px;border:none;border-radius:6px;background:#8b5cf6;color:white;cursor:pointer">确认上传</button>
   </div>
-  <div class="file-table">
-    <div class="table-header"><span>名称</span><span>大小</span><span style="text-align:right;">操作</span></div>
-    <div id="files-container"><div class="empty">加载中...</div></div>
+
+  <div class="files-grid" id="filesGrid"></div>
+</div>
+
+<!-- 登录弹窗 -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h2>登录</h2>
+    <input type="text" id="loginUser" placeholder="用户名">
+    <input type="password" id="loginPass" placeholder="密码">
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="doLogin()">登录</button>
+      <button class="btn-cancel" onclick="hideModal('loginModal')">取消</button>
+    </div>
   </div>
 </div>
 
+<!-- 注册弹窗 -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <h2>注册</h2>
+    <input type="text" id="regUser" placeholder="用户名">
+    <input type="password" id="regPass" placeholder="密码（至少6位）">
+    <input type="text" id="regInvite" placeholder="邀请码">
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="doRegister()">注册</button>
+      <button class="btn-cancel" onclick="hideModal('registerModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 上传弹窗 -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <h2>上传文件</h2>
+    <p>请在上方选择文件后确认</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('uploadModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 重命名弹窗 -->
+<div class="modal-overlay" id="renameModal">
+  <div class="modal">
+    <h2>重命名</h2>
+    <input type="text" id="newName" placeholder="新文件名">
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="confirmRename()">确认</button>
+      <button class="btn-cancel" onclick="hideModal('renameModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-const WORKER = 'https://sweet-shape-6382.3906951201.workers.dev';
-let currentUser = null, currentRole = null, currentPath = '';
-let allItems = [], isRegister = false;
+const API = 'https://sweet-shape-6382.3906951201.workers.dev';
+let currentRole = 'guest';
+let renameTarget = '';
 
-const showMsg = (el,text,color) => { el.textContent=text; el.style.color=color; };
-const formatSize = b => !b ? '-' : b<1024 ? b+' B' : b<1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
-
-// 认证
+// 检查登录状态
 async function checkAuth() {
   try {
-    const res = await fetch(`${WORKER}/auth/me`, { credentials:'include' });
-    const data = await res.json();
-    if (data.ok) {
-      currentUser = data.username; currentRole = data.role || 'guest';
-      document.getElementById('auth-modal').classList.remove('open');
-      if (currentRole === 'guest') {
-        document.getElementById('upload-btn').disabled = true;
-        document.getElementById('upload-btn').textContent = '👁 访客模式（只读）';
-        document.getElementById('user-bar').innerHTML = currentUser + ' <span style="color:#f59e0b;">[访客]</span> <button id="logout-btn">退出</button>';
-      } else {
-        document.getElementById('upload-btn').disabled = false;
-        document.getElementById('upload-btn').textContent = '⬆ 上传（' + currentUser + '）';
-        document.getElementById('user-bar').innerHTML = currentUser + (currentRole==='admin'?' <span style="color:var(--primary);">[管理员]</span>':'') + ' <button id="logout-btn">退出</button>';
+    const r = await fetch(API + '/auth/me', { credentials: 'include' });
+    if (r.ok) {
+      const d = await r.json();
+      currentRole = d.role;
+      document.getElementById('statusText').textContent = `已登录: ${d.username} (${d.role})`;
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('registerBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      if (d.role !== 'guest') {
+        document.getElementById('uploadBtn').style.display = 'inline-block';
+        document.getElementById('uploadArea').style.display = 'block';
       }
-      document.getElementById('logout-btn').onclick = logout;
     } else {
-      document.getElementById('auth-modal').classList.add('open');
-      document.getElementById('upload-btn').disabled = true;
+      document.getElementById('statusText').textContent = '未登录';
     }
-    loadFiles();
   } catch(e) { console.error(e); }
+  loadFiles();
 }
 
-document.getElementById('auth-switch').onclick = () => {
-  isRegister = !isRegister;
-  document.getElementById('auth-title').textContent = isRegister ? '注册' : '登录';
-  document.getElementById('auth-submit').textContent = isRegister ? '注册' : '登录';
-  document.getElementById('auth-switch').textContent = isRegister ? '已有账号？登录' : '没有账号？注册';
-  document.getElementById('auth-msg').textContent = '';
-};
-
-document.getElementById('auth-submit').onclick = async () => {
-  const u = document.getElementById('auth-username').value.trim();
-  const p = document.getElementById('auth-password').value;
-  if (!u || !p) { showMsg(document.getElementById('auth-msg'),'⚠️ 请填写完整','orange'); return; }
-  const res = await fetch(`${WORKER}/${isRegister ? 'auth/register' : 'auth/login'}`, {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-    body: JSON.stringify({ username:u, password:p })
+// 注册
+async function doRegister() {
+  const username = document.getElementById('regUser').value.trim();
+  const password = document.getElementById('regPass').value;
+  const inviteCode = document.getElementById('regInvite').value.trim();
+  if (!username || !password) { toast('请填写完整', 'error'); return; }
+  const r = await fetch(API + '/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ username, password, inviteCode })
   });
-  const d = await res.json();
-  if (d.ok) { checkAuth(); }
-  else showMsg(document.getElementById('auth-msg'), '❌ ' + (d.message||'失败'), 'red');
-};
-
-async function logout() {
-  await fetch(`${WORKER}/auth/logout`, { method:'POST', credentials:'include' });
-  currentUser=null; currentRole=null;
-  document.getElementById('auth-modal').classList.add('open');
-  document.getElementById('user-bar').textContent = '未登录';
-  checkAuth();
-}
-
-// 文件列表
-async function loadFiles() {
-  const c = document.getElementById('files-container');
-  c.innerHTML = '<div class="empty">加载中...</div>';
-  try {
-    const res = await fetch(`${WORKER}/${currentPath}`, { credentials:'include' });
-    const data = await res.json();
-    allItems = data.items || [];
-    c.innerHTML = allItems.map(item => {
-      if (item.type === 'dir') {
-        return `<div class="file-row"><span class="file-name">📁 ${item.name}</span><span class="file-size">文件夹</span><span class="file-actions"></span></div>`;
-      }
-      const canWrite = currentRole && currentRole !== 'guest';
-      return `<div class="file-row"><span class="file-name">📄 ${item.name}</span><span class="file-size">${formatSize(item.size)}</span><span class="file-actions"><button class="dl-btn" data-name="${item.name}">⬇</button>${canWrite?`<button class="rename">✏️</button><button class="del">🗑</button>`:''}</span></div>`;
-    }).join('');
-  } catch(e) { c.innerHTML = '<div class="empty">❌ 加载失败</div>'; }
-}
-
-// 下载
-document.addEventListener('click', async e => {
-  if (e.target.classList.contains('dl-btn')) {
-    const name = e.target.dataset.name;
-    const orig = e.target.textContent;
-    e.target.textContent = '⏳';
-    const res = await fetch(`${WORKER}/${name}?action=download`, { credentials:'include' });
-    if (res.status === 401) { alert('请先登录'); e.target.textContent=orig; return; }
-    const blob = await res.blob();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    URL.revokeObjectURL(a.href);
-    e.target.textContent = orig;
+  const d = await r.json();
+  if (d.ok) {
+    toast(d.message, 'success');
+    hideModal('registerModal');
+    // 注册成功后自动登录
+    setTimeout(() => doLoginAfterRegister(username, password), 500);
+  } else {
+    toast(d.message, 'error');
   }
-});
+}
+
+// 注册后自动登录
+async function doLoginAfterRegister(username, password) {
+  const r = await fetch(API + '/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ username, password })
+  });
+  const d = await r.json();
+  if (d.ok) { checkAuth(); } else { toast('自动登录失败，请手动登录', 'error'); }
+}
+
+// 登录
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (!username || !password) { toast('请填写完整', 'error'); return; }
+  const r = await fetch(API + '/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ username, password })
+  });
+  const d = await r.json();
+  if (d.ok) {
+    toast('登录成功', 'success');
+    hideModal('loginModal');
+    checkAuth();
+  } else {
+    toast(d.message, 'error');
+  }
+}
+
+// 退出
+async function logout() {
+  await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
+  location.reload();
+}
+
+// 加载文件
+async function loadFiles() {
+  const r = await fetch(API + '/files', { credentials: 'include' });
+  const d = await r.json();
+  if (!d.ok) return;
+  const grid = document.getElementById('filesGrid');
+  grid.innerHTML = '';
+  d.files.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'file-card';
+    card.innerHTML = `
+      <div class="info">
+        <div class="name">${f.name}</div>
+        <div class="size">${(f.size/1024).toFixed(1)} KB</div>
+      </div>
+      <div class="actions">
+        ${f.canDownload ? `<button class="btn-download" onclick="window.open('${f.url}','_blank')">下载</button>` : ''}
+        ${f.canRename ? `<button class="btn-rename" onclick="showRename('${f.name}')">重命名</button>` : ''}
+        ${f.canDelete ? `<button class="btn-delete" onclick="doDelete('${f.name}')">删除</button>` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
 
 // 上传
-document.getElementById('upload-btn').onclick = async () => {
-  const input = document.getElementById('upload-file');
-  if (!input.files.length) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  reader.onload = async () => {
-    const res = await fetch(`${WORKER}/${currentPath}`, {
-      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ name:file.name, content:reader.result })
-    });
-    const d = await res.json();
-    if (d.ok) { alert('✅ 上传成功'); loadFiles(); }
-    else alert('❌ ' + d.message);
-  };
-  reader.readAsText(file);
-};
+async function doUpload() {
+  const fileInput = document.getElementById('fileInput');
+  if (!fileInput.files[0]) { toast('请选择文件', 'error'); return; }
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  const r = await fetch(API + '/upload', { method: 'POST', credentials: 'include', body: formData });
+  const d = await r.json();
+  if (d.ok) { toast('上传成功', 'success'); loadFiles(); hideModal('uploadModal'); }
+  else toast(d.message, 'error');
+}
+
+// 删除
+async function doDelete(name) {
+  if (!confirm(`确定删除 ${name}？`)) return;
+  const r = await fetch(API + '/delete/' + encodeURIComponent(name), { method: 'DELETE', credentials: 'include' });
+  const d = await r.json();
+  if (d.ok) { toast('删除成功', 'success'); loadFiles(); }
+  else toast(d.message, 'error');
+}
+
+// 重命名
+function showRename(name) { renameTarget = name; document.getElementById('newName').value = name; showModal('renameModal'); }
+async function confirmRename() {
+  const newName = document.getElementById('newName').value.trim();
+  if (!newName || newName === renameTarget) return;
+  const r = await fetch(API + '/rename', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ oldName: renameTarget, newName }) });
+  const d = await r.json();
+  if (d.ok) { toast('重命名成功', 'success'); loadFiles(); hideModal('renameModal'); }
+  else toast(d.message, 'error');
+}
+
+// UI
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' active';
+  setTimeout(() => t.classList.remove('active'), 4000);
+}
 
 checkAuth();
 </script>
