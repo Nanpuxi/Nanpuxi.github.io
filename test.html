@@ -1,0 +1,11 @@
+<input type="file" id="fileInput">
+<button onclick="upload()">上传</button>
+<script>
+async function upload() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) return alert('请先选择文件');
+  const url = 'https://sweet-shape-6382.3906951201.workers.dev/?file=' + encodeURIComponent(file.name);
+  const res = await fetch(url, { method: 'POST', body: file });
+  alert(await res.text());
+}
+</script>
