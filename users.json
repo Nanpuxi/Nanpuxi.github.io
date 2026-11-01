@@ -1,21 +1,3 @@
 {
-  "Nanpuxi": {
-    "salt": "lf1a6mq9",
-    "hash": "c0583e69cbd7e2c321576efb9c5045f1f9fb9fe1f232421d942c9d96e8bc4fa9",
-    "role": "admin",
-    "createdAt": "2026-10-24T04:28:26.350Z"
-  },
-  "hhhhhh": {
-    "salt": "pqvlemkl",
-    "hash": "3b24061c34eefc132a8cc3bdbdee0368d4be620d395f790a40f47b105c95baa4",
-    "role": "guest",
-    "createdAt": "2026-10-24T04:36:06.720Z"
-  },
-  "hhhhhhh": {
-    "salt": "1acy9ss4",
-    "hash": "551e3fece63f67228c7b6f44d89cd2c518a05437c0bb84dfc1548d6cf174688c",
-    "role": "guest",
-    "createdAt": "2026-11-01T00:21:21.476Z"
-  },
-  "undefined": {}
+ 
 }
