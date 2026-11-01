@@ -6,152 +6,130 @@
 <title>文件库 - 南浦Xi</title>
 <style>
 :root {
-  --bg-dark: #0d1117; --card-dark: #161b22; --border-dark: #30363d;
-  --text-dark: #c9d1d9; --text-bright-dark: #f0f6fc; --muted-dark: #8b949e;
-  --accent-dark: #58a6ff; --accent-blue-dark: #1f6feb; --accent-green-dark: #238636;
-  --accent-red-dark: #da3633; --accent-yellow-dark: #d29922; --hover-dark: #30363d;
+  --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#c9d1d9; --bright:#f0f6fc; --muted:#8b949e;
+  --blue:#1f6feb; --green:#238636; --red:#da3633; --yellow:#d29922; --accent:#58a6ff; --hover:#30363d;
 }
 :root[data-theme="light"] {
-  --bg-dark: #ffffff; --card-dark: #f6f8fa; --border-dark: #d0d7de;
-  --text-dark: #24292f; --text-bright-dark: #1f2328; --muted-dark: #57606a;
-  --accent-dark: #0969da; --accent-blue-dark: #0969da; --accent-green-dark: #1a7f37;
-  --accent-red-dark: #d1242f; --accent-yellow-dark: #9a6700; --hover-dark: #eaeef2;
+  --bg:#fff; --card:#f6f8fa; --border:#d0d7de; --text:#24292f; --bright:#1f2328; --muted:#57606a;
+  --blue:#0969da; --green:#1a7f37; --red:#d1242f; --yellow:#9a6700; --accent:#0969da; --hover:#eaeef2;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif; background: var(--bg-dark); color: var(--text-dark); min-height: 100vh; transition: background 0.3s, color 0.3s; }
-
-.topbar { background: var(--card-dark); border-bottom: 1px solid var(--border-dark); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; transition: background 0.3s; }
-.topbar-left { display: flex; align-items: center; gap: 16px; }
-.topbar h1 { font-size: 1.2rem; font-weight: 600; }
-.topbar h1 a { color: var(--text-bright-dark); text-decoration: none; }
-.nav-links { display: flex; gap: 16px; align-items: center; }
-.nav-links a { color: var(--muted-dark); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-.nav-links a:hover, .nav-links a.active { color: var(--accent-dark); }
-.theme-toggle { width: 36px; height: 36px; border: 1px solid var(--border-dark); border-radius: 50%; background: var(--card-dark); color: var(--text-bright-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; }
-.theme-toggle:hover { background: var(--hover-dark); }
-.user-area { display: flex; align-items: center; gap: 10px; }
-.user-area .username { font-size: 0.85rem; color: var(--muted-dark); }
-.role-badge { padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
-.role-admin { background: rgba(88,166,255,0.15); color: var(--accent-dark); border: 1px solid var(--accent-dark); }
-.role-user { background: rgba(35,134,54,0.15); color: var(--accent-green-dark); border: 1px solid var(--accent-green-dark); }
-.role-guest { background: var(--hover-dark); color: var(--muted-dark); border: 1px solid var(--border-dark); }
-.user-area button { padding: 6px 14px; border: 1px solid var(--border-dark); border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-.btn-login { background: var(--card-dark); color: var(--text-bright-dark); }
-.btn-login:hover { background: var(--hover-dark); }
-.btn-register { background: var(--accent-green-dark); color: #fff; border-color: var(--accent-green-dark); }
-.btn-register:hover { opacity: 0.9; }
-.btn-logout { background: var(--accent-red-dark); color: #fff; border-color: var(--accent-red-dark); }
-.btn-logout:hover { opacity: 0.9; }
-.btn-upload { background: var(--accent-blue-dark); color: #fff; border-color: var(--accent-blue-dark); }
-.btn-upload:hover { opacity: 0.9; }
-
-.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
-.page-header h2 { font-size: 1.3rem; color: var(--text-bright-dark); }
-.page-header .subtitle { font-size: 0.85rem; color: var(--muted-dark); margin-top: 4px; }
-.page-header .subtitle span { cursor: pointer; color: var(--accent-dark); }
-.page-header .subtitle span:hover { text-decoration: underline; }
-
-.upload-section { background: var(--card-dark); border: 2px dashed var(--border-dark); border-radius: 12px; padding: 32px 24px; margin-bottom: 28px; text-align: center; transition: all 0.3s; }
-.upload-section:hover { border-color: var(--accent-dark); }
-.upload-section.dragover { border-color: var(--accent-dark); background: rgba(88,166,255,0.05); }
-.upload-section .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
-.upload-section h3 { margin-bottom: 8px; color: var(--text-bright-dark); font-size: 1rem; }
-.upload-section p { color: var(--muted-dark); font-size: 0.85rem; margin-bottom: 16px; }
-.upload-label { display: inline-block; padding: 10px 24px; background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 6px; cursor: pointer; color: var(--text-dark); font-size: 0.9rem; transition: all 0.2s; }
-.upload-label:hover { background: var(--hover-dark); }
-.upload-section input[type="file"] { display: none; }
-.upload-btn { margin-top: 16px; padding: 8px 24px; background: var(--accent-blue-dark); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
-.upload-btn:hover { opacity: 0.9; }
-.upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.progress-bar { width: 100%; height: 6px; background: var(--hover-dark); border-radius: 3px; overflow: hidden; margin-top: 14px; display: none; }
-.progress-bar.active { display: block; }
-.progress-fill { height: 100%; background: var(--accent-dark); width: 0%; transition: width 0.3s; }
-
-.files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.file-card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; padding: 18px; transition: all 0.2s; display: flex; flex-direction: column; gap: 12px; }
-.file-card.clickable { cursor: pointer; }
-.file-card.clickable:hover { border-color: var(--accent-dark); box-shadow: 0 4px 16px rgba(88,166,255,0.1); transform: translateY(-2px); }
-.file-header { display: flex; align-items: flex-start; gap: 12px; }
-.file-icon { font-size: 2.2rem; flex-shrink: 0; }
-.file-info { flex: 1; min-width: 0; }
-.file-name { font-weight: 500; color: var(--text-bright-dark); word-break: break-all; font-size: 0.95rem; margin-bottom: 4px; cursor: pointer; }
-.file-name:hover { color: var(--accent-dark); }
-.file-meta { font-size: 0.78rem; color: var(--muted-dark); }
-.file-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.file-actions button { flex: 1; padding: 6px 10px; border: 1px solid var(--border-dark); border-radius: 5px; cursor: pointer; font-size: 0.78rem; transition: all 0.2s; min-width: 56px; }
-.btn-download { background: var(--card-dark); color: var(--accent-dark); border-color: var(--accent-dark); }
-.btn-download:hover { background: rgba(88,166,255,0.1); }
-.btn-rename { background: var(--card-dark); color: var(--accent-yellow-dark); border-color: var(--accent-yellow-dark); }
-.btn-rename:hover { background: rgba(210,153,34,0.1); }
-.btn-delete { background: var(--card-dark); color: var(--accent-red-dark); border-color: var(--accent-red-dark); }
-.btn-delete:hover { background: rgba(209,36,47,0.1); }
-
-/* 用户表格 */
-.users-table { width: 100%; border-collapse: collapse; background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; overflow: hidden; }
-.users-table th, .users-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-dark); }
-.users-table th { background: var(--hover-dark); color: var(--muted-dark); font-size: 0.8rem; font-weight: 600; }
-.users-table tr:last-child td { border-bottom: none; }
-.users-table tr:hover td { background: var(--hover-dark); }
-.users-table .u-name { font-weight: 500; color: var(--text-bright-dark); }
-.role-tag { padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 500; }
-.role-tag.admin { background: rgba(88,166,255,0.15); color: var(--accent-dark); }
-.role-tag.user { background: rgba(35,134,54,0.15); color: var(--accent-green-dark); }
-.role-tag.guest { background: var(--hover-dark); color: var(--muted-dark); }
-.role-select { padding: 5px 10px; border: 1px solid var(--border-dark); border-radius: 5px; background: var(--bg-dark); color: var(--text-dark); font-size: 0.85rem; cursor: pointer; }
-.btn-save-role { padding: 5px 14px; background: var(--accent-blue-dark); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 0.85rem; }
-.btn-save-role:hover { opacity: 0.9; }
-.btn-save-role:disabled { opacity: 0.4; cursor: not-allowed; }
-.you-tag { font-size: 0.7rem; color: var(--accent-green-dark); margin-left: 6px; }
-
-.view-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-dark); }
-.view-tab { padding: 10px 20px; cursor: pointer; font-size: 0.9rem; color: var(--muted-dark); border-bottom: 2px solid transparent; transition: all 0.2s; }
-.view-tab.active { color: var(--accent-dark); border-bottom-color: var(--accent-dark); }
-.view-tab:hover { color: var(--text-bright-dark); }
-.view-panel { display: none; }
-.view-panel.active { display: block; }
-
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-.modal-overlay.active { display: flex; }
-.modal { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 28px; width: 90%; max-width: 400px; animation: modalIn 0.2s ease; }
-@keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal h2 { margin-bottom: 20px; color: var(--text-bright-dark); font-size: 1.1rem; }
-.modal input { width: 100%; padding: 10px 14px; margin-bottom: 14px; border: 1px solid var(--border-dark); border-radius: 6px; background: var(--bg-dark); color: var(--text-dark); font-size: 0.9rem; }
-.modal input:focus { outline: none; border-color: var(--accent-dark); }
-.modal-hint { font-size: 0.8rem; color: var(--muted-dark); margin-bottom: 14px; text-align: right; }
-.modal-hint a { color: var(--accent-dark); cursor: pointer; }
-.modal-actions { display: flex; gap: 10px; }
-.modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
-.btn-confirm { background: var(--accent-blue-dark); color: #fff; }
-.btn-confirm:hover { opacity: 0.9; }
-.btn-cancel { background: var(--hover-dark); color: var(--text-dark); }
-.btn-cancel:hover { opacity: 0.8; }
-
-.toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: #fff; z-index: 200; display: none; max-width: 360px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-.toast.success { background: var(--accent-green-dark); }
-.toast.error { background: var(--accent-red-dark); }
-.toast.active { display: block; }
-
-.empty-state, .login-prompt { text-align: center; padding: 60px 20px; }
-.empty-state .empty-icon, .login-prompt .icon { font-size: 3rem; margin-bottom: 16px; }
-.login-prompt { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 12px; }
-.login-prompt h3 { color: var(--text-bright-dark); margin-bottom: 8px; }
-.login-prompt p { color: var(--muted-dark); margin-bottom: 20px; }
-.login-prompt button { padding: 10px 24px; margin: 0 6px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
-.login-prompt .primary { background: var(--accent-blue-dark); color: #fff; }
-.login-prompt .secondary { background: var(--accent-green-dark); color: #fff; }
-
-@media (max-width: 640px) {
-  .topbar { padding: 12px 16px; }
-  .topbar h1 { font-size: 1rem; }
-  .nav-links { display: none; }
-  .container { padding: 16px; }
-  .files-grid { grid-template-columns: 1fr; }
-  .user-area .username { display: none; }
-  .page-header { flex-wrap: wrap; }
-  .users-table { font-size: 0.85rem; }
-  .users-table th, .users-table td { padding: 8px; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition:background .3s,color .3s; }
+.topbar { background:var(--card); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; }
+.topbar-left { display:flex; align-items:center; gap:16px; }
+.topbar h1 { font-size:1.2rem; font-weight:600; }
+.topbar h1 a { color:var(--bright); text-decoration:none; }
+.nav-links { display:flex; gap:16px; align-items:center; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:.9rem; transition:color .2s; }
+.nav-links a:hover, .nav-links a.active { color:var(--accent); }
+.theme-toggle { width:36px; height:36px; border:1px solid var(--border); border-radius:50%; background:var(--card); color:var(--bright); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+.user-area { display:flex; align-items:center; gap:10px; }
+.user-area .username { font-size:.85rem; color:var(--muted); }
+.role-badge { padding:3px 10px; border-radius:12px; font-size:.75rem; font-weight:500; }
+.role-admin { background:rgba(88,166,255,.15); color:var(--accent); border:1px solid var(--accent); }
+.role-user { background:rgba(35,134,54,.15); color:var(--green); border:1px solid var(--green); }
+.role-guest { background:var(--hover); color:var(--muted); border:1px solid var(--border); }
+.user-area button { padding:6px 14px; border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:.85rem; transition:all .2s; }
+.btn-login { background:var(--card); color:var(--bright); }
+.btn-login:hover { background:var(--hover); }
+.btn-register { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-register:hover { opacity:.9; }
+.btn-logout { background:var(--red); color:#fff; border-color:var(--red); }
+.btn-logout:hover { opacity:.9; }
+.btn-upload { background:var(--blue); color:#fff; border-color:var(--blue); }
+.btn-upload:hover { opacity:.9; }
+.container { max-width:1100px; margin:0 auto; padding:24px; }
+.page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; }
+.page-header h2 { font-size:1.3rem; color:var(--bright); }
+.page-header .subtitle { font-size:.85rem; color:var(--muted); margin-top:4px; }
+.page-header .subtitle span { cursor:pointer; color:var(--accent); }
+.page-header .subtitle span:hover { text-decoration:underline; }
+.upload-section { background:var(--card); border:2px dashed var(--border); border-radius:12px; padding:32px 24px; margin-bottom:28px; text-align:center; transition:all .3s; }
+.upload-section:hover { border-color:var(--accent); }
+.upload-section.dragover { border-color:var(--accent); background:rgba(88,166,255,.05); }
+.upload-section .upload-icon { font-size:2.5rem; margin-bottom:12px; }
+.upload-section h3 { margin-bottom:8px; color:var(--bright); font-size:1rem; }
+.upload-section p { color:var(--muted); font-size:.85rem; margin-bottom:16px; }
+.upload-label { display:inline-block; padding:10px 24px; background:var(--card); border:1px solid var(--border); border-radius:6px; cursor:pointer; color:var(--text); font-size:.9rem; }
+.upload-label:hover { background:var(--hover); }
+.upload-section input[type="file"] { display:none; }
+.upload-btn { margin-top:16px; padding:8px 24px; background:var(--blue); color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:.9rem; }
+.upload-btn:hover { opacity:.9; }
+.upload-btn:disabled { opacity:.5; cursor:not-allowed; }
+.progress-bar { width:100%; height:6px; background:var(--hover); border-radius:3px; overflow:hidden; margin-top:14px; display:none; }
+.progress-bar.active { display:block; }
+.progress-fill { height:100%; background:var(--accent); width:0%; transition:width .3s; }
+.files-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.file-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; transition:all .2s; display:flex; flex-direction:column; gap:12px; }
+.file-card.clickable { cursor:pointer; }
+.file-card.clickable:hover { border-color:var(--accent); box-shadow:0 4px 16px rgba(88,166,255,.1); transform:translateY(-2px); }
+.file-header { display:flex; align-items:flex-start; gap:12px; }
+.file-icon { font-size:2.2rem; flex-shrink:0; }
+.file-info { flex:1; min-width:0; }
+.file-name { font-weight:500; color:var(--bright); word-break:break-all; font-size:.95rem; margin-bottom:4px; cursor:pointer; }
+.file-name:hover { color:var(--accent); }
+.file-meta { font-size:.78rem; color:var(--muted); }
+.file-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.file-actions button { flex:1; padding:6px 10px; border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:.78rem; transition:all .2s; min-width:56px; }
+.btn-download { background:var(--card); color:var(--accent); border-color:var(--accent); }
+.btn-download:hover { background:rgba(88,166,255,.1); }
+.btn-rename { background:var(--card); color:var(--yellow); border-color:var(--yellow); }
+.btn-rename:hover { background:rgba(210,153,34,.1); }
+.btn-delete { background:var(--card); color:var(--red); border-color:var(--red); }
+.btn-delete:hover { background:rgba(209,36,47,.1); }
+.users-table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.users-table th, .users-table td { padding:12px 16px; text-align:left; border-bottom:1px solid var(--border); }
+.users-table th { background:var(--hover); color:var(--muted); font-size:.8rem; font-weight:600; }
+.users-table tr:last-child td { border-bottom:none; }
+.users-table tr:hover td { background:var(--hover); }
+.users-table .u-name { font-weight:500; color:var(--bright); }
+.role-tag { padding:2px 8px; border-radius:10px; font-size:.75rem; font-weight:500; }
+.role-tag.admin { background:rgba(88,166,255,.15); color:var(--accent); }
+.role-tag.user { background:rgba(35,134,54,.15); color:var(--green); }
+.role-tag.guest { background:var(--hover); color:var(--muted); }
+.role-select { padding:5px 10px; border:1px solid var(--border); border-radius:5px; background:var(--bg); color:var(--text); font-size:.85rem; cursor:pointer; }
+.btn-save-role { padding:5px 14px; background:var(--blue); color:#fff; border:none; border-radius:5px; cursor:pointer; font-size:.85rem; }
+.btn-save-role:hover { opacity:.9; }
+.btn-save-role:disabled { opacity:.4; cursor:not-allowed; }
+.you-tag { font-size:.7rem; color:var(--green); margin-left:6px; }
+.view-tabs { display:flex; gap:0; margin-bottom:20px; border-bottom:1px solid var(--border); }
+.view-tab { padding:10px 20px; cursor:pointer; font-size:.9rem; color:var(--muted); border-bottom:2px solid transparent; transition:all .2s; }
+.view-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.view-tab:hover { color:var(--bright); }
+.view-panel { display:none; }
+.view-panel.active { display:block; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(2px); }
+.modal-overlay.active { display:flex; }
+.modal { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:28px; width:90%; max-width:400px; animation:modalIn .2s ease; }
+@keyframes modalIn { from{transform:scale(.95);opacity:0} to{transform:scale(1);opacity:1} }
+.modal h2 { margin-bottom:20px; color:var(--bright); font-size:1.1rem; }
+.modal input { width:100%; padding:10px 14px; margin-bottom:14px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-size:.9rem; }
+.modal input:focus { outline:none; border-color:var(--accent); }
+.modal-hint { font-size:.8rem; color:var(--muted); margin-bottom:14px; text-align:right; }
+.modal-hint a { color:var(--accent); cursor:pointer; }
+.modal-actions { display:flex; gap:10px; }
+.modal-actions button { flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-size:.9rem; font-weight:500; }
+.btn-confirm { background:var(--blue); color:#fff; }
+.btn-confirm:hover { opacity:.9; }
+.btn-cancel { background:var(--hover); color:var(--text); }
+.btn-cancel:hover { opacity:.8; }
+.toast { position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:8px; color:#fff; z-index:200; display:none; max-width:360px; font-size:.9rem; box-shadow:0 4px 12px rgba(0,0,0,.3); animation:slideIn .3s ease; }
+@keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+.toast.success { background:var(--green); }
+.toast.error { background:var(--red); }
+.toast.active { display:block; }
+.empty-state, .login-prompt { text-align:center; padding:60px 20px; }
+.empty-state .empty-icon, .login-prompt .icon { font-size:3rem; margin-bottom:16px; }
+.login-prompt { background:var(--card); border:1px solid var(--border); border-radius:12px; }
+.login-prompt h3 { color:var(--bright); margin-bottom:8px; }
+.login-prompt p { color:var(--muted); margin-bottom:20px; }
+.login-prompt button { padding:10px 24px; margin:0 6px; border:none; border-radius:6px; cursor:pointer; font-size:.9rem; }
+.login-prompt .primary { background:var(--blue); color:#fff; }
+.login-prompt .secondary { background:var(--green); color:#fff; }
+@media (max-width:640px) {
+  .topbar { padding:12px 16px; } .topbar h1 { font-size:1rem; } .nav-links { display:none; }
+  .container { padding:16px; } .files-grid { grid-template-columns:1fr; } .user-area .username { display:none; }
+  .page-header { flex-wrap:wrap; } .users-table { font-size:.85rem; } .users-table th, .users-table td { padding:8px; }
 }
 </style>
 </head>
@@ -166,7 +144,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Ping
     </nav>
   </div>
   <div class="user-area">
-    <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">🌙</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换主题">🌙</button>
     <span class="username" id="username"></span>
     <span class="role-badge role-guest" id="roleBadge">未登录</span>
     <button class="btn-login" id="loginBtn" onclick="showModal('loginModal')">登录</button>
@@ -178,20 +156,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Ping
 </div>
 
 <div class="container">
-
   <div class="view-tabs">
     <div class="view-tab active" id="tabFiles" onclick="switchTab('files')">📂 文件管理</div>
     <div class="view-tab" id="tabUsers" onclick="switchTab('users')" style="display:none">👥 用户管理</div>
   </div>
 
-  <!-- 文件管理面板 -->
   <div class="view-panel active" id="panelFiles">
     <div class="page-header">
       <div>
         <h2>🗂 我的文件</h2>
         <div class="subtitle" id="pathBreadcrumb">📂 editor/save/</div>
       </div>
-      <button class="btn-upload" id="newFolderBtn2" onclick="showModal('mkdirModal')" style="display:none">📁 新建文件夹</button>
     </div>
 
     <div class="login-prompt" id="loginPrompt" style="display:none">
@@ -211,9 +186,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Ping
       <p>文件将保存到当前目录</p>
       <label class="upload-label" for="fileInput">选择文件</label>
       <input type="file" id="fileInput" onchange="onFileSelected(this)">
-      <div class="progress-bar" id="progressBar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
       <div><button class="upload-btn" id="uploadSubmitBtn" onclick="doUpload()" disabled>确认上传</button></div>
     </div>
 
@@ -222,89 +195,54 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Ping
     </div>
   </div>
 
-  <!-- 用户管理面板 -->
   <div class="view-panel" id="panelUsers">
     <div class="page-header">
-      <div>
-        <h2>👥 用户管理</h2>
-        <div class="subtitle">管理所有用户的角色权限</div>
-      </div>
-    </div>
+      <div><h2>👥 用户管理</h2><div class="subtitle">管理所有用户的角色权限</div></div></div>
     <table class="users-table">
-      <thead>
-        <tr><th>用户名</th><th>当前角色</th><th>修改角色</th><th>操作</th></tr>
-      </thead>
-      <tbody id="usersTableBody">
-        <tr><td colspan="4" class="empty-state">加载中...</td></tr>
-      </tbody>
+      <thead><tr><th>用户名</th><th>当前角色</th><th>修改角色</th><th>操作</th></tr></thead>
+      <tbody id="usersTableBody"><tr><td colspan="4" class="empty-state">加载中...</td></tr></tbody>
     </table>
   </div>
-
 </div>
 
-<!-- 登录弹窗 -->
 <div class="modal-overlay" id="loginModal">
-  <div class="modal">
-    <h2>🔑 登录</h2>
+  <div class="modal"><h2>🔑 登录</h2>
     <input type="text" id="loginUser" placeholder="用户名">
     <input type="password" id="loginPass" placeholder="密码">
     <div class="modal-hint"><a onclick="closeAllModals(); openRegister()">没有账号？去注册</a></div>
-    <div class="modal-actions">
-      <button class="btn-confirm" onclick="doLogin()">登录</button>
-      <button class="btn-cancel" onclick="hideModal('loginModal')">取消</button>
-    </div>
+    <div class="modal-actions"><button class="btn-confirm" onclick="doLogin()">登录</button><button class="btn-cancel" onclick="hideModal('loginModal')">取消</button></div>
   </div>
 </div>
 
-<!-- 注册弹窗 -->
 <div class="modal-overlay" id="registerModal">
-  <div class="modal">
-    <h2>📝 注册</h2>
+  <div class="modal"><h2>📝 注册</h2>
     <input type="text" id="regUser" placeholder="用户名（2-20字符）">
     <input type="password" id="regPass" placeholder="密码（至少6位）">
     <input type="text" id="regInvite" placeholder="邀请码">
     <div class="modal-hint"><a onclick="closeAllModals(); showModal('loginModal')">已有账号？去登录</a></div>
-    <div class="modal-actions">
-      <button class="btn-confirm" onclick="doRegister()">注册</button>
-      <button class="btn-cancel" onclick="hideModal('registerModal')">取消</button>
-    </div>
+    <div class="modal-actions"><button class="btn-confirm" onclick="doRegister()">注册</button><button class="btn-cancel" onclick="hideModal('registerModal')">取消</button></div>
   </div>
 </div>
 
-<!-- 新建文件夹弹窗 -->
 <div class="modal-overlay" id="mkdirModal">
-  <div class="modal">
-    <h2>📁 新建文件夹</h2>
+  <div class="modal"><h2>📁 新建文件夹</h2>
     <input type="text" id="newFolderName" placeholder="文件夹名称">
-    <div class="modal-actions">
-      <button class="btn-confirm" onclick="doMkdir()">创建</button>
-      <button class="btn-cancel" onclick="hideModal('mkdirModal')">取消</button>
-    </div>
+    <div class="modal-actions"><button class="btn-confirm" onclick="doMkdir()">创建</button><button class="btn-cancel" onclick="hideModal('mkdirModal')">取消</button></div>
   </div>
 </div>
 
-<!-- 上传弹窗 -->
 <div class="modal-overlay" id="uploadModal">
-  <div class="modal">
-    <h2>📤 上传文件</h2>
+  <div class="modal"><h2>📤 上传文件</h2>
     <p class="modal-hint" style="text-align:left">文件将保存到当前目录</p>
     <input type="file" id="uploadFileInput">
-    <div class="modal-actions">
-      <button class="btn-confirm" onclick="doUploadFromModal()">上传</button>
-      <button class="btn-cancel" onclick="hideModal('uploadModal')">取消</button>
-    </div>
+    <div class="modal-actions"><button class="btn-confirm" onclick="doUploadFromModal()">上传</button><button class="btn-cancel" onclick="hideModal('uploadModal')">取消</button></div>
   </div>
 </div>
 
-<!-- 重命名弹窗 -->
 <div class="modal-overlay" id="renameModal">
-  <div class="modal">
-    <h2>✏️ 重命名</h2>
+  <div class="modal"><h2>✏️ 重命名</h2>
     <input type="text" id="newNameInput" placeholder="新文件名">
-    <div class="modal-actions">
-      <button class="btn-confirm" onclick="confirmRename()">确认</button>
-      <button class="btn-cancel" onclick="hideModal('renameModal')">取消</button>
-    </div>
+    <div class="modal-actions"><button class="btn-confirm" onclick="confirmRename()">确认</button><button class="btn-cancel" onclick="hideModal('renameModal')">取消</button></div>
   </div>
 </div>
 
@@ -313,28 +251,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Ping
 <script>
 const API = 'https://sweet-shape-6382.3906951201.workers.dev';
 const SAVE_DIR = 'editor/save';
-let currentRole = 'guest';
-let currentUser = '';
-let currentDir = SAVE_DIR + '/';
-let renameTarget = '';
-let selectedFile = null;
+let currentRole = 'guest', currentUser = '', currentDir = SAVE_DIR + '/', renameTarget = '', selectedFile = null;
 
-// ============ 主题切换 ============
 function initTheme() {
-  const saved = localStorage.getItem('nanpuxi_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
+  const s = localStorage.getItem('nanpuxi_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', s);
+  document.getElementById('themeToggle').textContent = s === 'dark' ? '🌙' : '☀️';
 }
 function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('nanpuxi_theme', next);
-  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  const n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem('nanpuxi_theme', n);
+  document.getElementById('themeToggle').textContent = n === 'dark' ? '🌙' : '☀️';
 }
 initTheme();
 
-// ============ 视图切换 ============
 function switchTab(tab) {
   document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
@@ -343,22 +274,15 @@ function switchTab(tab) {
   if (tab === 'users') loadUsers();
 }
 
-// ============ 初始化 ============
 checkAuth();
 
-// ============ 认证 ============
 async function checkAuth() {
-  try {
-    const r = await fetch(API + '/auth/me', { credentials: 'include' });
-    if (r.ok) { const d = await r.json(); onAuthSuccess(d); }
-    else onAuthFail();
-  } catch(e) { onAuthFail(); }
+  try { const r = await fetch(API + '/auth/me', { credentials: 'include' }); if (r.ok) { const d = await r.json(); onAuthSuccess(d); } else onAuthFail(); } catch(e) { onAuthFail(); }
   loadFiles();
 }
 
 function onAuthSuccess(d) {
-  currentRole = d.role;
-  currentUser = d.username;
+  currentRole = d.role; currentUser = d.username;
   document.getElementById('username').textContent = currentUser;
   document.getElementById('roleBadge').textContent = d.role === 'admin' ? '👑 管理员' : d.role === 'user' ? '👤 成员' : '👁 访客';
   document.getElementById('roleBadge').className = 'role-badge role-' + d.role;
@@ -368,12 +292,10 @@ function onAuthSuccess(d) {
   document.getElementById('loginPrompt').style.display = 'none';
   if (d.role !== 'guest') {
     document.getElementById('newFolderBtn').style.display = 'inline-block';
-    document.getElementById('newFolderBtn2').style.display = 'inline-block';
     document.getElementById('uploadBtn').style.display = 'inline-block';
     document.getElementById('uploadSection').style.display = 'block';
   }
-  if (d.role === 'admin') document.getElementById('tabUsers').style.display = 'block';
-  else document.getElementById('tabUsers').style.display = 'none';
+  document.getElementById('tabUsers').style.display = d.role === 'admin' ? 'block' : 'none';
 }
 
 function onAuthFail() {
@@ -385,7 +307,6 @@ function onAuthFail() {
   document.getElementById('registerBtn').style.display = 'inline-block';
   document.getElementById('logoutBtn').style.display = 'none';
   document.getElementById('newFolderBtn').style.display = 'none';
-  document.getElementById('newFolderBtn2').style.display = 'none';
   document.getElementById('uploadBtn').style.display = 'none';
   document.getElementById('uploadSection').style.display = 'none';
   document.getElementById('tabUsers').style.display = 'none';
@@ -401,35 +322,27 @@ async function doRegister() {
   if (password.length < 6) { toast('密码至少6位', 'error'); return; }
   const r = await fetch(API + '/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ username, password, inviteCode }) });
   const d = await r.json();
-  if (d.ok) { toast(d.message, 'success'); closeAllModals(); setTimeout(() => autoLoginAfterRegister(username, password), 500); }
-  else toast(d.message, 'error');
+  if (d.ok) { toast(d.message, 'success'); closeAllModals(); setTimeout(() => autoLoginAfterRegister(username, password), 500); } else toast(d.message, 'error');
 }
-
 async function autoLoginAfterRegister(username, password) {
   const r = await fetch(API + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ username, password }) });
   const d = await r.json();
   if (d.ok) checkAuth(); else toast('自动登录失败，请手动登录', 'error');
 }
-
 async function doLogin() {
   const username = document.getElementById('loginUser').value.trim();
   const password = document.getElementById('loginPass').value;
   if (!username || !password) { toast('请填写完整', 'error'); return; }
   const r = await fetch(API + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ username, password }) });
   const d = await r.json();
-  if (d.ok) { toast('登录成功', 'success'); closeAllModals(); checkAuth(); }
-  else toast(d.message, 'error');
+  if (d.ok) { toast('登录成功', 'success'); closeAllModals(); checkAuth(); } else toast(d.message, 'error');
 }
-
 async function doLogout() {
   await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
-  toast('已退出', 'success');
-  setTimeout(() => location.reload(), 800);
+  toast('已退出', 'success'); setTimeout(() => location.reload(), 800);
 }
-
 function openRegister() { closeAllModals(); showModal('registerModal'); }
 
-// ============ 用户管理 ============
 async function loadUsers() {
   const tbody = document.getElementById('usersTableBody');
   tbody.innerHTML = '<tr><td colspan="4" class="empty-state">加载中...</td></tr>';
@@ -438,31 +351,24 @@ async function loadUsers() {
     const d = await r.json();
     if (!d.ok) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">加载失败：' + (d.message || '') + '</td></tr>'; return; }
     if (!d.users.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">暂无用户</td></tr>'; return; }
-
     tbody.innerHTML = '';
     d.users.forEach(u => {
-      const tr = document.createElement('tr');
       const isSelf = u.username === d.currentUser;
       const roleName = { admin: '管理员', user: '成员', guest: '访客' }[u.role];
-      tr.innerHTML = `
-        <td class="u-name">${u.username}${isSelf ? '<span class="you-tag">（你）</span>' : ''}</td>
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="u-name">${u.username}${isSelf ? '<span class="you-tag">（你）</span>' : ''}</td>
         <td><span class="role-tag ${u.role}">${roleName}</span></td>
-        <td>
-          <select class="role-select" id="sel_${u.username}" onchange="onRoleChange('${u.username}', this.value)" ${isSelf ? 'disabled title="不能修改自己的角色"' : ''}>
-            <option value="guest" ${u.role==='guest'?'selected':''}>访客</option>
-            <option value="user" ${u.role==='user'?'selected':''}>成员</option>
-            <option value="admin" ${u.role==='admin'?'selected':''}>管理员</option>
-          </select>
-        </td>
-        <td><button class="btn-save-role" id="btn_${u.username}" onclick="changeRole('${u.username}')" disabled ${isSelf ? 'title="不能修改自己的角色"' : ''}>保存</button></td>
-      `;
+        <td><select class="role-select" id="sel_${u.username}" onchange="onRoleChange('${u.username}')" ${isSelf ? 'disabled title="不能修改自己"' : ''}>
+          <option value="guest" ${u.role==='guest'?'selected':''}>访客</option>
+          <option value="user" ${u.role==='user'?'selected':''}>成员</option>
+          <option value="admin" ${u.role==='admin'?'selected':''}>管理员</option>
+        </select></td>
+        <td><button class="btn-save-role" id="btn_${u.username}" onclick="changeRole('${u.username}')" disabled ${isSelf ? 'title="不能修改自己"' : ''}>保存</button></td>`;
       tbody.appendChild(tr);
     });
   } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">加载失败</td></tr>'; }
 }
-
-function onRoleChange(username, val) { document.getElementById('btn_' + username).disabled = false; }
-
+function onRoleChange(username) { document.getElementById('btn_' + username).disabled = false; }
 async function changeRole(username) {
   const select = document.getElementById('sel_' + username);
   const newRole = select.value;
@@ -470,16 +376,10 @@ async function changeRole(username) {
   btn.disabled = true;
   const r = await fetch(API + '/auth/promote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ username, role: newRole }) });
   const d = await r.json();
-  if (d.ok) { toast(d.message, 'success'); loadUsers(); }
-  else { toast(d.message, 'error'); btn.disabled = false; }
+  if (d.ok) { toast(d.message, 'success'); loadUsers(); } else { toast(d.message, 'error'); btn.disabled = false; }
 }
 
-// ============ 目录导航 ============
-async function enterDir(dirPath) {
-  currentDir = dirPath.endsWith('/') ? dirPath : dirPath + '/';
-  await loadFiles();
-}
-
+async function enterDir(dirPath) { currentDir = dirPath.endsWith('/') ? dirPath : dirPath + '/'; await loadFiles(); }
 function updateBreadcrumb() {
   const base = SAVE_DIR + '/';
   const inner = currentDir.startsWith(base) ? currentDir.slice(base.length) : currentDir;
@@ -488,178 +388,110 @@ function updateBreadcrumb() {
   let acc = SAVE_DIR + '/';
   parts.forEach((p, i) => {
     acc += p + '/';
-    if (i === parts.length - 1) html += ` / <strong>${p}</strong>`;
-    else html += ` / <span onclick="enterDir('${acc}')">${p}</span>`;
+    html += i === parts.length - 1 ? ` / <strong>${p}</strong>` : ` / <span onclick="enterDir('${acc}')">${p}</span>`;
   });
   document.getElementById('pathBreadcrumb').innerHTML = html;
 }
 
-// ============ 文件列表 ============
 async function loadFiles() {
   updateBreadcrumb();
   const grid = document.getElementById('filesGrid');
-  if (currentRole === 'guest' && !currentUser) {
-    grid.innerHTML = '';
-    document.getElementById('loginPrompt').style.display = 'block';
-    return;
-  }
+  if (currentRole === 'guest' && !currentUser) { grid.innerHTML = ''; document.getElementById('loginPrompt').style.display = 'block'; return; }
   document.getElementById('loginPrompt').style.display = 'none';
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>加载中...</p></div>';
-
   try {
     const r = await fetch(API + '/files?dir=' + encodeURIComponent(currentDir), { credentials: 'include' });
     const d = await r.json();
     if (!d.ok) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>加载失败</p></div>'; return; }
-
     grid.innerHTML = '';
-
     (d.dirs || []).forEach(dir => {
-      const ownerTag = dir.owner ? `<span style="font-size:0.7rem;color:var(--accent-dark)">@${dir.owner}</span>` : '';
+      const ownerTag = dir.owner ? `<span style="font-size:.7rem;color:var(--accent)">@${dir.owner}</span>` : '';
       const card = document.createElement('div');
       card.className = 'file-card clickable';
-      card.innerHTML = `
-        <div class="file-header">
-          <div class="file-icon">📁</div>
-          <div class="file-info">
-            <div class="file-name">${dir.name}/</div>
-            <div class="file-meta">${ownerTag}</div>
-          </div>
-        </div>
-      `;
+      card.innerHTML = `<div class="file-header"><div class="file-icon">📁</div><div class="file-info"><div class="file-name">${dir.name}/</div><div class="file-meta">${ownerTag}</div></div></div>`;
       card.onclick = () => enterDir(dir.path);
       grid.appendChild(card);
     });
-
     (d.files || []).forEach(f => {
       const card = document.createElement('div');
       card.className = 'file-card';
       const ext = (f.name.split('.').pop() || '').toLowerCase();
-      const ownerTag = f.owner ? `<span style="font-size:0.7rem;color:var(--accent-dark)">@${f.owner}</span>` : '';
-      card.innerHTML = `
-        <div class="file-header">
-          <div class="file-icon">${getFileIcon(ext)}</div>
-          <div class="file-info">
-            <div class="file-name" title="${f.name}" onclick="window.open('${f.url}','_blank')">${f.name}</div>
-            <div class="file-meta">${formatSize(f.size)} ${ownerTag}</div>
-          </div>
-        </div>
-        <div class="file-actions">
-          <button class="btn-download" onclick="window.open('${f.url}','_blank')">⬇ 下载</button>
-          ${f.canRename ? `<button class="btn-rename" onclick="showRename('${f.path}','${f.name}')">✏️ 重命名</button>` : ''}
-          ${f.canDelete ? `<button class="btn-delete" onclick="doDelete('${f.path}')">🗑 删除</button>` : ''}
-        </div>
-      `;
+      const ownerTag = f.owner ? `<span style="font-size:.7rem;color:var(--accent)">@${f.owner}</span>` : '';
+      card.innerHTML = `<div class="file-header"><div class="file-icon">${getFileIcon(ext)}</div><div class="file-info"><div class="file-name" title="${f.name}" onclick="window.open('${f.url}','_blank')">${f.name}</div><div class="file-meta">${formatSize(f.size)} ${ownerTag}</div></div></div>
+        <div class="file-actions"><button class="btn-download" onclick="window.open('${f.url}','_blank')">⬇ 下载</button>${f.canRename ? `<button class="btn-rename" onclick="showRename('${f.path}','${f.name}')">✏️ 重命名</button>` : ''}${f.canDelete ? `<button class="btn-delete" onclick="doDelete('${f.path}')">🗑 删除</button>` : ''}</div>`;
       grid.appendChild(card);
     });
-
-    if (!grid.children.length) {
-      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div><p>此目录为空</p></div>';
-    }
+    if (!grid.children.length) grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div><p>此目录为空</p></div>';
   } catch(e) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>加载失败</p></div>'; }
 }
-
 function getFileIcon(ext) {
-  const map = { jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', webp:'🖼️', svg:'🖼️', mp4:'🎬', webm:'🎬', mov:'🎬', mp3:'🎵', wav:'🎵', flac:'🎵', pdf:'📕', doc:'📘', docx:'📘', xls:'📗', xlsx:'📗', pptx:'📙', zip:'📦', rar:'📦', '7z':'📦', txt:'📄', md:'📝', json:'📋', xml:'📋', csv:'📋', html:'🌐', css:'🎨', js:'⚡', ts:'⚡', py:'🐍', java:'☕', cpp:'💠', c:'💠', go:'🐹', rs:'🦀', exe:'⚙️', msi:'⚙️', dmg:'💿', apk:'📱', ipa:'📱' };
-  return map[ext] || '📄';
+  const m = { jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️',webp:'🖼️',svg:'🖼️',mp4:'🎬',webm:'🎬',mov:'🎬',mp3:'🎵',wav:'🎵',flac:'🎵',pdf:'📕',doc:'📘',docx:'📘',xls:'📗',xlsx:'📗',pptx:'📙',zip:'📦',rar:'📦','7z':'📦',txt:'📄',md:'📝',json:'📋',xml:'📋',csv:'📋',html:'🌐',css:'🎨',js:'⚡',ts:'⚡',py:'🐍',java:'☕',cpp:'💠',c:'💠',go:'🐹',rs:'🦀',exe:'⚙️',msi:'⚙️',dmg:'💿',apk:'📱',ipa:'📱' };
+  return m[ext] || '📄';
 }
+function formatSize(b) { if (!b) return ''; if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
 
-function formatSize(bytes) {
-  if (!bytes) return '';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/1048576).toFixed(1) + ' MB';
-}
-
-// ============ 新建文件夹 ============
 async function doMkdir() {
   const name = document.getElementById('newFolderName').value.trim();
   if (!name) { toast('请输入文件夹名称', 'error'); return; }
   const parent = currentDir.replace(/\/$/, '');
   const r = await fetch(API + '/mkdir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ dirname: name, parent }) });
   const d = await r.json();
-  if (d.ok) { toast(d.message, 'success'); hideModal('mkdirModal'); document.getElementById('newFolderName').value = ''; loadFiles(); }
-  else toast(d.message, 'error');
+  if (d.ok) { toast(d.message, 'success'); hideModal('mkdirModal'); document.getElementById('newFolderName').value = ''; loadFiles(); } else toast(d.message, 'error');
 }
 
-// ============ 上传 ============
 function onFileSelected(input) { selectedFile = input.files[0]; document.getElementById('uploadSubmitBtn').disabled = !selectedFile; }
-
 function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadSection').classList.remove('dragover');
-  if (e.dataTransfer.files.length) {
-    selectedFile = e.dataTransfer.files[0];
-    document.getElementById('uploadSubmitBtn').disabled = false;
-    document.getElementById('fileInput').files = e.dataTransfer.files;
-  }
+  e.preventDefault(); document.getElementById('uploadSection').classList.remove('dragover');
+  if (e.dataTransfer.files.length) { selectedFile = e.dataTransfer.files[0]; document.getElementById('uploadSubmitBtn').disabled = false; document.getElementById('fileInput').files = e.dataTransfer.files; }
 }
-
 async function doUpload() { if (selectedFile) await uploadFile(selectedFile); }
-
 async function doUploadFromModal() {
   const input = document.getElementById('uploadFileInput');
   if (!input.files[0]) { toast('请选择文件', 'error'); return; }
-  await uploadFile(input.files[0]);
-  hideModal('uploadModal');
+  await uploadFile(input.files[0]); hideModal('uploadModal');
 }
-
 async function uploadFile(file) {
   const formData = new FormData();
   formData.append('file', file);
-  // 计算相对 SAVE_DIR 的子目录
   const subdir = currentDir.startsWith(SAVE_DIR + '/') ? currentDir.slice(SAVE_DIR.length + 1).replace(/\/$/, '') : '';
   if (subdir) formData.append('subdir', subdir);
-
   const btn = document.getElementById('uploadSubmitBtn');
   const bar = document.getElementById('progressBar');
   const fill = document.getElementById('progressFill');
   if (btn) btn.disabled = true;
-  bar.classList.add('active');
-  fill.style.width = '30%';
+  bar.classList.add('active'); fill.style.width = '30%';
   try {
     const r = await fetch(API + '/upload', { method: 'POST', credentials: 'include', body: formData });
     fill.style.width = '80%';
     const d = await r.json();
-    if (d.ok) {
-      fill.style.width = '100%';
-      toast('上传成功: ' + file.name, 'success');
-      selectedFile = null;
-      document.getElementById('fileInput').value = '';
-      if (document.getElementById('uploadFileInput')) document.getElementById('uploadFileInput').value = '';
-      if (btn) btn.disabled = true;
-      setTimeout(loadFiles, 800);
-    } else toast(d.message || '上传失败', 'error');
+    if (d.ok) { fill.style.width = '100%'; toast('上传成功: ' + file.name, 'success'); selectedFile = null; document.getElementById('fileInput').value = ''; if (document.getElementById('uploadFileInput')) document.getElementById('uploadFileInput').value = ''; if (btn) btn.disabled = true; setTimeout(loadFiles, 800); } else toast(d.message || '上传失败', 'error');
   } catch(e) { toast('上传失败: ' + e.message, 'error'); }
   finally { setTimeout(() => { bar.classList.remove('active'); fill.style.width = '0%'; if (btn) btn.disabled = false; }, 600); }
 }
 
-// ============ 删除 ============
 async function doDelete(path) {
   if (!confirm('确定删除 ' + path.split('/').pop() + '？此操作不可恢复。')) return;
   const r = await fetch(API + '/delete/' + encodeURIComponent(path), { method: 'DELETE', credentials: 'include' });
   const d = await r.json();
-  if (d.ok) { toast('删除成功', 'success'); loadFiles(); }
-  else toast(d.message, 'error');
+  if (d.ok) { toast('删除成功', 'success'); loadFiles(); } else toast(d.message, 'error');
 }
-
-// ============ 重命名 ============
 function showRename(path, name) { renameTarget = path; document.getElementById('newNameInput').value = name; showModal('renameModal'); }
-
 async function confirmRename() {
   const newName = document.getElementById('newNameInput').value.trim();
-  if (!newName) { toast('请输入新文件名', 'error'); return; }
-  if (newName === renameTarget.split('/').pop()) { toast('文件名未改变', 'error'); return; }
+  if (!newName) { toast('请输入新名称', 'error'); return; }
   const r = await fetch(API + '/rename', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ oldName: renameTarget, newName }) });
   const d = await r.json();
-  if (d.ok) { toast('重命名成功', 'success'); hideModal('renameModal'); loadFiles(); }
-  else toast(d.message, 'error');
+  if (d.ok) { toast('重命名成功', 'success'); hideModal('renameModal'); loadFiles(); } else toast(d.message, 'error');
 }
 
-// ============ UI 工具 ============
 function showModal(id) { document.getElementById(id).classList.add('active'); }
 function hideModal(id) { document.getElementById(id).classList.remove('active'); }
 function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); }
-function toast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' active'; setTimeout(() => t.classList.remove('active'), 3500); }
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' active';
+  setTimeout(() => t.classList.remove('active'), 3000);
+}
 </script>
 </body>
 </html>
