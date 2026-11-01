@@ -2,5 +2,9 @@
   "Nanpuxi": {
     "pass": "nanpuxi",
     "role": "admin"
+  },
+  "aaaa": {
+    "pass": "asdfghjkl",
+    "role": "user"
   }
 }
