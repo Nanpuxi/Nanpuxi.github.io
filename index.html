@@ -101,7 +101,7 @@
     }
     .nav-brand:hover { opacity: 0.6; }
 
-    .nav-links { display: flex; gap: 28px; }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
 
     .nav-links a {
       font-size: 14px;
@@ -523,10 +523,6 @@
   <nav class="nav">
     <a href="index.html" class="nav-brand">南浦Xi</a>
     <div class="nav-links">
-      <a href="#projects" class="nav-anchor">项目</a>
-      <a href="#tools" class="nav-anchor">工具</a>
-      <a href="#updates" class="nav-anchor">更新</a>
-      <a href="#community" class="nav-anchor">社群</a>
       <a href="#about" class="nav-anchor">关于我</a>
       <a href="sponsor.html" class="nav-anchor">赞助</a>
       <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
@@ -717,7 +713,7 @@
     });
 
     // ===== 滚动时自动高亮当前所在区域的导航链接 =====
-    const sectionIds = ['projects', 'tools', 'updates', 'community', 'about'];
+    const sectionIds = ['about'];
     const navLinks = {};
     document.querySelectorAll('.nav-anchor').forEach(a => {
       navLinks[a.getAttribute('href').slice(1)] = a;
@@ -851,30 +847,28 @@
       box.innerHTML = `
         <div class="update-header">
           <div class="update-title">🔧 最近更新</div>
-         <a href="https://github.com/Nanpuxi/Nanpuxi.github.io" class="view-all-link" id="viewAllLink" style="color:inherit; text-decoration:none;">查看全部</a>
+          <a href="https://github.com/Nanpuxi/Nanpuxi.github.io" target="_blank" rel="noopener noreferrer" class="view-all-link" id="viewAllLink" style="color:inherit; text-decoration:none;">查看全部</a>
         </div>
         ${alertHtml}
         <ul class="update-list" id="updateList">${itemsHtml}</ul>
         ${footerHtml}`;
 
-      // 展开/收起
+      // 展开/收起 —— 只绑给底部的 toggleUpdate 按钮
       function toggle() {
         const list = document.getElementById('updateList');
         const btn = document.getElementById('toggleUpdate');
-        const link = document.getElementById('viewAllLink');
-        const expanded = btn && btn.textContent.startsWith('收起');
+        if (!btn) return;
+        const expanded = btn.textContent.startsWith('收起');
         list.querySelectorAll('.update-item').forEach((el, i) => {
           if (!expanded) el.classList.add('active');
           else if (i >= 3) el.classList.remove('active');
         });
-        if (btn) btn.textContent = expanded ? '查看全部 ▼' : '收起 ▲';
-        if (link) link.textContent = expanded ? '查看全部' : '收起';
+        btn.textContent = expanded ? '查看全部 ▼' : '收起 ▲';
       }
 
       const btn = document.getElementById('toggleUpdate');
-      const link = document.getElementById('viewAllLink');
       if (btn) btn.addEventListener('click', toggle);
-      if (link) link.addEventListener('click', toggle);
+      // 注意：viewAllLink 不再绑定 toggle，点击直接跳转 GitHub
     })();
   </script>
 
