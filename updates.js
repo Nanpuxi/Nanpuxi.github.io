@@ -2,7 +2,7 @@
 window.UPDATE_LOG = {
 
   // 顶部提示（不需要就留空字符串 ''）
-  alert: '⚠️ 遇到意外情况，请加站主QQ 3906951201 反馈问题，或在 GitHub 提交 Issue。',
+  alert: '⚠️ 遇到意外情况，请加站主QQ 3906951201 反馈问题，或在 GitHub 提交 Issue',
   
   // 更新列表（最新的放最上面）
   list: [
