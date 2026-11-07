@@ -18,6 +18,13 @@ if (dark) document.documentElement.setAttribute('data-theme', 'dark');
 })();
 </script>
 <style>
+    
+    .item-version {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 13px;
+  margin-left: 4px;
+}
 /* ===== 主题配色变量 ===== */
 :root {
 --bg: #ffffff;
@@ -471,11 +478,6 @@ gap: 8px;
 margin-bottom: 4px;
 }
 .item-icon { font-size: 14px; }
-.item-author {
-font-weight: 600;
-color: var(--text);
-font-size: 13px;
-}
 .item-date {
 font-size: 11px;
 color: var(--text-faint);
@@ -533,13 +535,13 @@ background: rgba(255,255,255,0.04);
 <div class="tags">
 <span class="tag">3C成员</span>
 <span class="tag">小up主</span>
-<span class="tag">喵喵喵</span>
-<span class="tag">喵喵喵喵</span>
+<span class="tag">平浪风云成员</span>
+<span class="tag">讲题博主？？？</span>
 </div>
 
 <!-- 项目 -->
 <div id="projects">
-<p class="section-title">🚀 项目</p>
+<p class="section-title">项目</p>
 <div class="card-grid">
 <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
 <div class="card-header">
@@ -561,7 +563,7 @@ background: rgba(255,255,255,0.04);
 
 <!-- 工具 -->
 <div id="tools">
-<p class="section-title">🛠️ 工具</p>
+<p class="section-title">工具</p>
 <div class="card-grid">
 <a href="place/" class="card">
 <div class="card-header">
@@ -585,7 +587,7 @@ background: rgba(255,255,255,0.04);
 
 <!-- 更新日志（由 updates.js 渲染） -->
 <div id="updates">
-<p class="section-title">📋 更新日志</p>
+<p class="section-title">更新日志</p>
 <div class="update-log" id="updateLog">
 <!-- JS 自动渲染 -->
 </div>
@@ -593,7 +595,7 @@ background: rgba(255,255,255,0.04);
 
 <!-- 社群 -->
 <div id="community">
-<p class="section-title">💬 社群</p>
+<p class="section-title">社群</p>
 <p class="section-title" style="color:#ddd; font-size:12px; text-transform:none; letter-spacing:0;">点击卡片即可复制群号 / 频道号</p>
 <div class="card-grid">
 <div class="card copy-card" data-copy="695369973">
@@ -625,7 +627,7 @@ background: rgba(255,255,255,0.04);
 
 <!-- 关于我 -->
 <div id="about">
-<p class="section-title">🐱 关于我</p>
+<p class="section-title">关于我</p>
 <div class="about-text">
 <p>我是南浦Xi喵，一个喜欢轨道交通、架空世界设定的小up主，不定期更新视频喵 🎬</p>
 <p style="margin-top:8px;">想破500粉！欢迎关注我~</p>
@@ -802,7 +804,9 @@ const itemsHtml = data.list.map((item, i) => `
 <li class="update-item${i < 3 ? ' active' : ''}">
 <div class="item-head">
 <span class="item-icon">${item.icon || '📌'}</span>
+<span class="item-author">${item.author || ''}</span>
 <span class="item-version">${item.version || ''}</span>
+<span class="item-sep">·</span>
 <span class="item-date">${item.date || ''}</span>
 </div>
 <div class="item-content">${item.content || ''}</div>
