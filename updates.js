@@ -4,7 +4,7 @@ window.UPDATE_LOG = {
 
   list: [
     {
-      icon: '',
+      icon: '  ',
       author: '南浦Xi',
       version: '2.1.7',
       date: '2026/11/7',
