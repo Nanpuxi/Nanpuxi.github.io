@@ -858,10 +858,9 @@ return;
 if (serverVersion !== currentVersion) {
 box.classList.add('show');
 clearInterval(timer);
-setTimeout(function () {
-location.replace(location.pathname + '?_r=' + Date.now());
-}, 1500);
+location.replace(location.pathname);
 }
+
 })
 .catch(function () {});
 }
