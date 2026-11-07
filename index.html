@@ -6,6 +6,9 @@
   <title>南浦Xi的主页</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+  <!-- 更新日志数据 -->
+  <script src="updates.js"></script>
+
   <!-- 主题初始化 -->
   <script>
     (function () {
@@ -415,9 +418,6 @@
       border-radius: 12px;
       overflow: hidden;
       text-align: left;
-      opacity: 0;
-      transform: translateY(18px);
-      animation: fadeUp 0.6s ease-out 0.9s forwards;
     }
 
     .update-header {
@@ -440,13 +440,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .update-time {
-      font-size: 12px;
-      color: var(--text-faint);
-      font-weight: 400;
-      margin-left: 4px;
     }
 
     .view-all-link {
@@ -602,63 +595,11 @@
       <p class="section-title" style="color:#ddd;">更多工具正在开发中~</p>
     </div>
 
-    <!-- 更新日志 -->
+    <!-- 更新日志（由 updates.js 渲染） -->
     <div id="updates">
       <p class="section-title">📋 更新日志</p>
-      <div class="update-log">
-        <div class="update-header">
-          <div class="update-title">🔧 最近更新 <span class="update-time">(3天前)</span></div>
-          <span class="view-all-link">查看全部</span>
-        </div>
-
-        <div class="update-alert">
-          ⚠️ 遇到意外情况，请加QQ交流群 487819503 并私聊群主提供存档号，不要在群里@
-        </div>
-
-        <ul class="update-list" id="updateList">
-          <li class="update-item active">
-            <div class="item-head">
-              <span class="item-icon">📁</span>
-              <span class="item-author">南浦Xi</span>
-              <span class="item-date">2026/11/7</span>
-            </div>
-            <div class="item-content">文件库系统上线！支持登录注册、文件管理、上传下载，后端使用 Cloudflare Worker + GitHub 仓库存储。</div>
-          </li>
-          <li class="update-item active">
-            <div class="item-head">
-              <span class="item-icon">🧮</span>
-              <span class="item-author">南浦Xi</span>
-              <span class="item-date">2026/11/5</span>
-            </div>
-            <div class="item-content">算钱工具箱新增「复利定投」模块，支持自定义定投周期和年化收益率计算。</div>
-          </li>
-          <li class="update-item active">
-            <div class="item-head">
-              <span class="item-icon">🗺️</span>
-              <span class="item-author">南浦Xi</span>
-              <span class="item-date">2026/11/3</span>
-            </div>
-            <div class="item-content">地名生成器优化算法，新增更多城市命名风格模板。</div>
-          </li>
-          <li class="update-item">
-            <div class="item-head">
-              <span class="item-icon">🎨</span>
-              <span class="item-author">南浦Xi</span>
-              <span class="item-date">2026/11/1</span>
-            </div>
-            <div class="item-content">主页全新改版：暗色模式、动画入场、更新日志区块上线。</div>
-          </li>
-          <li class="update-item">
-            <div class="item-head">
-              <span class="item-icon">🔗</span>
-              <span class="item-author">南浦Xi</span>
-              <span class="item-date">2026/10/28</span>
-            </div>
-            <div class="item-content">AARC 项目页面上线，帮 Au 做宣传推广。</div>
-          </li>
-        </ul>
-
-        <div class="update-footer" id="toggleUpdate">查看全部 ▼</div>
+      <div class="update-log" id="updateLog">
+        <!-- JS 自动渲染 -->
       </div>
     </div>
 
@@ -754,10 +695,7 @@
         const navHeight = document.querySelector('.nav').offsetHeight;
         const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
 
-        window.scrollTo({
-          top: targetTop,
-          behavior: 'smooth'
-        });
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
       });
     });
 
@@ -787,10 +725,7 @@
 
     function getDocTop(el) {
       let top = 0;
-      while (el) {
-        top += el.offsetTop;
-        el = el.offsetParent;
-      }
+      while (el) { top += el.offsetTop; el = el.offsetParent; }
       return top;
     }
 
@@ -825,10 +760,7 @@
     let ticking = false;
     window.addEventListener('scroll', () => {
       if (!ticking) {
-        requestAnimationFrame(() => {
-          updateActiveNav();
-          ticking = false;
-        });
+        requestAnimationFrame(() => { updateActiveNav(); ticking = false; });
         ticking = true;
       }
     }, { passive: true });
@@ -839,17 +771,11 @@
     const backToTopBtn = document.getElementById('backToTop');
 
     function toggleBackToTop() {
-      if (window.scrollY > 30) {
-        backToTopBtn.classList.add('visible');
-      } else {
-        backToTopBtn.classList.remove('visible');
-      }
+      if (window.scrollY > 30) backToTopBtn.classList.add('visible');
+      else backToTopBtn.classList.remove('visible');
     }
 
-    window.addEventListener('scroll', () => {
-      requestAnimationFrame(toggleBackToTop);
-    }, { passive: true });
-
+    window.addEventListener('scroll', () => { requestAnimationFrame(toggleBackToTop); }, { passive: true });
     toggleBackToTop();
 
     backToTopBtn.addEventListener('click', () => {
@@ -857,11 +783,7 @@
     });
 
     // ===== 滚动入场动画 =====
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -40px 0px'
-    };
-
+    const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -40px 0px' };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -872,7 +794,7 @@
       });
     }, observerOptions);
 
-    document.querySelectorAll('.copy-card, #about .about-text, .update-log').forEach(el => {
+    document.querySelectorAll('.copy-card, #about .about-text').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(16px)';
       el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
@@ -886,11 +808,8 @@
       var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
 
       function applyTheme(theme) {
-        if (theme === 'dark') {
-          root.setAttribute('data-theme', 'dark');
-        } else {
-          root.removeAttribute('data-theme');
-        }
+        if (theme === 'dark') root.setAttribute('data-theme', 'dark');
+        else root.removeAttribute('data-theme');
       }
 
       systemDark.addEventListener('change', function (e) {
@@ -907,24 +826,55 @@
       });
     })();
 
-    // ===== 更新日志展开/收起 =====
+    // ===== 更新日志：读取 updates.js 并渲染 =====
     (function() {
-      const btn = document.getElementById('toggleUpdate');
-      const list = document.getElementById('updateList');
-      let expanded = false;
+      const data = window.UPDATE_LOG;
+      const box = document.getElementById('updateLog');
+      if (!data || !box) return;
 
-      btn.addEventListener('click', () => {
-        expanded = !expanded;
-        const items = list.querySelectorAll('.update-item');
-        items.forEach((el, index) => {
-          if (expanded) {
-            el.classList.add('active');
-          } else if (index >= 3) {
-            el.classList.remove('active');
-          }
+      const alertHtml = data.alert
+        ? `<div class="update-alert">${data.alert}</div>` : '';
+
+      const itemsHtml = data.list.map((item, i) => `
+        <li class="update-item${i < 3 ? ' active' : ''}">
+          <div class="item-head">
+            <span class="item-icon">${item.icon || '📌'}</span>
+            <span class="item-author">${item.author || ''}</span>
+            <span class="item-date">${item.date || ''}</span>
+          </div>
+          <div class="item-content">${item.content || ''}</div>
+        </li>`).join('');
+
+      const footerHtml = data.list.length > 3
+        ? `<div class="update-footer" id="toggleUpdate">查看全部 ▼</div>` : '';
+
+      box.innerHTML = `
+        <div class="update-header">
+          <div class="update-title">🔧 最近更新</div>
+          <span class="view-all-link" id="viewAllLink">查看全部</span>
+        </div>
+        ${alertHtml}
+        <ul class="update-list" id="updateList">${itemsHtml}</ul>
+        ${footerHtml}`;
+
+      // 展开/收起
+      function toggle() {
+        const list = document.getElementById('updateList');
+        const btn = document.getElementById('toggleUpdate');
+        const link = document.getElementById('viewAllLink');
+        const expanded = btn && btn.textContent.startsWith('收起');
+        list.querySelectorAll('.update-item').forEach((el, i) => {
+          if (!expanded) el.classList.add('active');
+          else if (i >= 3) el.classList.remove('active');
         });
-        btn.textContent = expanded ? '收起 ▲' : '查看全部 ▼';
-      });
+        if (btn) btn.textContent = expanded ? '查看全部 ▼' : '收起 ▲';
+        if (link) link.textContent = expanded ? '查看全部' : '收起';
+      }
+
+      const btn = document.getElementById('toggleUpdate');
+      const link = document.getElementById('viewAllLink');
+      if (btn) btn.addEventListener('click', toggle);
+      if (link) link.addEventListener('click', toggle);
     })();
   </script>
 
