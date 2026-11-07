@@ -1,1387 +1,877 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算钱工具箱 · 房贷 / 个税 / 汇率 / 比价</title>
-<style>
-  :root {
-    --bg:#f6f7f9; --panel:#fff; --text:#1f2328; --muted:#6b7280; --border:#e3e6ea;
-    --brand:#2f6fed; --brand-soft:#eaf1ff; --ok:#1a7f45; --err:#c0392b;
-    --warn:#b26a00; --soft:#f2f4f7; --radius:12px;
-  }
-  html[data-theme="dark"] {
-    --bg:#14171c; --panel:#1b1f26; --text:#e6e9ef; --muted:#9aa3b2; --border:#2b313b;
-    --brand:#6f9bff; --brand-soft:#22304d; --ok:#4ec98a; --err:#ff7a6b;
-    --warn:#e0a44a; --soft:#22262e;
-  }
-  * { box-sizing:border-box; }
-  body {
-    margin:0; background:var(--bg); color:var(--text);
-    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-    transition:background .2s,color .2s;
-  }
-  .wrap { max-width:980px; margin:0 auto; padding:28px 20px 70px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>南浦Xi · 个人导航</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  header { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-  h1 { font-size:22px; margin:0; letter-spacing:.5px; }
-  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
-  .theme-btn {
-    background:var(--panel); color:var(--text); border:1px solid var(--border);
-    border-radius:999px; padding:7px 14px; cursor:pointer; font-size:13px;
-  }
-  .theme-btn:hover { border-color:var(--brand); }
+  <!-- 主题初始化：在渲染前同步读取偏好，避免深色模式闪烁 -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var dark = saved ? saved === 'dark' : systemDark;
+      if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
 
-  nav.tabs { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0 18px; }
-  nav.tabs button {
-    background:transparent; border:1px solid var(--border); color:var(--muted);
-    padding:7px 15px; border-radius:999px; cursor:pointer; font-size:14px; transition:all .15s;
-  }
-  nav.tabs button:hover { color:var(--text); border-color:var(--brand); }
-  nav.tabs button.active {
-    background:var(--brand-soft); color:var(--brand); border-color:var(--brand); font-weight:600;
-  }
+  <style>
+    /* ===== 主题配色变量 ===== */
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --text-soft: #666;
+      --text-mute: #888;
+      --text-faint: #aaa;
+      --card-bg: #fafafa;
+      --card-border: #f0f0f0;
+      --card-border-hover: #e4e4e8;
+      --tag-bg: #f3f3f5;
+      --tag-bg-hover: #e8e8ec;
+      --scrollbar: #e0e0e0;
+      --scrollbar-hover: #ccc;
+      --badge-bg: #fff3e0;
+      --badge-red-bg: #ff9898;
+      --badge-red-fg: #a40000;
+      --copy-ripple: rgba(0,0,0,0.04);
+    }
 
-  .tool { display:none; }
-  .tool.active { display:block; }
+    html[data-theme="dark"] {
+      --bg: #15161a;
+      --text: #e8e8ea;
+      --text-soft: #a8a8ae;
+      --text-mute: #8a8a92;
+      --text-faint: #6a6a72;
+      --card-bg: #1e1f24;
+      --card-border: #2a2b31;
+      --card-border-hover: #383940;
+      --tag-bg: #26272d;
+      --tag-bg-hover: #32333b;
+      --scrollbar: #2e2f36;
+      --scrollbar-hover: #44464e;
+      --badge-bg: #3a3220;
+      --badge-red-bg: #5c2b2b;
+      --badge-red-fg: #ffb3b3;
+      --copy-ripple: rgba(255,255,255,0.06);
+    }
 
-  .card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px; }
-  .card h2 { margin:0 0 4px; font-size:16px; }
-  .card h3 { margin:18px 0 8px; font-size:14px; }
-  .hint { color:var(--muted); font-size:12.5px; margin-bottom:14px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  @media (max-width:760px) { .grid-2,.grid-3 { grid-template-columns:1fr; } }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      scroll-behavior: smooth;
+      transition: background .35s ease, color .35s ease;
+    }
 
-  label.field { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
-  input[type="text"], select {
-    width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border);
-    border-radius:8px; padding:9px 11px; font-size:14px; outline:none;
-    font-family:inherit;
-  }
-  input[type="text"] { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; }
-  input[type="text"]:focus, select:focus { border-color:var(--brand); }
-  select { cursor:pointer; }
+    /* 滚动条美化 */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
-  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px; }
-  button.act { background:var(--brand); color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13.5px; }
-  button.act:hover { filter:brightness(1.08); }
-  button.ghost { background:transparent; color:var(--text); border:1px solid var(--border); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13.5px; }
-  button.ghost:hover { border-color:var(--brand); color:var(--brand); }
-  button.mini { padding:4px 9px; font-size:12px; }
+    /* ===== 导航栏 ===== */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(-12px);
+      animation: navIn 0.6s ease-out 0.1s forwards;
+    }
 
-  .status { font-size:12.5px; margin-left:4px; }
-  .status.ok { color:var(--ok); }
-  .status.err { color:var(--err); }
+    @keyframes navIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-  .kv { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:6px; }
-  .kv .box { background:var(--soft); border-radius:10px; padding:12px 14px; }
-  .kv .box .k { font-size:12px; color:var(--muted); }
-  .kv .box .v { font-size:19px; font-weight:600; margin-top:2px; word-break:break-all; }
-  .kv .box .v small { font-size:12px; font-weight:400; color:var(--muted); }
-  .hl { color:var(--brand); }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      transition: opacity .25s ease;
+    }
 
-  .table-wrap { max-height:340px; overflow:auto; border:1px solid var(--border); border-radius:10px; margin-top:10px; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th,td { padding:7px 10px; border-bottom:1px solid var(--border); text-align:right; white-space:nowrap; }
-  th { color:var(--muted); font-weight:500; position:sticky; top:0; background:var(--panel); text-align:right; }
-  th:first-child,td:first-child { text-align:left; }
-  tbody tr:last-child td { border-bottom:none; }
+    .nav-brand:hover { opacity: 0.6; }
 
-  .chk { display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13.5px; }
-  .chk input[type="checkbox"] { width:16px; height:16px; accent-color:var(--brand); cursor:pointer; }
-  .chk .sp { margin-left:auto; color:var(--muted); font-size:12.5px; }
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
 
-  .plan-row { border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
-  .plan-row .top { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-  .plan-row .top input { flex:1; }
-  .best { border-color:var(--ok); background:var(--soft); }
-  .tag { font-size:11.5px; background:var(--ok); color:#fff; padding:2px 7px; border-radius:999px; }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      transition: opacity .25s ease, transform .25s ease;
+      position: relative;
+      padding: 4px 2px;
+      border-radius: 4px;
+    }
 
-  .note { font-size:12px; color:var(--muted); line-height:1.7; margin-top:10px; }
-  .note b { color:var(--warn); }
+    /* 导航链接下划线动画 */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--text);
+      transition: width .3s ease;
+    }
 
-  /* ============ 计算器专用 ============ */
-  .calc-wrap { background:var(--soft); border-radius:var(--radius); padding:16px; }
-  .calc-input {
-    width:100%; background:var(--bg); color:var(--text); border:2px solid var(--border);
-    border-radius:10px; padding:14px 16px; font-size:16px; outline:none;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    margin-bottom:12px; transition:border-color .15s;
-  }
-  .calc-input:focus { border-color:var(--brand); }
-  .calc-result {
-    background:var(--brand-soft); border-radius:10px; padding:14px 16px; margin-bottom:12px;
-  }
-  .calc-result .res-main {
-    font-size:22px; font-weight:700; color:var(--brand); word-break:break-all; line-height:1.4;
-  }
-  .calc-result .res-expr {
-    font-size:13px; color:var(--muted); margin-top:4px; word-break:break-all;
-  }
-  .calc-result .res-detail {
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-top:10px;
-  }
-  .calc-result .res-detail .box { background:var(--panel); padding:8px 12px; border-radius:8px; }
-  .calc-result .res-detail .box .k { font-size:11px; color:var(--muted); }
-  .calc-result .res-detail .box .v { font-size:14px; font-weight:600; word-break:break-all; }
-  .calc-result .res-mixed {
-    font-size:13px; color:var(--text); margin-top:8px; padding-top:8px; border-top:1px solid var(--border);
-  }
-  .keypad {
-    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
-  }
-  .keypad button {
-    height:46px; border:1px solid var(--border); border-radius:10px; background:var(--panel);
-    color:var(--text); font-size:16px; cursor:pointer; transition:all .1s; font-family:inherit;
-  }
-  .keypad button:hover { border-color:var(--brand); background:var(--brand-soft); }
-  .keypad button:active { transform:scale(0.96); }
-  .keypad button.keyop { color:var(--brand); font-weight:600; }
-  .keypad button.keyeq { background:var(--brand); color:#fff; font-weight:700; }
-  .keypad button.keyeq:hover { background:var(--brand); filter:brightness(1.1); }
-  .calc-history { margin-top:12px; }
-  .calc-history .hist-item {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:6px 10px; border-radius:6px; font-size:12.5px; margin-bottom:4px;
-    background:var(--bg); cursor:pointer;
-  }
-  .calc-history .hist-item:hover { background:var(--brand-soft); }
-  .calc-history .hist-item .hist-expr { color:var(--muted); }
-  .calc-history .hist-item .hist-res { color:var(--brand); font-weight:600; }
-  footer { color:var(--muted); font-size:12.5px; text-align:center; margin-top:40px; line-height:1.8; }
-</style>
+    .nav-links a:hover { opacity: 0.6; }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* 点击时的波纹效果 */
+    .nav-links a {
+      overflow: hidden;
+    }
+
+    .nav-links a .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--copy-ripple);
+      transform: scale(0);
+      animation: rippleExpand 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rippleExpand {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* 导航链接激活态（下划线，无背景高亮） */
+    .nav-links a.active {
+      color: var(--text);
+    }
+
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    /* ===== 主内容 ===== */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+
+    /* ===== Hero 区域入场动画 ===== */
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.7s ease-out 0.3s forwards;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--text-mute);
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.7s ease-out 0.45s forwards;
+    }
+
+    /* 标签逐个入场 */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 64px;
+    }
+
+    .tag {
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      font-size: 13px;
+      color: var(--text-soft);
+      opacity: 0;
+      transform: translateY(12px) scale(0.9);
+      animation: tagIn 0.5s ease-out forwards;
+    }
+
+    .tag:nth-child(1) { animation-delay: 0.6s; }
+    .tag:nth-child(2) { animation-delay: 0.7s; }
+    .tag:nth-child(3) { animation-delay: 0.8s; }
+    .tag:nth-child(4) { animation-delay: 0.9s; }
+
+    @keyframes tagIn {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .tag {
+      transition: transform .25s ease, background .25s ease, color .25s ease;
+    }
+    .tag:hover {
+      transform: scale(1.06);
+      background: var(--tag-bg-hover);
+      color: var(--text);
+    }
+
+    /* ===== 分区标题 ===== */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-align: left;
+      opacity: 0;
+      transform: translateX(-12px);
+      animation: fadeRight 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeRight {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ===== 卡片 ===== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      text-align: left;
+      margin-bottom: 56px;
+    }
+
+    .card {
+      display: block;
+      padding: 20px 22px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      text-decoration: none;
+      color: inherit;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.6s ease-out forwards;
+      transition: transform .3s cubic-bezier(.25,.8,.25,1),
+                  box-shadow .3s cubic-bezier(.25,.8,.25,1),
+                  border-color .3s ease,
+                  background .3s ease;
+    }
+
+    .card-grid .card:nth-child(1) { animation-delay: 0.7s; }
+    .card-grid .card:nth-child(2) { animation-delay: 0.85s; }
+    .card-grid .card:nth-child(3) { animation-delay: 1.0s; }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      border-color: var(--card-border-hover);
+      background: var(--card-bg);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-icon {
+      font-size: 20px;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .card:hover .card-icon {
+      transform: scale(1.2) rotate(-5deg);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-mute);
+      line-height: 1.5;
+    }
+
+    .card-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: var(--badge-red-bg);
+      color: var(--badge-red-fg);
+      font-size: 11px;
+      font-weight: 600;
+      vertical-align: middle;
+      transition: transform .25s ease;
+    }
+
+    .card:hover .card-badge {
+      transform: scale(1.08);
+    }
+
+    .card-badge-new {
+      background: var(--badge-bg);
+      color: var(--text);
+    }
+
+    /* ===== 社群卡片（可点击复制） ===== */
+    .copy-card {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .copy-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: var(--copy-ripple);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .5s ease, height .5s ease, opacity .5s ease;
+      opacity: 0;
+    }
+
+    .copy-card:active::before {
+      width: 300px;
+      height: 300px;
+      opacity: 1;
+    }
+
+    .copy-card:active {
+      transform: scale(0.98);
+    }
+
+    .copy-hint {
+      font-size: 12px;
+      color: var(--text-mute);
+      margin-top: 4px;
+      transition: color .25s ease;
+    }
+
+    .copy-card:hover .copy-hint {
+      color: var(--text-soft);
+    }
+
+    /* ===== Toast 提示 ===== */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px) scale(0.95);
+      padding: 10px 22px;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+      z-index: 999;
+    }
+
+    html[data-theme="dark"] .toast {
+      background: #2c2d33;
+      color: var(--text);
+      box-shadow: 0 6px 24px rgba(0,0,0,.4);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* ===== 关于我 ===== */
+    .about-text {
+      font-size: 14px;
+      color: var(--text-soft);
+      line-height: 1.8;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.6s ease-out 1.1s forwards;
+    }
+
+    .about-text a {
+      color: var(--text);
+      text-decoration: underline;
+      transition: color .2s;
+    }
+
+    .about-text a:hover { color: var(--text-soft); }
+
+    /* ===== 页脚 ===== */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: var(--text-faint);
+      opacity: 0;
+      animation: fadeIn 0.6s ease-out 1.3s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ===== 通用动画关键帧 ===== */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== 分区整体入场延迟 ===== */
+    #projects .section-title { animation-delay: 0.55s; }
+    #tools .section-title { animation-delay: 0.65s; }
+    #community .section-title { animation-delay: 0.75s; }
+    #community .section-title + .section-title { animation-delay: 0.8s; }
+    #about .section-title { animation-delay: 1.0s; }
+
+    /* ===== 回到顶部按钮 ===== */
+    #backToTop {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 998;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1),
+                  background .25s ease, box-shadow .25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+    }
+
+    #backToTop.visible {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #backToTop:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
+    }
+
+    #backToTop:active {
+      transform: scale(0.92);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 600px) {
+      .nav { padding: 16px 20px; }
+      .container { padding: 56px 20px 40px; }
+      .hero-title { font-size: 32px; }
+      #backToTop { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
+    }
+
+    /* 减少动画偏好（无障碍） */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ===== 深色模式切换按钮 ===== */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: transform .25s ease, background .25s ease, border-color .25s ease;
+      margin-left: 8px;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--card-border-hover);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.92);
+    }
+
+    .theme-toggle .icon-sun { display: none; }
+    html[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+    html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div>
-      <h1>算钱工具箱</h1>
-      <div class="sub">房贷 · 个税 · 汇率 · 比价 · 单位 · 计算器 —— 全部在你浏览器里算,不上传任何数据</div>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">南浦Xi</a>
+    <div class="nav-links">
+      <a href="#about" class="nav-anchor">关于我</a>
+      <a href="sponsor.html" class="nav-anchor">赞助</a>
+      <button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+      </button>
     </div>
-    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <a class="theme-btn" href="/" style="text-decoration:none;">↩ 返回主站</a>
-      <button class="theme-btn" id="themeBtn">🌙 暗色</button>
-    </div>
-  </header>
-
-  <nav class="tabs" id="tabs">
-    <button data-target="loan" class="active">房贷月供</button>
-    <button data-target="tax">个税 / 年终奖</button>
-    <button data-target="fx">汇率换算</button>
-    <button data-target="deal">折扣比价</button>
-    <button data-target="unit">单位换算</button>
-    <button data-target="calc">计算器</button>
   </nav>
 
-  <main>
-    <!-- ========== 房贷 ========== -->
-    <section class="tool active" id="tool-loan">
-      <div class="card">
-        <h2>房贷月供计算器</h2>
-        <div class="hint">支持等额本息 / 等额本金,可模拟提前还款,并给出逐年还款明细。</div>
-        <div class="grid-3">
-          <div><label class="field">贷款金额(万元)</label><input type="text" id="lnAmt" value="100" inputmode="decimal"></div>
-          <div><label class="field">年利率(%)</label><input type="text" id="lnRate" value="3.5" inputmode="decimal"></div>
-          <div><label class="field">贷款年限</label><input type="text" id="lnYears" value="30" inputmode="decimal"></div>
-        </div>
-        <div class="grid-2" style="margin-top:14px;">
-          <div>
-            <label class="field">还款方式</label>
-            <select id="lnType">
-              <option value="bx" selected>等额本息(月供固定)</option>
-              <option value="bj">等额本金(月供递减)</option>
-            </select>
-          </div>
-          <div>
-            <label class="field">提前还款(万元,可留空)</label>
-            <input type="text" id="lnPre" placeholder="例如 20" inputmode="decimal">
-          </div>
-        </div>
-        <div class="grid-2" style="margin-top:14px;">
-          <div>
-            <label class="field">提前还款时间(第几个月)</label>
-            <input type="text" id="lnPreM" value="36" inputmode="decimal">
-          </div>
-          <div>
-            <label class="field">提前还款后</label>
-            <select id="lnPreMode">
-              <option value="less" selected>减少月供(期限不变)</option>
-              <option value="short">缩短期限(月供不变)</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <button class="act" id="lnCalc">计算</button>
-          <button class="ghost" id="lnReset">重置</button>
-          <span class="status" id="lnStatus"></span>
-        </div>
+  <!-- 主内容 -->
+  <main class="container">
 
-        <div id="lnOut" style="display:none;">
-          <h3>结果</h3>
-          <div class="kv" id="lnKv"></div>
-          <h3>逐年还款明细</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>年份</th><th>当年还款</th><th>其中本金</th><th>其中利息</th><th>年末剩余本金</th></tr></thead>
-              <tbody id="lnTable"></tbody>
-            </table>
+    <!-- Hero -->
+    <h1 class="hero-title">南浦Xi</h1>
+    <p class="hero-sub">我是南浦Xi喵</p>
+    <div class="tags">
+      <span class="tag">3C成员</span>
+      <span class="tag">小up主</span>
+      <span class="tag">喵喵喵</span>
+      <span class="tag">喵喵喵喵</span>
+    </div>
+
+    <!-- 项目 -->
+    <div id="projects">
+      <p class="section-title">🚀 项目</p>
+      <div class="card-grid">
+        <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">AARC</span>
           </div>
-        </div>
-        <div class="note">月利率按 <b>年利率 ÷ 12</b> 计算,结果未含可能出现的利率调整、残值与手续费,请以贷款银行实际还款计划为准。</div>
+          <p class="card-desc">帮Au宣传</p>
+        </a>
       </div>
-    </section>
+    </div>
 
-    <!-- ========== 个税 ========== -->
-    <section class="tool" id="tool-tax">
-      <div class="card">
-        <h2>工资个税 / 年终奖计税</h2>
-        <div class="hint">按累计预扣法算全年 12 个月到手工资,并比较年终奖「单独计税」与「并入综合所得」哪种更省。</div>
-        <div class="grid-2">
-          <div><label class="field">税前月薪(元)</label><input type="text" id="txSalary" value="15000" inputmode="decimal"></div>
-          <div><label class="field">年终奖(元,可留空)</label><input type="text" id="txBonus" placeholder="例如 30000" inputmode="decimal"></div>
-        </div>
-        <div class="grid-2" style="margin-top:14px;">
-          <div><label class="field">五险一金个人缴纳比例(%)</label><input type="text" id="txSocial" value="22.5" inputmode="decimal"></div>
-          <div><label class="field">其他扣除(元/月)</label><input type="text" id="txOther" value="0" inputmode="decimal"></div>
-        </div>
+    <!-- 工具 -->
+    <div id="tools">
+      <p class="section-title">🛠️ 工具</p>
+      <div class="card-grid">
+        <a href="place/" class="card">
+          <div class="card-header">
+            <span class="card-icon">  </span>
+            <span class="card-title">地名生成器</span>
+            <span class="card-badge">好用</span>
+          </div>
+          <p class="card-desc">作者：南京精灵的灵芝，南浦Xi</p>
+        </a>
 
-        <h3>专项附加扣除(勾选,自动累加)</h3>
-        <div class="grid-2">
-          <div>
-            <label class="chk"><input type="checkbox" id="sd1" data-amt="2000" data-mult="1"><span>子女教育(2000 元/月/人)</span><span class="sp">×<input type="text" id="sd1n" value="1" style="width:48px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
-            <label class="chk"><input type="checkbox" id="sd2" data-amt="2000" data-mult="1"><span>3 岁以下婴幼儿照护(2000 元/月/人)</span><span class="sp">×<input type="text" id="sd2n" value="1" style="width:48px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
-            <label class="chk"><input type="checkbox" id="sd3" data-amt="400"><span>继续教育(学历 400 元/月)</span><span class="sp">400</span></label>
-            <label class="chk"><input type="checkbox" id="sd4" data-amt="3600" data-once="1"><span>职业资格继续教育(3600 元/年)</span><span class="sp">300/月</span></label>
+        <a href="tools/" class="card">
+          <div class="card-header">
+            <span class="card-icon">🧮</span>
+            <span class="card-title">算钱工具箱</span>
+            <span class="card-badge">6 合 1</span>
           </div>
-          <div>
-            <label class="chk"><input type="checkbox" id="sd5" data-amt="1000"><span>住房贷款利息(1000 元/月)</span><span class="sp">1000</span></label>
-            <label class="chk"><input type="checkbox" id="sd6" data-amt="1500"><span>住房租金(1500 元/月)</span>
-              <select id="sd6v" style="width:auto;display:inline-block;padding:2px 4px;font-size:12.5px;">
-                <option value="1500" selected>直辖市/省会 1500</option>
-                <option value="1100">市辖区户籍人口&gt;100万 1100</option>
-                <option value="800">其他 800</option>
-              </select></label>
-            <label class="chk"><input type="checkbox" id="sd7" data-amt="3000"><span>赡养老人(独生子女 3000 元/月)</span>
-              <select id="sd7v" style="width:auto;display:inline-block;padding:2px 4px;font-size:12.5px;">
-                <option value="3000" selected>独生子女 3000</option>
-                <option value="1500">非独生分摊 1500</option>
-              </select></label>
-            <label class="chk"><input type="checkbox" id="sd8" data-amt="0"><span>大病医疗(按年填,元)</span><span class="sp"><input type="text" id="sd8v" value="0" style="width:64px;display:inline-block;padding:2px 4px;" inputmode="decimal"></span></label>
+          <p class="card-desc">房贷月供、个税年终奖、汇率换算、折扣比价、单位换算、复利定投，本地计算不上传数据</p>
+        </a>
+        
+          
+        <a href="metromap/" class="card">
+          <div class="card-header">
+            <span class="card-icon">⏬</span>
+            <span class="card-title">下载中心</span>
+            <span class="card-badge">啥都有</span>
           </div>
-        </div>
-        <div class="row">
-          <span style="font-size:13px;color:var(--muted);">专项附加扣除合计:</span>
-          <strong id="txSum" style="font-size:15px;">0</strong>
-          <span style="font-size:13px;color:var(--muted);">元/月</span>
-          <button class="act" id="txCalc" style="margin-left:auto;">计算</button>
-          <span class="status" id="txStatus"></span>
-        </div>
+          <p class="card-desc">作者：南浦Xi</p>
+        </a>
 
-        <div id="txOut" style="display:none;">
-          <h3>结果</h3>
-          <div class="kv" id="txKv"></div>
-          <h3>全年 12 个月到手明细</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>月份</th><th>应发</th><th>五险一金</th><th>个税</th><th>到手</th></tr></thead>
-              <tbody id="txTable"></tbody>
-            </table>
+
+      </div>
+      <p class="section-title" style="color:#ddd;">更多工具正在开发中~</p>
+    </div>
+
+    <!-- 社群 -->
+    <div id="community">
+      <p class="section-title">💬 社群</p>
+      <p class="section-title" style="color:#ddd; font-size:12px; text-transform:none; letter-spacing:0;">点击卡片即可复制群号 / 频道号</p>
+      <div class="card-grid">
+        <div class="card copy-card" data-copy="695369973">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">van-豆射手的粉丝交流群</span>
           </div>
+          <p class="card-desc">QQ群 · 695369973</p>
+          <p class="copy-hint">点击复制群号</p>
         </div>
-        <div class="note">
-          按现行规则计算:基本减除费用 <b>5000 元/月</b>,年度汇算减除 <b>60000 元/年</b>;五险一金比例默认 22.5%(养老 8% + 医疗 2% + 失业 0.5% + 公积金 12%),请按你所在地与基数核对。<br>
-          年终奖单独计税政策现行有效期至 <b>2027 年 12 月 31 日</b>。大病医疗为年度据实扣除,超 1.5 万元部分限额 8 万元,此处按月摊入展示。结果为估算,汇算清缴以税务机关口径为准。
+        <div class="card copy-card" data-copy="487819503">
+          <div class="card-header">
+            <span class="card-icon">👥</span>
+            <span class="card-title">南浦Xi的粉丝交流群</span>
+          </div>
+          <p class="card-desc">QQ群 · 487819503</p>
+          <p class="copy-hint">点击复制群号</p>
+        </div>
+        <div class="card copy-card" data-copy="pd60907944">
+          <div class="card-header">
+            <span class="card-icon">📡</span>
+            <span class="card-title">QQ频道</span>
+          </div>
+          <p class="card-desc">豌豆的QQ频道，欢迎加入讨论</p>
+          <p class="copy-hint">点击复制频道名</p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ========== 汇率 ========== -->
-    <section class="tool" id="tool-fx">
-      <div class="card">
-        <h2>汇率换算</h2>
-        <div class="hint">内置 26 种货币对人民币参考汇率,可一键联网更新,也可手动改任意汇率。</div>
-        <div class="grid-3">
-          <div>
-            <label class="field">金额</label>
-            <input type="text" id="fxAmt" value="100" inputmode="decimal">
-          </div>
-          <div>
-            <label class="field">从</label>
-            <select id="fxFrom"></select>
-          </div>
-          <div>
-            <label class="field">到</label>
-            <select id="fxTo"></select>
-          </div>
-        </div>
-        <div class="row">
-          <button class="act" id="fxSwap">⇄ 交换</button>
-          <button class="ghost" id="fxUpdate">联网更新汇率</button>
-          <span class="status" id="fxStatus"></span>
-        </div>
-
-        <div class="kv" style="margin-top:16px;" id="fxKv"></div>
-
-        <h3>全部币种对人民币(1 外币 = ? 人民币)</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>币种</th><th>代码</th><th>汇率</th><th>操作</th></tr></thead>
-            <tbody id="fxTable"></tbody>
-          </table>
-        </div>
-        <div class="note">内置汇率为 <b>2026-10-06</b> 人民币汇率中间价(国家外汇管理局口径)参考值,仅供参考,实际成交以银行牌价为准。点击「联网更新汇率」会向公开汇率接口请求最新数据;失败时会自动保留当前值。</div>
+    <!-- 关于我 -->
+    <div id="about">
+      <p class="section-title">🐱 关于我</p>
+      <div class="about-text">
+        <p>我是南浦Xi喵，一个喜欢轨道交通、架空世界设定的小up主，不定期更新视频喵 🎬</p>
+        <p style="margin-top:8px;">想破500粉！欢迎关注我~</p>
       </div>
-    </section>
+    </div>
 
-    <!-- ========== 折扣比价 ========== -->
-    <section class="tool" id="tool-deal">
-      <div class="card">
-        <h2>折扣 / 满减 / 优惠券比价</h2>
-        <div class="hint">同一件商品,把不同优惠方案摆在一起比,直接告诉你哪个到手最便宜、相当于打了几折。</div>
-        <div class="grid-2">
-          <div><label class="field">商品原价(元)</label><input type="text" id="dlPrice" value="599" inputmode="decimal"></div>
-          <div><label class="field">计算顺序</label><input type="text" value="折扣 → 满减 → 优惠券" disabled style="color:var(--muted);"></div>
-        </div>
-
-        <h3>优惠方案</h3>
-        <div id="dlPlans"></div>
-        <div class="row">
-          <button class="ghost" id="dlAdd">+ 添加方案</button>
-          <button class="act" id="dlCalc">比价</button>
-          <button class="ghost" id="dlDemo">载入示例</button>
-          <span class="status" id="dlStatus"></span>
-        </div>
-
-        <div id="dlOut" style="display:none;">
-          <h3>比价结果(由便宜到贵)</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>方案</th><th>折后</th><th>满减</th><th>用券</th><th>到手价</th><th>相当于</th></tr></thead>
-              <tbody id="dlTable"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="note">格式:折扣填 <b>8.5</b> 表示八五折,不打折填 <b>10</b>;满减填 <b>满300减50</b>,多档用逗号分隔,自动取满足条件的最大一档;优惠券填 <b>满200减20</b>,无门槛直接填 <b>减20</b>。留空表示不使用该项优惠。</div>
-      </div>
-    </section>
-
-    <!-- ========== 单位换算 ========== -->
-    <section class="tool" id="tool-unit">
-      <div class="card">
-        <h2>单位换算</h2>
-        <div class="hint">选类别 → 选单位 → 输入数值,双向实时换算。</div>
-        <div class="grid-3">
-          <div><label class="field">类别</label><select id="unCat"></select></div>
-          <div><label class="field">从</label><select id="unFrom"></select></div>
-          <div><label class="field">到</label><select id="unTo"></select></div>
-        </div>
-        <div class="grid-2" style="margin-top:14px;">
-          <div><label class="field" id="unL1">数值</label><input type="text" id="unA" value="1" inputmode="decimal"></div>
-          <div><label class="field" id="unL2">结果</label><input type="text" id="unB" inputmode="decimal"></div>
-        </div>
-        <div class="row">
-          <button class="ghost" id="unSwap">⇄ 交换单位</button>
-          <button class="ghost" id="unCopy">复制结果</button>
-          <span class="status" id="unStatus"></span>
-        </div>
-        <h3>该单位可换算成</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>单位</th><th>数值</th></tr></thead>
-            <tbody id="unTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== 计算器 ========== -->
-    <section class="tool" id="tool-calc">
-      <div class="card">
-        <h2>计算器</h2>
-        <div class="hint">含 <b>/</b> 走精确分数(如 <b>2/3+1/2</b>、<b>2'1/3</b>),否则走小数表达式(如 <b>1.5*3+sin(30)</b>)。顶部显示结果、小数、倒数、假分数、带分数。</div>
-        <div class="calc-wrap">
-          <input type="text" class="calc-input" id="calcInput" placeholder="输入算式,如 2/3+1/2 或 1.5*3" autocomplete="off">
-          <div class="calc-result" id="calcResult">
-            <div class="res-main" id="calcMain">等待输入…</div>
-            <div class="res-expr" id="calcExpr"></div>
-            <div class="res-detail" id="calcDetail"></div>
-            <div class="res-mixed" id="calcMixed"></div>
-          </div>
-          <div class="keypad" id="calcKeypad">
-            <button class="keyop" data-key="C">C</button>
-            <button class="keyop" data-key="+">+</button>
-            <button class="keyop" data-key="-">−</button>
-            <button style="visibility:hidden"></button>
-
-            <button class="keyop" data-key="⌫">⌫</button>
-            <button class="keyop" data-key="*">×</button>
-            <button class="keyop" data-key="/">÷</button>
-            <button style="visibility:hidden"></button>
-
-            <button data-key="7">7</button>
-            <button data-key="8">8</button>
-            <button data-key="9">9</button>
-            <button style="visibility:hidden"></button>
-
-            <button data-key="4">4</button>
-            <button data-key="5">5</button>
-            <button data-key="6">6</button>
-            <button style="visibility:hidden"></button>
-
-            <button data-key="1">1</button>
-            <button data-key="2">2</button>
-            <button data-key="3">3</button>
-            <button style="visibility:hidden"></button>
-
-            <button data-key=".">.</button>
-            <button data-key="0">0</button>
-            <button class="keyeq" data-key="=">=</button>
-            <button style="visibility:hidden"></button>
-          </div>
-          <div class="calc-history" id="calcHistory"></div>
-        </div>
-        <div class="note">
-          按键 6 行布局:<b>C + −</b> / <b>⌫ × ÷</b> / <b>789</b> / <b>456</b> / <b>123</b> / <b>. 0 =</b>。<br>
-          分数写法:整数 <b>5</b>、假分数 <b>5/4</b>、带分数 <b>2'1/3</b>(2 又 1/3)。小数表达式支持括号及 <b>sin/cos/tan</b>(角度制)。
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer>
-    单个 HTML 文件 · 零依赖 · 离线可用(仅汇率更新需联网)<br>
-    所有计算都在本地完成,输入的数据不会离开你的浏览器
+  <!-- 页脚 -->
+  <footer class="footer">
+    喵喵喵
   </footer>
-</div>
 
-<script>
-(function () {
-  "use strict";
-  var $ = function (id) { return document.getElementById(id); };
+  <!-- 回到顶部按钮 -->
+  <button id="backToTop" title="回到顶部">↑</button>
 
-  /* ============ 主题 ============ */
-  var themeBtn = $("themeBtn");
-  function applyTheme(t) {
-    document.documentElement.setAttribute("data-theme", t);
-    themeBtn.textContent = t === "dark" ? "☀️ 浅色" : "🌙 深色";
-    try { localStorage.setItem("toolbox-theme", t); } catch (e) {}
-  }
-  try {
-    var saved = localStorage.getItem("toolbox-theme");
-    applyTheme(saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
-  } catch (e) { applyTheme("light"); }
-  themeBtn.addEventListener("click", function () {
-    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
-  });
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
-  /* ============ Tab ============ */
-  $("tabs").addEventListener("click", function (e) {
-    var btn = e.target.closest("button[data-target]");
-    if (!btn) return;
-    var t = btn.getAttribute("data-target");
-    Array.prototype.forEach.call(document.querySelectorAll("nav.tabs button"), function (b) {
-      b.classList.toggle("active", b === btn);
-    });
-    Array.prototype.forEach.call(document.querySelectorAll(".tool"), function (s) {
-      s.classList.toggle("active", s.id === "tool-" + t);
-    });
-  });
-
-  /* ============ 通用 ============ */
-  function num(id, def) {
-    var el = typeof id === "string" ? $(id) : id;
-    if (!el) return def === undefined ? 0 : def;
-    var v = parseFloat(String(el.value).replace(/[,，\s%]/g, ""));
-    return isNaN(v) ? (def === undefined ? 0 : def) : v;
-  }
-  function money(n, dec) {
-    var d = dec === undefined ? 2 : dec;
-    if (!isFinite(n)) return "-";
-    return Number(n).toLocaleString("zh-CN", { minimumFractionDigits: d, maximumFractionDigits: d });
-  }
-  function wan(n) { return money(n / 10000, 2); }
-  function setStatus(id, msg, isErr) {
-    var el = $(id);
-    el.textContent = msg || "";
-    el.className = "status " + (isErr ? "err" : "ok");
-    if (msg) setTimeout(function () { if (el.textContent === msg) el.textContent = ""; }, 3000);
-  }
-  function copyText(text, statusId, okMsg) {
-    if (!text) { setStatus(statusId, "没有可复制的内容", true); return; }
-    var done = function () { setStatus(statusId, okMsg || "已复制"); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, function () { fb(); });
-    } else fb();
-    function fb() {
-      var ta = document.createElement("textarea");
-      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand("copy"); done(); }
-      catch (e) { setStatus(statusId, "复制失败,请手动选中", true); }
-      document.body.removeChild(ta);
-    }
-  }
-  function box(k, v, hl) {
-    return '<div class="box"><div class="k">' + k + '</div><div class="v' + (hl ? ' hl' : '') + '">' + v + '</div></div>';
-  }
-
-  /* ============================================================
-     1. 房贷
-     ============================================================ */
-  function simulateLoan(principal, annualRate, months, type, preMonth, preAmt, preMode) {
-    var r = annualRate / 100 / 12;
-    var M;
-    if (type === "bx") {
-      M = r === 0 ? principal / months : principal * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
-    } else {
-      M = null;
-    }
-    var basePrincipal = principal / months;   // 等额本金的固定本金部分
-    var balance = principal;
-    var totalInterest = 0, totalPaid = 0;
-    var rows = [];
-    var curM = M;
-    var paidMonths = 0;
-    var limit = months * 2 + 2;
-    var preDone = false;
-    var savedInterest = null;
-
-    for (var m = 1; m <= limit && balance > 0.005; m++) {
-      var interest = balance * r;
-      var principalPart;
-      if (type === "bx") {
-        principalPart = curM - interest;
-      } else {
-        principalPart = basePrincipal;
-      }
-      if (principalPart > balance) principalPart = balance;
-
-      // 提前还款
-      if (!preDone && preAmt > 0 && m === preMonth && balance - principalPart > 0.005) {
-        var extra = Math.min(preAmt, balance - principalPart);
-        principalPart += extra;
-        preDone = true;
-      }
-
-      var pay = principalPart + interest;
-      balance -= principalPart;
-      totalInterest += interest;
-      totalPaid += pay;
-      paidMonths = m;
-      rows.push({ m: m, pay: pay, p: principalPart, i: interest, bal: balance, mp: type === "bx" ? curM : pay });
-
-      // 提前还款后调整月供 / 期限
-      if (preDone && !savedInterest && m === preMonth && balance > 0.005) {
-        if (type === "bx") {
-          if (preMode === "less") {
-            var left = months - m;
-            curM = r === 0 ? balance / left : balance * r * Math.pow(1 + r, left) / (Math.pow(1 + r, left) - 1);
-          } else {
-            // 月供不变,求新剩余期数
-            var need = Math.log(curM / (curM - balance * r)) / Math.log(1 + r);
-            need = Math.ceil(need);
-            curM = r === 0 ? balance / need : balance * r * Math.pow(1 + r, need) / (Math.pow(1 + r, need) - 1);
-            months = m + need;
-          }
-        } else {
-          // 等额本金:重算剩余期的固定本金
-          var leftM = preMode === "less" ? months - m : Math.max(1, Math.round(months - m));
-          basePrincipal = balance / leftM;
-        }
-      }
-      if (type !== "bx" && preDone && preMode === "short" && m === preMonth) {
-        // 等额本金缩短期限:保持首月还款额,反推期数,简化为按剩余本金/原月本金
-        var nm = Math.ceil(balance / (principal / months));
-        basePrincipal = balance / nm;
-        months = m + nm;
-      }
-    }
-    return { rows: rows, totalInterest: totalInterest, totalPaid: totalPaid, months: paidMonths, firstPay: rows.length ? rows[0].mp : 0, lastPay: rows.length ? rows[rows.length - 1].pay : 0 };
-  }
-
-  function calcLoan() {
-    var amtW = num("lnAmt"), rate = num("lnRate"), years = num("lnYears");
-    if (amtW <= 0 || years <= 0) { setStatus("lnStatus", "请填写贷款金额和年限", true); return; }
-    var P = amtW * 10000;
-    var n = Math.round(years * 12);
-    if (n < 1 || n > 600) { setStatus("lnStatus", "年限请填 1–50 之间", true); return; }
-    var type = $("lnType").value;
-    var preAmt = num("lnPre") * 10000;
-    var preM = Math.round(num("lnPreM"));
-    var preMode = $("lnPreMode").value;
-    if (preAmt > 0 && (preM < 1 || preM >= n)) {
-      setStatus("lnStatus", "提前还款月份需在 1 到 " + (n - 1) + " 之间", true); return;
-    }
-
-    var base = simulateLoan(P, rate, n, type, 0, 0, preMode);
-    var cur = preAmt > 0 ? simulateLoan(P, rate, n, type, preM, preAmt, preMode) : base;
-
-    var kv = "";
-    if (preAmt > 0) {
-      var after = cur.rows[preM];   // 提前还款后的第一期
-      kv += box(type === "bx" ? "原月供" : "提前还款前月供", money(cur.firstPay) + " <small>元</small>");
-      kv += box(type === "bx" ? "新月供" : "提前还款后月供",
-                money(after ? (type === "bx" ? after.mp : after.pay) : cur.firstPay) + " <small>元</small>", true);
-      kv += box("末月月供", money(cur.lastPay) + " <small>元</small>");
-    } else if (type === "bj") {
-      kv += box("首月月供", money(cur.firstPay) + " <small>元</small>", true);
-      kv += box("末月月供", money(cur.lastPay) + " <small>元</small>");
-      kv += box("每月递减约", money((cur.firstPay - cur.lastPay) / Math.max(1, cur.months - 1)) + " <small>元</small>");
-    } else {
-      kv += box("月供(固定)", money(cur.firstPay) + " <small>元</small>", true);
-    }
-    kv += box("支付利息总额", wan(cur.totalInterest) + " <small>万元</small>");
-    kv += box("本息合计", wan(cur.totalPaid) + " <small>万元</small>");
-    kv += box("实际还款期数", cur.months + " <small>期 / " + (cur.months / 12).toFixed(1) + " 年</small>");
-    if (preAmt > 0) {
-      kv += box("节省利息", wan(base.totalInterest - cur.totalInterest) + " <small>万元</small>", true);
-      kv += box("提前还清", "第 " + cur.months + " <small>期</small>");
-    }
-    $("lnKv").innerHTML = kv;
-
-    // 按年汇总
-    var years = [];
-    var acc = null;
-    for (var i = 0; i < cur.rows.length; i++) {
-      var y = Math.floor((cur.rows[i].m - 1) / 12);
-      if (!acc || acc.y !== y) {
-        if (acc) years.push(acc);
-        acc = { y: y, pay: 0, p: 0, i: 0, bal: 0 };
-      }
-      acc.pay += cur.rows[i].pay;
-      acc.p += cur.rows[i].p;
-      acc.i += cur.rows[i].i;
-      acc.bal = cur.rows[i].bal;
-    }
-    if (acc) years.push(acc);
-
-    var html = "";
-    for (var j = 0; j < years.length; j++) {
-      var o = years[j];
-      html += "<tr><td>第 " + (o.y + 1) + " 年</td><td>" + money(o.pay) + "</td><td>" + money(o.p) +
-              "</td><td>" + money(o.i) + "</td><td>" + money(o.bal < 0 ? 0 : o.bal) + "</td></tr>";
-    }
-    html += '<tr style="font-weight:600;"><td>合计</td><td>' + money(cur.totalPaid) + "</td><td>" +
-            money(P) + "</td><td>" + money(cur.totalInterest) + "</td><td>0.00</td></tr>";
-    $("lnTable").innerHTML = html;
-    $("lnOut").style.display = "block";
-    setStatus("lnStatus", "计算完成");
-  }
-  $("lnCalc").addEventListener("click", calcLoan);
-  $("lnReset").addEventListener("click", function () {
-    $("lnAmt").value = "100"; $("lnRate").value = "3.5"; $("lnYears").value = "30";
-    $("lnPre").value = ""; $("lnPreM").value = "36";
-    $("lnType").value = "bx"; $("lnPreMode").value = "less";
-    $("lnOut").style.display = "none";
-  });
-
-  /* ============================================================
-     2. 个税
-     ============================================================ */
-  var YEAR_TAX = [
-    [36000, 0.03, 0], [144000, 0.10, 2520], [300000, 0.20, 16920],
-    [420000, 0.25, 31920], [660000, 0.30, 52920], [960000, 0.35, 85920],
-    [Infinity, 0.45, 181920]
-  ];
-  var MONTH_TAX = [
-    [3000, 0.03, 0], [12000, 0.10, 210], [25000, 0.20, 1410],
-    [35000, 0.25, 2660], [55000, 0.30, 4410], [80000, 0.35, 7160],
-    [Infinity, 0.45, 15160]
-  ];
-  function taxBy(t, x) {
-    if (x <= 0) return 0;
-    for (var i = 0; i < t.length; i++) {
-      if (x <= t[i][0]) return Math.max(0, x * t[i][1] - t[i][2]);
-    }
-    return 0;
-  }
-  // 全年一次性奖金单独计税:用「奖金 ÷ 12」定税率档位,再对奖金全额计税
-  function bonusSepTax(bonus) {
-    var x = bonus / 12;
-    for (var i = 0; i < MONTH_TAX.length; i++) {
-      if (x <= MONTH_TAX[i][0]) return Math.max(0, bonus * MONTH_TAX[i][1] - MONTH_TAX[i][2]);
-    }
-    return 0;
-  }
-
-  function specialDeduction() {
-    var s = 0;
-    if ($("sd1").checked) s += 2000 * Math.max(0, num("sd1n"));
-    if ($("sd2").checked) s += 2000 * Math.max(0, num("sd2n"));
-    if ($("sd3").checked) s += 400;
-    if ($("sd4").checked) s += 3600 / 12;
-    if ($("sd5").checked) s += 1000;
-    if ($("sd6").checked) s += parseFloat($("sd6v").value) || 0;
-    if ($("sd7").checked) s += parseFloat($("sd7v").value) || 0;
-    if ($("sd8").checked) {
-      var medical = num("sd8v");
-      var over = Math.max(0, medical - 15000);
-      s += Math.min(over, 80000) / 12;
-    }
-    return s;
-  }
-  ["sd1", "sd2", "sd3", "sd4", "sd5", "sd6", "sd7", "sd8", "sd1n", "sd2n", "sd6v", "sd7v", "sd8v"].forEach(function (id) {
-    $(id).addEventListener("input", function () { $("txSum").textContent = money(specialDeduction(), 0); });
-    $(id).addEventListener("change", function () { $("txSum").textContent = money(specialDeduction(), 0); });
-  });
-  $("txSum").textContent = money(specialDeduction(), 0);
-
-  function calcTax() {
-    var salary = num("txSalary");
-    var bonus = num("txBonus");
-    var socialRate = num("txSocial") / 100;
-    var other = num("txOther");
-    var special = specialDeduction();
-    if (salary <= 0) { setStatus("txStatus", "请填写税前月薪", true); return; }
-
-    var social = salary * socialRate;
-    var monthly = [];
-    var prevCum = 0, cumTaxPaid = 0, yearTax = 0, netTotal = 0;
-    for (var i = 1; i <= 12; i++) {
-      var cumIncome = salary * i;
-      var cumBase = 5000 * i;
-      var cumSocial = social * i;
-      var cumSpecial = (special + other) * i;
-      var cumTaxable = Math.max(0, cumIncome - cumBase - cumSocial - cumSpecial);
-      var cumTax = taxBy(YEAR_TAX, cumTaxable);
-      var mTax = Math.max(0, cumTax - prevCum);
-      prevCum = cumTax;
-      cumTaxPaid += mTax;
-      yearTax += mTax;
-      var net = salary - social - mTax;
-      netTotal += net;
-      monthly.push({ m: i, gross: salary, social: social, tax: mTax, net: net });
-    }
-
-    // 年终奖两种计税方式
-    var bonusSep = 0, bonusMerge = 0, bestWay = "none", bonusTax = 0;
-    if (bonus > 0) {
-      bonusSep = bonusSepTax(bonus);
-      var annualTaxableWith = Math.max(0, salary * 12 - 60000 - social * 12 - (special + other) * 12 + bonus);
-      var totalTaxMerge = taxBy(YEAR_TAX, annualTaxableWith);
-      bonusMerge = Math.max(0, totalTaxMerge - cumTaxPaid);
-      bonusTax = Math.min(bonusSep, bonusMerge);
-      bestWay = bonusSep <= bonusMerge ? "sep" : "merge";
-    }
-
-    var totalIncome = salary * 12 + bonus;
-    var totalTax = yearTax + bonusTax;
-    var totalNet = netTotal + (bonus - bonusTax);
-
-    var kv = "";
-    kv += box("每月到手(第 1 月)", money(monthly[0].net) + " <small>元</small>", true);
-    kv += box("每月到手(第 12 月)", money(monthly[11].net) + " <small>元</small>");
-    kv += box("全年到手(含年终奖)", money(totalNet) + " <small>元</small>", true);
-    kv += box("全年个税合计", money(totalTax) + " <small>元</small>");
-    kv += box("实际税负率", (totalIncome > 0 ? (totalTax / totalIncome * 100).toFixed(2) : "0.00") + " <small>%</small>");
-    kv += box("全年五险一金", money(social * 12) + " <small>元</small>");
-    $("txKv").innerHTML = kv;
-
-    var extra = "";
-    if (bonus > 0) {
-      var word = bestWay === "sep" ? "单独计税" : "并入综合所得";
-      extra = '<div style="margin-top:12px;padding:12px 14px;background:var(--soft);border-radius:10px;font-size:13.5px;line-height:1.9;">' +
-        "<b>年终奖 " + money(bonus, 0) + " 元,推荐:" + word + "</b><br>" +
-        "单独计税 → 个税 " + money(bonusSep) + " 元" + (bestWay === "sep" ? " <span class='tag'>更省</span>" : "") + "<br>" +
-        "并入综合所得 → 个税 " + money(bonusMerge) + " 元" + (bestWay === "merge" ? " <span class='tag'>更省</span>" : "") + "<br>" +
-        "两种方式相差 <b>" + money(Math.abs(bonusSep - bonusMerge)) + "</b> 元</div>";
-    }
-    $("txKv").innerHTML += extra;
-
-    var html = "";
-    for (var j = 0; j < monthly.length; j++) {
-      var o = monthly[j];
-      html += "<tr><td>" + o.m + " 月</td><td>" + money(o.gross) + "</td><td>" + money(o.social) +
-              "</td><td>" + money(o.tax) + "</td><td><b>" + money(o.net) + "</b></td></tr>";
-    }
-    html += '<tr style="font-weight:600;"><td>合计</td><td>' + money(salary * 12) + "</td><td>" +
-            money(social * 12) + "</td><td>" + money(yearTax) + "</td><td>" + money(netTotal) + "</td></tr>";
-    $("txTable").innerHTML = html;
-    $("txOut").style.display = "block";
-    setStatus("txStatus", "计算完成");
-  }
-  $("txCalc").addEventListener("click", calcTax);
-
-  /* ============================================================
-     3. 汇率
-     ============================================================ */
-  // 1 外币 = X 人民币(2026-10-06 中间价)
-  var FX_DEFAULT = [
-    ["CNY", "人民币", 1],
-    ["USD", "美元", 6.7351], ["EUR", "欧元", 7.6215], ["JPY", "日元", 0.042727],
-    ["HKD", "港元", 0.858420], ["GBP", "英镑", 8.8918], ["AUD", "澳元", 4.6959],
-    ["SGD", "新加坡元", 5.2607], ["CHF", "瑞士法郎", 8.0608], ["CAD", "加元", 4.7341],
-    ["KRW", "韩元", 0.004958], ["NZD", "新西兰元", 3.7899], ["MOP", "澳门元", 0.832986],
-    ["MYR", "马来西亚林吉特", 1.6483], ["RUB", "俄罗斯卢布", 0.079958], ["ZAR", "南非兰特", 0.410004],
-    ["AED", "阿联酋迪拉姆", 1.8292], ["SAR", "沙特里亚尔", 1.7892], ["HUF", "匈牙利福林", 0.020784],
-    ["PLN", "波兰兹罗提", 1.7465], ["DKK", "丹麦克朗", 1.0195], ["SEK", "瑞典克朗", 0.672314],
-    ["NOK", "挪威克朗", 0.699741], ["TRY", "土耳其里拉", 0.137159], ["MXN", "墨西哥比索", 0.372787],
-    ["THB", "泰铢", 0.199996]
-  ];
-  var FX = {};
-  var FX_NAME = {};
-  FX_DEFAULT.forEach(function (r) { FX[r[0]] = r[2]; FX_NAME[r[0]] = r[1]; });
-
-  var fxFrom = $("fxFrom"), fxTo = $("fxTo");
-  FX_DEFAULT.forEach(function (r) {
-    fxFrom.add(new Option(r[1] + " " + r[0], r[0]));
-    fxTo.add(new Option(r[1] + " " + r[0], r[0]));
-  });
-  fxFrom.value = "USD"; fxTo.value = "CNY";
-
-  function fxConvert(amt, from, to) {
-    return amt * FX[from] / FX[to];
-  }
-  function fxRender() {
-    var amt = num("fxAmt");
-    var f = fxFrom.value, t = fxTo.value;
-    var out = fxConvert(amt, f, t);
-    var rate = FX[f] / FX[t];
-    var dec = Math.abs(out) >= 100 ? 2 : (Math.abs(out) >= 1 ? 4 : 6);
-    $("fxKv").innerHTML =
-      box(amt + " " + f + " =", money(out, dec) + " <small>" + t + "</small>", true) +
-      box("汇率 1 " + f + " =", money(rate, 6) + " <small>" + t + "</small>") +
-      box("反向 1 " + t + " =", money(1 / rate, 6) + " <small>" + f + "</small>");
-    $("fxKv").innerHTML += '<div style="grid-column:1/-1;"><button class="ghost mini" id="fxCopy">复制结果</button></div>';
-    var cb = $("fxCopy");
-    if (cb) cb.addEventListener("click", function () { copyText(String(out), "fxStatus", "已复制换算结果"); });
-    renderFxTable();
-  }
-  function renderFxTable() {
-    var html = "";
-    FX_DEFAULT.forEach(function (r) {
-      var code = r[0];
-      if (code === "CNY") return;
-      html += "<tr><td>" + r[1] + "</td><td>" + code + "</td>" +
-        '<td><input type="text" data-code="' + code + '" value="' + FX[code] + '" style="padding:4px 7px;font-size:12.5px;"></td>' +
-        "<td>" + money(FX[code], 6) + "</td></tr>";
-    });
-    $("fxTable").innerHTML = html;
-    Array.prototype.forEach.call($("fxTable").querySelectorAll("input[data-code]"), function (inp) {
-      inp.addEventListener("change", function () {
-        var v = parseFloat(inp.value);
-        if (isNaN(v) || v <= 0) { inp.value = FX[inp.getAttribute("data-code")]; return; }
-        FX[inp.getAttribute("data-code")] = v;
-        fxRender();
-        setStatus("fxStatus", "已更新 " + inp.getAttribute("data-code"));
-      });
-    });
-  }
-  ["fxAmt"].forEach(function (id) { $(id).addEventListener("input", fxRender); });
-  fxFrom.addEventListener("change", fxRender);
-  fxTo.addEventListener("change", fxRender);
-  $("fxSwap").addEventListener("click", function () {
-    var a = fxFrom.value; fxFrom.value = fxTo.value; fxTo.value = a; fxRender();
-  });
-  $("fxUpdate").addEventListener("click", function () {
-    setStatus("fxStatus", "正在获取…");
-    var sources = [
-      { url: "https://open.er-api.com/v6/latest/CNY", parse: function (d) { return d && d.rates ? d.rates : null; }, base: "CNY" },
-      { url: "https://api.frankfurter.app/latest?from=CNY", parse: function (d) { return d && d.rates ? d.rates : null; }, base: "CNY" }
-    ];
-    var i = 0;
-    function tryNext() {
-      if (i >= sources.length) { setStatus("fxStatus", "联网失败,仍使用当前汇率", true); return; }
-      var s = sources[i++];
-      fetch(s.url).then(function (r) { return r.json(); }).then(function (d) {
-        var rates = s.parse(d);
-        if (!rates) throw new Error("bad");
-        var count = 0;
-        Object.keys(FX).forEach(function (code) {
-          if (code === "CNY") return;
-          if (rates[code] && rates[code] > 0) { FX[code] = 1 / rates[code]; count++; }
+  <script>
+    // ===== 点击复制功能 =====
+    document.querySelectorAll('.copy-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const text = card.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('已复制：' + text);
+        }).catch(() => {
+          showToast('复制失败，请手动复制');
         });
-        if (!count) throw new Error("none");
-        fxRender();
-        setStatus("fxStatus", "已更新 " + count + " 个币种");
-      }).catch(function () { tryNext(); });
-    }
-    tryNext();
-  });
-  fxRender();
-
-  /* ============================================================
-     4. 折扣比价
-     ============================================================ */
-  var dlPlans = $("dlPlans");
-  var planCount = 0;
-  function addPlan(name, disc, tiers, coupon) {
-    planCount++;
-    var id = planCount;
-    var div = document.createElement("div");
-    div.className = "plan-row";
-    div.setAttribute("data-id", id);
-    div.innerHTML =
-      '<div class="top">' +
-        '<input type="text" class="p-name" placeholder="方案名称,如 官方旗舰店" value="' + (name || "") + '">' +
-        '<button class="ghost mini p-del">删除</button>' +
-      "</div>" +
-      '<div class="grid-3">' +
-        '<div><label class="field">折扣(10 = 不打折)</label><input type="text" class="p-disc" placeholder="如 8.5" value="' + (disc || "") + '" inputmode="decimal"></div>' +
-        '<div><label class="field">满减档位</label><input type="text" class="p-tier" placeholder="满300减50, 满600减120" value="' + (tiers || "") + '"></div>' +
-        '<div><label class="field">优惠券</label><input type="text" class="p-coupon" placeholder="满200减20 或 减20" value="' + (coupon || "") + '"></div>' +
-      "</div>";
-    dlPlans.appendChild(div);
-    div.querySelector(".p-del").addEventListener("click", function () {
-      div.remove();
-      if (!dlPlans.children.length) addPlan("", "", "", "");
-    });
-  }
-  addPlan("", "", "", "");
-  addPlan("", "", "", "");
-
-  function parseTiers(str) {
-    var out = [];
-    var re = /满\s*(\d+(?:\.\d+)?)\s*减\s*(\d+(?:\.\d+)?)/g, m;
-    while ((m = re.exec(str)) !== null) out.push([parseFloat(m[1]), parseFloat(m[2])]);
-    return out;
-  }
-  function parseCoupon(str) {
-    if (!str) return null;
-    var s = str.replace(/\s/g, "");
-    var m = s.match(/^(?:满(\d+(?:\.\d+)?))?减(\d+(?:\.\d+)?)$/);
-    if (!m) return null;
-    return { min: m[1] ? parseFloat(m[1]) : 0, cut: parseFloat(m[2]) };
-  }
-  function calcPlan(price, disc, tierStr, couponStr) {
-    var afterDisc = price * (disc > 0 && disc <= 10 ? disc / 10 : 1);
-    var cutTier = 0;
-    var tiers = parseTiers(tierStr || "");
-    tiers.forEach(function (t) { if (afterDisc >= t[0] && t[1] > cutTier) cutTier = t[1]; });
-    var afterTier = Math.max(0, afterDisc - cutTier);
-    var cp = parseCoupon(couponStr || "");
-    var cutCoupon = 0;
-    if (cp && afterTier >= cp.min) cutCoupon = cp.cut;
-    var final = Math.max(0, afterTier - cutCoupon);
-    return { afterDisc: afterDisc, cutTier: cutTier, cutCoupon: cutCoupon, final: final, rate: price > 0 ? final / price * 10 : 0 };
-  }
-  $("dlAdd").addEventListener("click", function () { addPlan("", "", "", ""); });
-  $("dlDemo").addEventListener("click", function () {
-    dlPlans.innerHTML = "";
-    $("dlPrice").value = "599";
-    addPlan("官方店:直接打折", "8.5", "", "");
-    addPlan("平台:满减叠加", "10", "满300减50, 满600减120", "满200减20");
-    addPlan("直播间:大额券", "9", "", "减80");
-    setStatus("dlStatus", "已载入示例,点「比价」看结果");
-  });
-  $("dlCalc").addEventListener("click", function () {
-    var price = num("dlPrice");
-    if (price <= 0) { setStatus("dlStatus", "请填写商品原价", true); return; }
-    var rows = Array.prototype.slice.call(dlPlans.children).map(function (row) {
-      var name = row.querySelector(".p-name").value || "未命名方案";
-      var r = calcPlan(price, num(row.querySelector(".p-disc")), row.querySelector(".p-tier").value, row.querySelector(".p-coupon").value);
-      return { name: name, r: r, row: row };
-    });
-    rows.sort(function (a, b) { return a.r.final - b.r.final; });
-    var html = "";
-    rows.forEach(function (o, idx) {
-      var best = idx === 0;
-      o.row.classList.toggle("best", best);
-      html += "<tr" + (best ? ' style="font-weight:600;"' : "") + "><td>" + o.name +
-        (best ? ' <span class="tag">最便宜</span>' : "") + "</td><td>" + money(o.r.afterDisc) +
-        "</td><td>-" + money(o.r.cutTier) + "</td><td>-" + money(o.r.cutCoupon) +
-        "</td><td><b>" + money(o.r.final) + "</b></td><td>" + o.r.rate.toFixed(2) + " 折</td></tr>";
-    });
-    if (rows.length > 1) {
-      var gap = rows[1].r.final - rows[0].r.final;
-      html += '<tr><td colspan="6" style="text-align:left;color:var(--muted);">最优方案比第二名便宜 ' +
-        money(gap) + " 元</td></tr>";
-    }
-    $("dlTable").innerHTML = html;
-    $("dlOut").style.display = "block";
-    setStatus("dlStatus", "比价完成");
-  });
-
-  /* ============================================================
-     5. 单位换算
-     ============================================================ */
-  var UNITS = {
-    "长度": [["米", 1], ["千米", 1000], ["分米", 0.1], ["厘米", 0.01], ["毫米", 0.001], ["微米", 1e-6],
-             ["英寸", 0.0254], ["英尺", 0.3048], ["码", 0.9144], ["英里", 1609.344], ["海里", 1852],
-             ["市里", 500], ["市尺", 1 / 3], ["市寸", 1 / 30]],
-    "重量": [["千克", 1], ["克", 0.001], ["毫克", 1e-6], ["吨", 1000], ["磅", 0.45359237],
-             ["盎司", 0.028349523125], ["市斤", 0.5], ["市两", 0.05], ["克拉", 0.0002]],
-    "面积": [["平方米", 1], ["平方千米", 1e6], ["平方厘米", 1e-4], ["公顷", 10000], ["亩", 666.6666667],
-             ["英亩", 4046.8564224], ["平方英尺", 0.09290304], ["平方英寸", 0.00064516], ["平方英里", 2589988.11]],
-    "体积": [["升", 1], ["毫升", 0.001], ["立方米", 1000], ["立方厘米", 0.001], ["立方英尺", 28.316846592],
-             ["美制加仑", 3.785411784], ["英制加仑", 4.54609], ["美制品脱", 0.473176473]],
-    "时间": [["秒", 1], ["分钟", 60], ["小时", 3600], ["天", 86400], ["周", 604800], ["月(30天)", 2592000], ["年(365天)", 31536000]],
-    "速度": [["米/秒", 1], ["千米/小时", 1 / 3.6], ["英里/小时", 0.44704], ["节", 0.5144444444], ["英尺/秒", 0.3048]],
-    "数据存储": [["字节", 1], ["比特", 0.125], ["KB(10³)", 1e3], ["MB(10⁶)", 1e6], ["GB(10⁹)", 1e9], ["TB(10¹²)", 1e12],
-                 ["KiB(2¹⁰)", 1024], ["MiB(2²⁰)", 1048576], ["GiB(2³⁰)", 1073741824], ["TiB(2⁴⁰)", 1099511627776]],
-    "温度": "TEMP"
-  };
-  var TEMP_UNITS = ["摄氏度", "华氏度", "开尔文"];
-  function toCelsius(u, v) {
-    if (u === "摄氏度") return v;
-    if (u === "华氏度") return (v - 32) * 5 / 9;
-    return v - 273.15;
-  }
-  function fromCelsius(u, c) {
-    if (u === "摄氏度") return c;
-    if (u === "华氏度") return c * 9 / 5 + 32;
-    return c + 273.15;
-  }
-  function unitList(cat) { return cat === "温度" ? TEMP_UNITS : UNITS[cat].map(function (x) { return x[0]; }); }
-  function unitFactor(cat, name) {
-    var f = UNITS[cat].filter(function (x) { return x[0] === name; })[0];
-    return f ? f[1] : 1;
-  }
-  function convert(cat, val, from, to) {
-    if (cat === "温度") return fromCelsius(to, toCelsius(from, val));
-    return val * unitFactor(cat, from) / unitFactor(cat, to);
-  }
-
-  var unCat = $("unCat"), unFrom = $("unFrom"), unTo = $("unTo");
-  Object.keys(UNITS).forEach(function (c) { unCat.add(new Option(c, c)); });
-  function fillUnits() {
-    var list = unitList(unCat.value);
-    unFrom.innerHTML = ""; unTo.innerHTML = "";
-    list.forEach(function (u) { unFrom.add(new Option(u, u)); unTo.add(new Option(u, u)); });
-    unFrom.value = list[0];
-    unTo.value = list[1] || list[0];
-  }
-  function unRender() {
-    var cat = unCat.value, a = num("unA"), f = unFrom.value, t = unTo.value;
-    var b = convert(cat, a, f, t);
-    $("unB").value = Number(b.toPrecision(10)).toString();
-    $("unL1").textContent = f;
-    $("unL2").textContent = t;
-    var html = "";
-    unitList(cat).forEach(function (u) {
-      var v = convert(cat, a, f, u);
-      html += "<tr" + (u === t ? ' style="font-weight:600;"' : "") + "><td>" + u + "</td><td>" +
-        Number(v.toPrecision(10)).toString() + "</td></tr>";
-    });
-    $("unTable").innerHTML = html;
-  }
-  unCat.addEventListener("change", function () { fillUnits(); unRender(); });
-  unFrom.addEventListener("change", unRender);
-  unTo.addEventListener("change", unRender);
-  $("unA").addEventListener("input", unRender);
-  $("unB").addEventListener("input", function () {
-    var cat = unCat.value, b = num("unB"), f = unFrom.value, t = unTo.value;
-    var a = convert(cat, b, t, f);
-    $("unA").value = Number(a.toPrecision(10)).toString();
-    var html = "";
-    unitList(cat).forEach(function (u) {
-      var v = convert(cat, num("unA"), f, u);
-      html += "<tr" + (u === t ? ' style="font-weight:600;"' : "") + "><td>" + u + "</td><td>" +
-        Number(v.toPrecision(10)).toString() + "</td></tr>";
-    });
-    $("unTable").innerHTML = html;
-  });
-  $("unSwap").addEventListener("click", function () {
-    var a = unFrom.value; unFrom.value = unTo.value; unTo.value = a; unRender();
-  });
-  $("unCopy").addEventListener("click", function () { copyText($("unB").value, "unStatus", "已复制换算结果"); });
-  unCat.value = "长度"; fillUnits(); unRender();
-
-  /* ============================================================
-     6. 计算器(小数 + 分数 合并)
-     按键 6 行: C + − / ⌫ × ÷ / 789 / 456 / 123 / . 0 =
-     判定:表达式含 "/" 且能整体解析为分数算式 → 精确分数计算;
-          否则 → 小数表达式求值(四则、括号、sin/cos/tan)。
-     ============================================================ */
-  var calcInput = $("calcInput");
-  var calcMain = $("calcMain");
-  var calcExpr = $("calcExpr");
-  var calcDetail = $("calcDetail");
-  var calcMixed = $("calcMixed");
-  var calcHistory = $("calcHistory");
-  var calcHistList = [];
-
-  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
-  function simp(n, d) {
-    if (d < 0) { n = -n; d = -d; }
-    var g = gcd(Math.abs(n), d) || 1;
-    return { n: n / g, d: d / g };
-  }
-  // 分数写法: 3/4   5   2'1/3(=7/3)   -2/3
-  function parseFrac(tok) {
-    var t = String(tok).replace(/\s+/g, "");
-    if (t === "" || t === "-" || t === "+") throw new Error("空分数");
-    var sign = 1;
-    if (t.charAt(0) === "-") { sign = -1; t = t.slice(1); }
-    else if (t.charAt(0) === "+") { t = t.slice(1); }
-    var whole = 0, num, den;
-    var apos = t.indexOf("'");
-    if (apos > -1) {
-      var wstr = t.slice(0, apos);
-      whole = wstr === "" ? 0 : Number(wstr);
-      t = t.slice(apos + 1);
-    }
-    var sp = t.split("/");
-    if (sp.length === 1) {
-      if (sp[0] === "") throw new Error("格式有误");
-      num = Number(sp[0]); den = 1;
-    } else if (sp.length === 2) {
-      if (sp[0] === "" || sp[1] === "") throw new Error("分子或分母为空");
-      num = Number(sp[0]); den = Number(sp[1]);
-    } else throw new Error("分数格式有误,应为 分子/分母");
-    if (!isFinite(num) || !isFinite(den)) throw new Error("数字无效");
-    if (den === 0) throw new Error("分母不能为零");
-    var neg = sign < 0 || whole < 0 || num < 0;
-    var total = Math.abs(whole) * Math.abs(den) + Math.abs(num);
-    return simp(neg ? -total : total, Math.abs(den));
-  }
-  function fracOp(a, op, b) {
-    if (op === "+") return simp(a.n * b.d + b.n * a.d, a.d * b.d);
-    if (op === "-") return simp(a.n * b.d - b.n * a.d, a.d * b.d);
-    if (op === "*") return simp(a.n * b.n, a.d * b.d);
-    if (b.n === 0) throw new Error("不能除以零");
-    return simp(a.n * b.d, a.d * b.n);
-  }
-  // 在分数算式里,把 "a ÷ b" 改写为整体除法,让 ÷ 表示左右整体的除法,
-  // 避免 "3/4 ÷ 2/3" 被误读成左结合的 (3/4)/2/3。仅在分数判定路径调用。
-  function parseFracExpr(src) {
-    var s = src.replace(/×/g, "*").replace(/–/g, "-").replace(/−/g, "-").replace(/÷/g, "\x01");
-    var pos = 0;
-    function peek() { return pos < s.length ? s.charAt(pos) : ""; }
-    function ws() { while (peek() === " " || peek() === "\t") pos++; }
-    function num() {
-      ws();
-      var neg = 1;
-      if (peek() === "-" || peek() === "+") { if (peek() === "-") neg = -1; pos++; }
-      var j = pos;
-      var DIG = /[0-9'.]/;
-      while (j < s.length && DIG.test(s.charAt(j))) j++;
-      if (j === pos) throw new Error("缺少操作数");
-      var f = parseFrac(s.slice(pos, j));
-      pos = j;
-      return { n: neg < 0 ? -f.n : f.n, d: f.d };
-    }
-    function paren() {
-      ws();
-      if (peek() === "(") { pos++; var v = expr(); ws(); if (peek() === ")") pos++; else throw new Error("括号未闭合"); return v; }
-      return num();
-    }
-    // 顶层 ÷ 把左右两侧各自当作一个整体求值
-    function topDiv() {
-      var rstart = pos;
-      var depth = 0;
-      while (pos < s.length) {
-        var c = s.charAt(pos);
-        if (c === "(") depth++;
-        else if (c === ")") depth--;
-        else if (depth === 0 && (c === "+" || c === "-")) break;
-        pos++;
-      }
-      var right = s.slice(rstart, pos).replace(/\x01/g, "/");
-      return parseFracExpr(right);
-    }
-    function term() {
-      var v = paren();
-      ws();
-      while (true) {
-        if (peek() === "*") { pos++; v = fracOp(v, "*", paren()); ws(); }
-        else if (peek() === "/" || peek() === "\x01") {
-          pos++; v = fracOp(v, "/", topDiv()); ws();
-        } else break;
-      }
-      return v;
-    }
-    function expr() {
-      var v = term();
-      ws();
-      while (peek() === "+" || peek() === "-") {
-        var op = peek(); pos++;
-        v = fracOp(v, op, term());
-        ws();
-      }
-      return v;
-    }
-    var r = expr();
-    ws();
-    if (pos < s.length) throw new Error("无法识别的字符");
-    return r;
-  }
-
-  // 是否可整体当作分数算式(含 /)
-  function isFracInput(raw) {
-    var t = raw.trim();
-    if (t === "") return false;
-    if (t.indexOf("/") === -1) return false;
-    // 含小数点的单 token(如 1.5/3)交给小数求值,避免精度丢失
-    var toks = t.split(/[\+\-\*\/\(\)×÷]/);
-    for (var i = 0; i < toks.length; i++) {
-      var x = toks[i].trim();
-      if (x !== "" && x.indexOf(".") > -1) return false;
-    }
-    return true;
-  }
-
-  // 小数结果尝试转最简分数(连分数法,精度允许时才返回)
-  function decToFrac(v) {
-    var sign = v < 0 ? -1 : 1, x = Math.abs(v);
-    if (!isFinite(x) || x === 0) return null;
-    var p0 = 0, p1 = 1, q0 = 1, q1 = 0, maxd = 1000000, last = null, lastErr = Infinity;
-    for (var step = 0; step < 200; step++) {
-      var a = Math.floor(x);
-      var p = a * p1 + p0, q = a * q1 + q0;
-      if (q > maxd) break;
-      var err = Math.abs(sign * p / q - v);
-      if (err < lastErr) { lastErr = err; last = { n: sign * p, d: q }; }
-      if (err < 1e-12) return simp(sign * p, q);
-      x = 1 / (x - a);
-      p0 = p1; p1 = p; q0 = q1; q1 = q;
-    }
-    if (lastErr < 1e-9) return simp(last.n, last.d);
-    return null;
-  }
-
-  function fracNice(f) {
-    if (f.d === 1) return String(f.n);
-    return f.n + "/" + f.d;
-  }
-
-  function mixedText(f) {
-    var w = Math.trunc(f.n / f.d);
-    var rn = Math.abs(f.n - w * f.d);
-    return w + " 又 " + rn + "/" + f.d;
-  }
-
-  function setDetail(f, decTxt) {
-    var recip = f.n === 0 ? "不存在(为 0)" : fracNice(simp(f.d, Math.abs(f.n)));
-    var cards = "";
-    cards += box("分数结果(最简)", "<b>" + fracNice(f) + "</b>", true);
-    cards += box("小数结果", decTxt);
-    cards += box("倒数", recip);
-    cards += box("假分数", f.n + "/" + f.d);
-    calcDetail.innerHTML = cards;
-    calcMixed.textContent = (f.d !== 1 && Math.abs(f.n) / f.d >= 1) ? "带分数: " + mixedText(f) : "";
-  }
-
-  function calcEval(expr) {
-    var raw = (expr === undefined) ? calcInput.value.trim() : String(expr).trim();
-    if (raw === "") {
-      calcMain.textContent = "等待输入…";
-      calcExpr.textContent = "";
-      calcDetail.innerHTML = "";
-      calcMixed.textContent = "";
-      return;
-    }
-    try {
-      if (isFracInput(raw)) {
-        var r = parseFracExpr(raw);
-        var dec = r.n / r.d;
-        var dTxt = Number(dec.toPrecision(12)).toString();
-        calcMain.textContent = fracNice(r);
-        calcExpr.textContent = raw + " = " + fracNice(r);
-        setDetail(r, dTxt);
-      } else {
-        // 小数表达式求值
-        var js = raw.replace(/×/g, "*").replace(/÷/g, "/").replace(/–/g, "-").replace(/−/g, "-");
-        var trig = /(^|[\+\-\*\/\(,])sin\(|(^|[\+\-\*\/\(,])cos\(|(^|[\+\-\*\/\(,])tan\(/;
-        if (trig.test(js)) js = "with(Math){" + js + "}";
-        var v = Function("return (" + js + ")")();
-        if (typeof v !== "number" || !isFinite(v)) throw 0;
-        v = Number(v.toPrecision(15));
-        var vTxt = Number(v.toPrecision(12)).toString();
-        calcMain.textContent = vTxt;
-        calcExpr.textContent = raw + " = " + vTxt;
-        var fr = decToFrac(v);
-        var recip2 = v === 0 ? "不存在(为 0)" : Number((1 / v).toPrecision(12)).toString();
-        var cards = "";
-        cards += box("结果", "<b>" + vTxt + "</b>", true);
-        cards += box("分数", fr ? fracNice(fr) : "—");
-        cards += box("倒数", recip2);
-        cards += box("平方", Number((v * v).toPrecision(12)).toString());
-        calcDetail.innerHTML = cards;
-        calcMixed.textContent = (fr && fr.d !== 1) ? "带分数: " + mixedText(fr) : "";
-      }
-    } catch (e) {
-      calcMain.textContent = "表达式错误";
-      calcExpr.textContent = raw;
-      calcDetail.innerHTML = "";
-      calcMixed.textContent = "";
-    }
-  }
-
-  function addHistory(expr, res) {
-    if (!expr || !res) return;
-    calcHistList.unshift({ expr: expr, res: res });
-    if (calcHistList.length > 15) calcHistList.pop();
-    renderHistory();
-  }
-  function renderHistory() {
-    if (!calcHistList.length) { calcHistory.innerHTML = ""; return; }
-    var h = "";
-    calcHistList.forEach(function (o) {
-      h += '<div class="hist-item" data-expr="' + o.expr + '"><span class="hist-expr">' + o.expr +
-           '</span><span class="hist-res">' + o.res + '</span></div>';
-    });
-    calcHistory.innerHTML = h;
-    Array.prototype.forEach.call(calcHistory.querySelectorAll(".hist-item"), function (item) {
-      item.addEventListener("click", function () {
-        calcInput.value = item.getAttribute("data-expr");
-        calcEval();
       });
     });
-  }
 
-  // ---------- 虚拟按键(6 行布局) ----------
-  calcInput.addEventListener("input", function () { calcEval(); });
-  calcInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      var expr = calcInput.value.trim();
-      if (expr) {
-        try {
-          if (isFracInput(expr)) {
-            var r = parseFracExpr(expr);
-            if (r) addHistory(expr, fracNice(r));
-          } else {
-            var js2 = expr.replace(/×/g, "*").replace(/÷/g, "/").replace(/–/g, "-").replace(/−/g, "-");
-            var trig2 = /(^|[\+\-\*\/\(,])sin\(|(^|[\+\-\*\/\(,])cos\(|(^|[\+\-\*\/\(,])tan\(/;
-            if (trig2.test(js2)) js2 = "with(Math){" + js2 + "}";
-            var v2 = Function("return (" + js2 + ")")();
-            if (typeof v2 === "number" && isFinite(v2)) addHistory(expr, Number(v2.toPrecision(12)).toString());
-          }
-        } catch (e2) {}
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // ===== 导航链接点击：波纹 + 平滑滚动 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+
+        e.preventDefault();
+
+        // 计算偏移量（导航栏高度 + 一点余量）
+        const navHeight = document.querySelector('.nav').offsetHeight;
+        const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+
+        // 平滑滚动到目标位置
+        window.scrollTo({
+          top: targetTop,
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // ===== 导航链接波纹效果 =====
+    document.querySelectorAll('.nav-anchor').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+      });
+    });
+
+    // ===== 滚动时自动高亮当前所在区域的导航链接 =====
+    const sectionIds = ['about'];
+    const navLinks = {};
+    document.querySelectorAll('.nav-anchor').forEach(a => {
+      navLinks[a.getAttribute('href').slice(1)] = a;
+    });
+
+    // 预计算各 section 距文档顶部的偏移（offsetTop 递归累加，兼容 offsetParent 不同的情况）
+    function getDocTop(el) {
+      let top = 0;
+      while (el) {
+        top += el.offsetTop;
+        el = el.offsetParent;
+      }
+      return top;
+    }
+
+    const sectionTops = {};
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) sectionTops[id] = getDocTop(el);
+    });
+
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + 120; // 视口偏移量（导航栏高度 + 余量）
+      let currentId = sectionIds[0];
+
+      // 从上往下遍历，找到最后一个 top <= scrollPos 的 section
+      for (const id of sectionIds) {
+        if (sectionTops[id] !== undefined && sectionTops[id] <= scrollPos) {
+          currentId = id;
+        }
+      }
+
+      // 滚动到最底部时强制激活"关于我"
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 40) {
+        currentId = 'about';
+      }
+
+      // 在最顶部时激活第一个
+      if (window.scrollY < 60) {
+        currentId = sectionIds[0];
+      }
+
+      Object.values(navLinks).forEach(a => a.classList.remove('active'));
+      if (navLinks[currentId]) navLinks[currentId].classList.add('active');
+    }
+
+    // 用 scroll 事件 + 节流
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateActiveNav();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // 初始调用
+    updateActiveNav();
+
+    // ===== 回到顶部按钮 =====
+    const backToTopBtn = document.getElementById('backToTop');
+
+    function toggleBackToTop() {
+      if (window.scrollY > 30) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
       }
     }
-  });
-  Array.prototype.forEach.call(document.querySelectorAll("#calcKeypad button"), function (btn) {
-    btn.addEventListener("click", function () {
-      var key = btn.getAttribute("data-key");
-      if (!key) return;
-      if (key === "C") {
-        calcInput.value = "";
-        calcEval();
-      } else if (key === "⌫") {
-        calcInput.value = calcInput.value.slice(0, -1);
-        calcEval();
-      } else if (key === "=") {
-        var expr = calcInput.value.trim();
-        if (expr) {
-          try {
-            if (isFracInput(expr)) {
-              var r = parseFracExpr(expr);
-              if (r) addHistory(expr, fracNice(r));
-            } else {
-              var js3 = expr.replace(/×/g, "*").replace(/÷/g, "/").replace(/–/g, "-").replace(/−/g, "-");
-              var trig3 = /(^|[\+\-\*\/\(,])sin\(|(^|[\+\-\*\/\(,])cos\(|(^|[\+\-\*\/\(,])tan\(/;
-              if (trig3.test(js3)) js3 = "with(Math){" + js3 + "}";
-              var v3 = Function("return (" + js3 + ")")();
-              if (typeof v3 === "number" && isFinite(v3)) addHistory(expr, Number(v3.toPrecision(12)).toString());
-            }
-          } catch (e2) {}
-        }
-      } else {
-        calcInput.value += key;
-        calcEval();
-      }
+
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(toggleBackToTop);
+    }, { passive: true });
+
+    // 初始检查
+    toggleBackToTop();
+
+    // 点击回到顶部
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
-  calcEval();
-  calcEval();
 
+    // ===== 滚动入场动画（IntersectionObserver） =====
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    };
 
-})();
-</script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.copy-card, #about .about-text').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+      observer.observe(el);
+    });
+
+    // ===== 深色模式切换 =====
+    (function () {
+      var btn = document.getElementById('themeToggle');
+      var root = document.documentElement;
+      var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+        } else {
+          root.removeAttribute('data-theme');
+        }
+      }
+
+      // 跟随系统主题变化（仅当用户未手动选择时）
+      systemDark.addEventListener('change', function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem('theme'); } catch (err) {}
+        if (!saved) applyTheme(e.matches ? 'dark' : 'light');
+      });
+
+      btn.addEventListener('click', function () {
+        var isDark = root.getAttribute('data-theme') === 'dark';
+        var next = isDark ? 'light' : 'dark';
+        applyTheme(next);
+        try { localStorage.setItem('theme', next); } catch (err) {}
+      });
+    })();
+  </script>
+
 </body>
 </html>
