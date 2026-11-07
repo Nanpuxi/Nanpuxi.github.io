@@ -516,7 +516,7 @@ background: rgba(255,255,255,0.04);
 
 <!-- 导航栏 -->
 <nav class="nav">
-<a href="index.html" class="nav-brand">哈基喵</a>
+<a href="index.html" class="nav-brand">6767</a>
 <div class="nav-links">
 <a href="#about" class="nav-anchor">关于我</a>
 <a href="sponsor.html" class="nav-anchor">赞助</a>
@@ -856,9 +856,10 @@ if (serverVersion) currentVersion = serverVersion;
 return;
 }
 if (serverVersion !== currentVersion) {
-box.classList.add('show');
-clearInterval(timer);
-location.replace(location.pathname);
+  box.classList.add('show');
+  clearInterval(timer);
+  // 直接跳回首页根路径，不带任何参数
+  location.replace('/');
 }
 
 })
