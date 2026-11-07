@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2048</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>2048</h1>
+            
+<a href="/" class="home-btn">返回主站</a>
+            <div class="scores">
+                <div class="score-box">
+                    <span class="score-label">分数</span>
+                    <span class="score-value" id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">最高分</span>
+                    <span class="score-value" id="best">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="sub-header">
+            <p class="intro">合并相同数字，拼出 <b>2048</b>！</p>
+            <button class="new-game-btn" id="newGameBtn">新游戏</button>
+        </div>
+
+        <div class="board" id="board">
+            <div class="grid-container" id="gridContainer"></div>
+            <div class="tile-container" id="tileContainer"></div>
+            <div class="game-over" id="gameOver">
+                <div class="game-over-content">
+                    <p class="go-title" id="goTitle">游戏结束</p>
+                    <p class="go-score" id="goScore"></p>
+                    <button class="new-game-btn" id="restartBtn">重新开始</button>
+                </div>
+            </div>
+            <div class="game-win" id="gameWin">
+                <div class="game-over-content">
+                    <p class="go-title win">你赢了！🎉</p>
+                    <p class="go-score">成功合成 2048</p>
+                    <button class="new-game-btn" id="keepBtn">继续挑战</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>使用 <b>方向键</b> 或 <b>滑动屏幕</b> 移动方块</p>
+            <p class="tip">提示：把大数字保持在角落，更容易合并</p>
+        </footer>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
