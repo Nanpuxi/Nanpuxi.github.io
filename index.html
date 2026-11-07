@@ -6,7 +6,7 @@
   <title>南浦Xi的主页</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- 主题初始化：在渲染前同步读取偏好，避免深色模式闪烁 -->
+  <!-- 主题初始化 -->
   <script>
     (function () {
       var saved = null;
@@ -69,7 +69,6 @@
       transition: background .35s ease, color .35s ease;
     }
 
-    /* 滚动条美化 */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
@@ -88,9 +87,7 @@
       animation: navIn 0.6s ease-out 0.1s forwards;
     }
 
-    @keyframes navIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes navIn { to { opacity: 1; transform: translateY(0); } }
 
     .nav-brand {
       font-size: 18px;
@@ -99,13 +96,9 @@
       text-decoration: none;
       transition: opacity .25s ease;
     }
-
     .nav-brand:hover { opacity: 0.6; }
 
-    .nav-links {
-      display: flex;
-      gap: 28px;
-    }
+    .nav-links { display: flex; gap: 28px; }
 
     .nav-links a {
       font-size: 14px;
@@ -118,7 +111,6 @@
       border-radius: 4px;
     }
 
-    /* 导航链接下划线动画 */
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -133,10 +125,7 @@
     .nav-links a:hover { opacity: 0.6; }
     .nav-links a:hover::after { width: 100%; }
 
-    /* 点击时的波纹效果 */
-    .nav-links a {
-      overflow: hidden;
-    }
+    .nav-links a { overflow: hidden; }
 
     .nav-links a .ripple {
       position: absolute;
@@ -147,21 +136,10 @@
       pointer-events: none;
     }
 
-    @keyframes rippleExpand {
-      to {
-        transform: scale(4);
-        opacity: 0;
-      }
-    }
+    @keyframes rippleExpand { to { transform: scale(4); opacity: 0; } }
 
-    /* 导航链接激活态（下划线，无背景高亮） */
-    .nav-links a.active {
-      color: var(--text);
-    }
-
-    .nav-links a.active::after {
-      width: 100%;
-    }
+    .nav-links a.active { color: var(--text); }
+    .nav-links a.active::after { width: 100%; }
 
     /* ===== 主内容 ===== */
     .container {
@@ -171,7 +149,6 @@
       text-align: center;
     }
 
-    /* ===== Hero 区域入场动画 ===== */
     .hero-title {
       font-size: 42px;
       font-weight: 800;
@@ -191,7 +168,6 @@
       animation: fadeUp 0.7s ease-out 0.45s forwards;
     }
 
-    /* 标签逐个入场 */
     .tags {
       display: flex;
       flex-wrap: wrap;
@@ -210,24 +186,15 @@
       transform: translateY(12px) scale(0.9);
       animation: tagIn 0.5s ease-out forwards;
     }
-
     .tag:nth-child(1) { animation-delay: 0.6s; }
     .tag:nth-child(2) { animation-delay: 0.7s; }
     .tag:nth-child(3) { animation-delay: 0.8s; }
     .tag:nth-child(4) { animation-delay: 0.9s; }
 
-    @keyframes tagIn {
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes tagIn { to { opacity: 1; transform: translateY(0) scale(1); } }
 
-    .tag {
-      transition: transform .25s ease, background .25s ease, color .25s ease;
-    }
-    .tag:hover {
-      transform: scale(1.06);
-      background: var(--tag-bg-hover);
-      color: var(--text);
-    }
+    .tag { transition: transform .25s ease, background .25s ease, color .25s ease; }
+    .tag:hover { transform: scale(1.06); background: var(--tag-bg-hover); color: var(--text); }
 
     /* ===== 分区标题 ===== */
     .section-title {
@@ -243,9 +210,7 @@
       animation: fadeRight 0.5s ease-out forwards;
     }
 
-    @keyframes fadeRight {
-      to { opacity: 1; transform: translateX(0); }
-    }
+    @keyframes fadeRight { to { opacity: 1; transform: translateX(0); } }
 
     /* ===== 卡片 ===== */
     .card-grid {
@@ -267,10 +232,7 @@
       opacity: 0;
       transform: translateY(18px);
       animation: fadeUp 0.6s ease-out forwards;
-      transition: transform .3s cubic-bezier(.25,.8,.25,1),
-                  box-shadow .3s cubic-bezier(.25,.8,.25,1),
-                  border-color .3s ease,
-                  background .3s ease;
+      transition: transform .3s cubic-bezier(.25,.8,.25,1), box-shadow .3s cubic-bezier(.25,.8,.25,1), border-color .3s ease, background .3s ease;
     }
 
     .card-grid .card:nth-child(1) { animation-delay: 0.7s; }
@@ -284,32 +246,17 @@
       background: var(--card-bg);
     }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 
     .card-icon {
       font-size: 20px;
       transition: transform .35s cubic-bezier(.34,1.56,.64,1);
     }
+    .card:hover .card-icon { transform: scale(1.2) rotate(-5deg); }
 
-    .card:hover .card-icon {
-      transform: scale(1.2) rotate(-5deg);
-    }
+    .card-title { font-size: 16px; font-weight: 700; }
 
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--text-mute);
-      line-height: 1.5;
-    }
+    .card-desc { font-size: 13px; color: var(--text-mute); line-height: 1.5; }
 
     .card-badge {
       display: inline-block;
@@ -323,63 +270,31 @@
       vertical-align: middle;
       transition: transform .25s ease;
     }
+    .card:hover .card-badge { transform: scale(1.08); }
+    .card-badge-new { background: var(--badge-bg); color: var(--text); }
 
-    .card:hover .card-badge {
-      transform: scale(1.08);
-    }
-
-    .card-badge-new {
-      background: var(--badge-bg);
-      color: var(--text);
-    }
-
-    /* ===== 社群卡片（可点击复制） ===== */
-    .copy-card {
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
+    /* ===== 社群卡片 ===== */
+    .copy-card { cursor: pointer; position: relative; overflow: hidden; }
     .copy-card::before {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
       background: var(--copy-ripple);
       border-radius: 50%;
       transform: translate(-50%, -50%);
       transition: width .5s ease, height .5s ease, opacity .5s ease;
       opacity: 0;
     }
+    .copy-card:active::before { width: 300px; height: 300px; opacity: 1; }
+    .copy-card:active { transform: scale(0.98); }
+    .copy-hint { font-size: 12px; color: var(--text-mute); margin-top: 4px; transition: color .25s ease; }
+    .copy-card:hover .copy-hint { color: var(--text-soft); }
 
-    .copy-card:active::before {
-      width: 300px;
-      height: 300px;
-      opacity: 1;
-    }
-
-    .copy-card:active {
-      transform: scale(0.98);
-    }
-
-    .copy-hint {
-      font-size: 12px;
-      color: var(--text-mute);
-      margin-top: 4px;
-      transition: color .25s ease;
-    }
-
-    .copy-card:hover .copy-hint {
-      color: var(--text-soft);
-    }
-
-    /* ===== Toast 提示 ===== */
+    /* ===== Toast ===== */
     .toast {
       position: fixed;
-      bottom: 40px;
-      left: 50%;
+      bottom: 40px; left: 50%;
       transform: translateX(-50%) translateY(20px) scale(0.95);
       padding: 10px 22px;
       border-radius: 8px;
@@ -391,17 +306,8 @@
       transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
       z-index: 999;
     }
-
-    html[data-theme="dark"] .toast {
-      background: #2c2d33;
-      color: var(--text);
-      box-shadow: 0 6px 24px rgba(0,0,0,.4);
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
-    }
+    html[data-theme="dark"] .toast { background: #2c2d33; color: var(--text); box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 
     /* ===== 关于我 ===== */
     .about-text {
@@ -413,13 +319,7 @@
       transform: translateY(12px);
       animation: fadeUp 0.6s ease-out 1.1s forwards;
     }
-
-    .about-text a {
-      color: var(--text);
-      text-decoration: underline;
-      transition: color .2s;
-    }
-
+    .about-text a { color: var(--text); text-decoration: underline; transition: color .2s; }
     .about-text a:hover { color: var(--text-soft); }
 
     /* ===== 页脚 ===== */
@@ -431,30 +331,23 @@
       opacity: 0;
       animation: fadeIn 0.6s ease-out 1.3s forwards;
     }
+    @keyframes fadeIn { to { opacity: 1; } }
 
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-    /* ===== 通用动画关键帧 ===== */
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== 分区整体入场延迟 ===== */
+    /* ===== 分区入场延迟 ===== */
     #projects .section-title { animation-delay: 0.55s; }
     #tools .section-title { animation-delay: 0.65s; }
     #community .section-title { animation-delay: 0.75s; }
     #community .section-title + .section-title { animation-delay: 0.8s; }
+    #updates .section-title { animation-delay: 0.85s; }
     #about .section-title { animation-delay: 1.0s; }
 
-    /* ===== 回到顶部按钮 ===== */
+    /* ===== 回到顶部 ===== */
     #backToTop {
       position: fixed;
-      bottom: 32px;
-      right: 32px;
-      width: 48px;
-      height: 48px;
+      bottom: 32px; right: 32px;
+      width: 48px; height: 48px;
       border-radius: 50%;
       background: var(--text);
       color: var(--bg);
@@ -467,26 +360,12 @@
       z-index: 998;
       opacity: 0;
       transform: translateY(12px);
-      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1),
-                  background .25s ease, box-shadow .25s ease;
+      transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1), background .25s ease, box-shadow .25s ease;
       box-shadow: 0 4px 14px rgba(0,0,0,.15);
     }
-
-    #backToTop.visible {
-      display: flex;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #backToTop:hover {
-      filter: brightness(1.15);
-      transform: translateY(-2px) scale(1.08);
-      box-shadow: 0 8px 24px rgba(0,0,0,.22);
-    }
-
-    #backToTop:active {
-      transform: scale(0.92);
-    }
+    #backToTop.visible { display: flex; opacity: 1; transform: translateY(0); }
+    #backToTop:hover { filter: brightness(1.15); transform: translateY(-2px) scale(1.08); box-shadow: 0 8px 24px rgba(0,0,0,.22); }
+    #backToTop:active { transform: scale(0.92); }
 
     /* ===== 响应式 ===== */
     @media (max-width: 600px) {
@@ -496,7 +375,6 @@
       #backToTop { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
     }
 
-    /* 减少动画偏好（无障碍） */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -505,10 +383,9 @@
       }
     }
 
-    /* ===== 深色模式切换按钮 ===== */
+    /* ===== 深色模式切换 ===== */
     .theme-toggle {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       border-radius: 50%;
       border: 1px solid var(--card-border);
       background: var(--card-bg);
@@ -523,19 +400,128 @@
       transition: transform .25s ease, background .25s ease, border-color .25s ease;
       margin-left: 8px;
     }
-
-    .theme-toggle:hover {
-      transform: scale(1.08);
-      border-color: var(--card-border-hover);
-    }
-
-    .theme-toggle:active {
-      transform: scale(0.92);
-    }
-
+    .theme-toggle:hover { transform: scale(1.08); border-color: var(--card-border-hover); }
+    .theme-toggle:active { transform: scale(0.92); }
     .theme-toggle .icon-sun { display: none; }
     html[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
     html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+    /* ===== 更新日志 ===== */
+    .update-log {
+      margin: 0 auto 56px;
+      max-width: 680px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.6s ease-out 0.9s forwards;
+    }
+
+    .update-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    html[data-theme="dark"] .update-header {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .update-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .update-time {
+      font-size: 12px;
+      color: var(--text-faint);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+
+    .view-all-link {
+      font-size: 13px;
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: color .2s;
+    }
+    .view-all-link:hover { color: var(--text); }
+
+    .update-alert {
+      color: #f85149;
+      padding: 12px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--card-border);
+      line-height: 1.6;
+    }
+
+    .update-list { list-style: none; padding: 0; margin: 0; }
+
+    .update-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(48,54,61,0.3);
+      font-size: 13px;
+      line-height: 1.7;
+      display: none;
+      animation: fadeUp 0.4s ease-out forwards;
+    }
+    .update-item.active { display: block; }
+    .update-item:last-child { border-bottom: none; }
+
+    .item-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .item-icon { font-size: 14px; }
+
+    .item-author {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .item-date {
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+
+    .item-content {
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .item-content a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+    .item-content a:hover { text-decoration: underline; }
+
+    .update-footer {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      color: var(--text-faint);
+      font-size: 13px;
+      transition: color .2s, background .2s;
+    }
+    .update-footer:hover {
+      color: var(--text-soft);
+      background: rgba(255,255,255,0.04);
+    }
   </style>
 </head>
 <body>
@@ -546,6 +532,7 @@
     <div class="nav-links">
       <a href="#projects" class="nav-anchor">项目</a>
       <a href="#tools" class="nav-anchor">工具</a>
+      <a href="#updates" class="nav-anchor">更新</a>
       <a href="#community" class="nav-anchor">社群</a>
       <a href="#about" class="nav-anchor">关于我</a>
       <a href="sponsor.html" class="nav-anchor">赞助</a>
@@ -569,28 +556,27 @@
       <span class="tag">喵喵喵喵</span>
     </div>
 
-  <!-- 项目 -->
-<div id="projects">
-  <p class="section-title">🚀 项目</p>
-  <div class="card-grid">
-    <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
-      <div class="card-header">
-        <span class="card-icon">🔗</span>
-        <span class="card-title">AARC</span>
+    <!-- 项目 -->
+    <div id="projects">
+      <p class="section-title">🚀 项目</p>
+      <div class="card-grid">
+        <a href="https://aarc.jowei19.com" target="_blank" rel="noopener" class="card">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">AARC</span>
+          </div>
+          <p class="card-desc">帮Au宣传</p>
+        </a>
+        <a href="editor/editor.html" class="card">
+          <div class="card-header">
+            <span class="card-icon">📁</span>
+            <span class="card-title">文件库</span>
+            <span class="card-badge card-badge-new">NEW</span>
+          </div>
+          <p class="card-desc">要用VPN不然很卡</p>
+        </a>
       </div>
-      <p class="card-desc">帮Au宣传</p>
-    </a>
-
-    <a href="editor/editor.html" class="card">
-      <div class="card-header">
-        <span class="card-icon">📁</span>
-        <span class="card-title">文件库</span>
-        <span class="card-badge card-badge-new">NEW</span>
-      </div>
-      <p class="card-desc">要用VPN不然很卡</p>
-    </a>
-  </div>
-</div>
+    </div>
 
     <!-- 工具 -->
     <div id="tools">
@@ -598,13 +584,12 @@
       <div class="card-grid">
         <a href="place/" class="card">
           <div class="card-header">
-            <span class="card-icon">  </span>
+            <span class="card-icon">🗺️</span>
             <span class="card-title">地名生成器</span>
             <span class="card-badge">好用</span>
           </div>
           <p class="card-desc">作者：南京精灵的灵芝，南浦Xi</p>
         </a>
-
         <a href="tools/" class="card">
           <div class="card-header">
             <span class="card-icon">🧮</span>
@@ -613,12 +598,68 @@
           </div>
           <p class="card-desc">房贷月供、个税年终奖、汇率换算、折扣比价、单位换算、复利定投，本地计算不上传数据</p>
         </a>
-        
-          
-       
-
       </div>
       <p class="section-title" style="color:#ddd;">更多工具正在开发中~</p>
+    </div>
+
+    <!-- 更新日志 -->
+    <div id="updates">
+      <p class="section-title">📋 更新日志</p>
+      <div class="update-log">
+        <div class="update-header">
+          <div class="update-title">🔧 最近更新 <span class="update-time">(3天前)</span></div>
+          <span class="view-all-link">查看全部</span>
+        </div>
+
+        <div class="update-alert">
+          ⚠️ 遇到意外情况，请加QQ交流群 487819503 并私聊群主提供存档号，不要在群里@
+        </div>
+
+        <ul class="update-list" id="updateList">
+          <li class="update-item active">
+            <div class="item-head">
+              <span class="item-icon">📁</span>
+              <span class="item-author">南浦Xi</span>
+              <span class="item-date">2026/11/7</span>
+            </div>
+            <div class="item-content">文件库系统上线！支持登录注册、文件管理、上传下载，后端使用 Cloudflare Worker + GitHub 仓库存储。</div>
+          </li>
+          <li class="update-item active">
+            <div class="item-head">
+              <span class="item-icon">🧮</span>
+              <span class="item-author">南浦Xi</span>
+              <span class="item-date">2026/11/5</span>
+            </div>
+            <div class="item-content">算钱工具箱新增「复利定投」模块，支持自定义定投周期和年化收益率计算。</div>
+          </li>
+          <li class="update-item active">
+            <div class="item-head">
+              <span class="item-icon">🗺️</span>
+              <span class="item-author">南浦Xi</span>
+              <span class="item-date">2026/11/3</span>
+            </div>
+            <div class="item-content">地名生成器优化算法，新增更多城市命名风格模板。</div>
+          </li>
+          <li class="update-item">
+            <div class="item-head">
+              <span class="item-icon">🎨</span>
+              <span class="item-author">南浦Xi</span>
+              <span class="item-date">2026/11/1</span>
+            </div>
+            <div class="item-content">主页全新改版：暗色模式、动画入场、更新日志区块上线。</div>
+          </li>
+          <li class="update-item">
+            <div class="item-head">
+              <span class="item-icon">🔗</span>
+              <span class="item-author">南浦Xi</span>
+              <span class="item-date">2026/10/28</span>
+            </div>
+            <div class="item-content">AARC 项目页面上线，帮 Au 做宣传推广。</div>
+          </li>
+        </ul>
+
+        <div class="update-footer" id="toggleUpdate">查看全部 ▼</div>
+      </div>
     </div>
 
     <!-- 社群 -->
@@ -710,12 +751,9 @@
         if (!targetEl) return;
 
         e.preventDefault();
-
-        // 计算偏移量（导航栏高度 + 一点余量）
         const navHeight = document.querySelector('.nav').offsetHeight;
         const targetTop = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
 
-        // 平滑滚动到目标位置
         window.scrollTo({
           top: targetTop,
           behavior: 'smooth'
@@ -741,13 +779,12 @@
     });
 
     // ===== 滚动时自动高亮当前所在区域的导航链接 =====
-    const sectionIds = ['projects', 'tools', 'community', 'about'];
+    const sectionIds = ['projects', 'tools', 'updates', 'community', 'about'];
     const navLinks = {};
     document.querySelectorAll('.nav-anchor').forEach(a => {
       navLinks[a.getAttribute('href').slice(1)] = a;
     });
 
-    // 预计算各 section 距文档顶部的偏移（offsetTop 递归累加，兼容 offsetParent 不同的情况）
     function getDocTop(el) {
       let top = 0;
       while (el) {
@@ -764,22 +801,19 @@
     });
 
     function updateActiveNav() {
-      const scrollPos = window.scrollY + 120; // 视口偏移量（导航栏高度 + 余量）
+      const scrollPos = window.scrollY + 120;
       let currentId = sectionIds[0];
 
-      // 从上往下遍历，找到最后一个 top <= scrollPos 的 section
       for (const id of sectionIds) {
         if (sectionTops[id] !== undefined && sectionTops[id] <= scrollPos) {
           currentId = id;
         }
       }
 
-      // 滚动到最底部时强制激活"关于我"
       if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 40) {
         currentId = 'about';
       }
 
-      // 在最顶部时激活第一个
       if (window.scrollY < 60) {
         currentId = sectionIds[0];
       }
@@ -788,7 +822,6 @@
       if (navLinks[currentId]) navLinks[currentId].classList.add('active');
     }
 
-    // 用 scroll 事件 + 节流
     let ticking = false;
     window.addEventListener('scroll', () => {
       if (!ticking) {
@@ -800,7 +833,6 @@
       }
     }, { passive: true });
 
-    // 初始调用
     updateActiveNav();
 
     // ===== 回到顶部按钮 =====
@@ -818,18 +850,13 @@
       requestAnimationFrame(toggleBackToTop);
     }, { passive: true });
 
-    // 初始检查
     toggleBackToTop();
 
-    // 点击回到顶部
     backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // ===== 滚动入场动画（IntersectionObserver） =====
+    // ===== 滚动入场动画 =====
     const observerOptions = {
       threshold: 0.15,
       rootMargin: '0px 0px -40px 0px'
@@ -845,7 +872,7 @@
       });
     }, observerOptions);
 
-    document.querySelectorAll('.copy-card, #about .about-text').forEach(el => {
+    document.querySelectorAll('.copy-card, #about .about-text, .update-log').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(16px)';
       el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
@@ -866,7 +893,6 @@
         }
       }
 
-      // 跟随系统主题变化（仅当用户未手动选择时）
       systemDark.addEventListener('change', function (e) {
         var saved = null;
         try { saved = localStorage.getItem('theme'); } catch (err) {}
@@ -878,6 +904,26 @@
         var next = isDark ? 'light' : 'dark';
         applyTheme(next);
         try { localStorage.setItem('theme', next); } catch (err) {}
+      });
+    })();
+
+    // ===== 更新日志展开/收起 =====
+    (function() {
+      const btn = document.getElementById('toggleUpdate');
+      const list = document.getElementById('updateList');
+      let expanded = false;
+
+      btn.addEventListener('click', () => {
+        expanded = !expanded;
+        const items = list.querySelectorAll('.update-item');
+        items.forEach((el, index) => {
+          if (expanded) {
+            el.classList.add('active');
+          } else if (index >= 3) {
+            el.classList.remove('active');
+          }
+        });
+        btn.textContent = expanded ? '收起 ▲' : '查看全部 ▼';
       });
     })();
   </script>
