@@ -13,6 +13,12 @@ window.UPDATE_LOG = {
       content: '更新日志系统上线，支持在网页上查看更新日志。'
     },
     {
+      icon: '💌',
+      author: '南浦Xi',
+      date: '2026/11/6',
+      content: '隐私政策页面上线，支持在网页上查看隐私政策。'
+    },
+    {
       icon: '📁',
       author: '南浦Xi',
       date: '2026/11/1',
@@ -24,5 +30,6 @@ window.UPDATE_LOG = {
       date: '2026/10/1',
       content: 'AARC 项目页面上线，帮 Au 做宣传推广。'
     }
+    
   ]
 };
