@@ -15,7 +15,7 @@ window.UPDATE_LOG = {
       author: '南浦Xi',
       version: '2.1.7',
       date: '2026/11/7',
-      content: '把author加回来了，方便查看作者，把一些emoji删了太难看了，修复了更新日志消失的问题，左上角以后每次更新都会发生改动'
+      content: '把author加回来了，方便查看作者，把一些emoji删了太难看了，修复了更新日志消失的问题。'
     },
      
     {
