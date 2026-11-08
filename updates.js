@@ -4,6 +4,7 @@ window.UPDATE_LOG = {
 
   list: [
      {
+       
       author: '南浦Xi',
       version: '2.4',
       date: '2026/11/8',
