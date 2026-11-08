@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地名生成器 - 源码</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<!-- 主题初始化（跟主站一致） -->
+<script>
+(function () {
+var saved = null;
+try { saved = localStorage.getItem('theme'); } catch (e) {}
+var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+var dark = saved ? saved === 'dark' : systemDark;
+if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>
+/* ===== 主题配色变量（跟主站一致） ===== */
+:root {
+--bg: #ffffff;
+--text: #1a1a1a;
+--text-soft: #666;
+--text-mute: #888;
+--text-faint: #aaa;
+--card-bg: #fafafa;
+--card-border: #f0f0f0;
+--card-border-hover: #e4e4e8;
+--tag-bg: #f3f3f5;
+--tag-bg-hover: #e8e8ec;
+--scrollbar: #e0e0e0;
+--scrollbar-hover: #ccc;
+--badge-bg: #fff3e0;
+--badge-red-bg: #ff9898;
+--badge-red-fg: #a40000;
+--copy-ripple: rgba(0,0,0,0.04);
+--accent: #ffb300;
+--accent-hover: #e6a200;
+--focus-ring: rgba(255, 179, 0, 0.35);
+}
+html[data-theme="dark"] {
+--bg: #15161a;
+--text: #e8e8ea;
+--text-soft: #a8a8ae;
+--text-mute: #8a8a92;
+--text-faint: #6a6a72;
+--card-bg: #1e1f24;
+--card-border: #2a2b31;
+--card-border-hover: #383940;
+--tag-bg: #26272d;
+--tag-bg-hover: #32333b;
+--scrollbar: #2e2f36;
+--scrollbar-hover: #44464e;
+--badge-bg: #3a3220;
+--badge-red-bg: #5c2b2b;
+--badge-red-fg: #ffb3b3;
+--copy-ripple: rgba(255,255,255,0.06);
+--accent: #ffb300;
+--accent-hover: #e6a200;
+--focus-ring: rgba(255, 179, 0, 0.25);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+background: var(--bg);
+color: var(--text);
+line-height: 1.6;
+min-height: 100vh;
+transition: background .35s ease, color .35s ease;
+}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+/* ===== 导航栏 ===== */
+.nav {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 20px 48px;
+max-width: 960px;
+margin: 0 auto;
+opacity: 0;
+transform: translateY(-12px);
+animation: navIn 0.6s ease-out 0.1s forwards;
+}
+@keyframes navIn { to { opacity: 1; transform: translateY(0); } }
+.nav-brand {
+font-size: 18px;
+font-weight: 700;
+color: var(--text);
+text-decoration: none;
+transition: opacity .25s ease;
+}
+.nav-brand:hover { opacity: 0.6; }
+.nav-links { display: flex; gap: 16px; align-items: center; }
+.nav-links a {
+font-size: 14px;
+font-weight: 700;
+color: var(--text);
+text-decoration: none;
+transition: opacity .25s ease, transform .25s ease;
+position: relative;
+padding: 4px 2px;
+border-radius: 4px;
+}
+.nav-links a::after {
+content: '';
+position: absolute;
+bottom: -4px;
+left: 0;
+width: 0;
+height: 2px;
+background: var(--text);
+transition: width .3s ease;
+}
+.nav-links a:hover { opacity: 0.6; }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== 深色模式切换 ===== */
+.theme-toggle {
+width: 36px; height: 36px;
+border-radius: 50%;
+border: 1px solid var(--card-border);
+background: var(--card-bg);
+color: var(--text);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 16px;
+line-height: 1;
+padding: 0;
+transition: transform .25s ease, background .25s ease, border-color .25s ease;
+margin-left: 8px;
+}
+.theme-toggle:hover { transform: scale(1.08); border-color: var(--card-border-hover); }
+.theme-toggle:active { transform: scale(0.92); }
+.theme-toggle .icon-sun { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+/* ===== 主内容 ===== */
+.container {
+max-width: 680px;
+margin: 0 auto;
+padding: 40px 24px 60px;
+text-align: center;
+}
+
+/* ===== 标题区 ===== */
+.hero-title {
+font-size: 36px;
+font-weight: 800;
+letter-spacing: -0.5px;
+margin-bottom: 12px;
+opacity: 0;
+transform: translateY(20px);
+animation: fadeUp 0.7s ease-out 0.3s forwards;
+}
+.hero-sub {
+font-size: 15px;
+color: var(--text-mute);
+margin-bottom: 40px;
+opacity: 0;
+transform: translateY(16px);
+animation: fadeUp 0.7s ease-out 0.45s forwards;
+}
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ===== 分区标题 ===== */
+.section-title {
+font-size: 13px;
+font-weight: 600;
+color: var(--text-faint);
+text-transform: uppercase;
+letter-spacing: 2px;
+margin-bottom: 20px;
+text-align: left;
+opacity: 0;
+transform: translateX(-12px);
+animation: fadeRight 0.5s ease-out 0.55s forwards;
+}
+@keyframes fadeRight { to { opacity: 1; transform: translateX(0); } }
+
+/* ===== 下载卡片 ===== */
+.download-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: 14px;
+text-align: left;
+margin-bottom: 56px;
+}
+.download-card {
+display: flex;
+align-items: center;
+gap: 16px;
+padding: 20px 22px;
+border-radius: 12px;
+background: var(--card-bg);
+border: 1.5px solid var(--card-border);
+text-decoration: none;
+color: inherit;
+cursor: pointer;
+opacity: 0;
+transform: translateY(18px);
+animation: fadeUp 0.6s ease-out forwards;
+transition: transform .3s cubic-bezier(.25,.8,.25,1), box-shadow .3s cubic-bezier(.25,.8,.25,1), border-color .3s ease, background .3s ease;
+}
+.download-grid .download-card:nth-child(1) { animation-delay: 0.65s; }
+.download-grid .download-card:nth-child(2) { animation-delay: 0.8s; }
+.download-grid .download-card:nth-child(3) { animation-delay: 0.95s; }
+.download-card:hover {
+transform: translateY(-4px);
+box-shadow: 0 10px 30px rgba(0,0,0,.12);
+border-color: var(--card-border-hover);
+}
+html[data-theme="dark"] .download-card:hover {
+box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.download-icon {
+font-size: 28px;
+flex-shrink: 0;
+transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.download-card:hover .download-icon { transform: scale(1.15) rotate(-5deg); }
+.download-info { flex: 1; }
+.download-name {
+font-size: 15px;
+font-weight: 700;
+color: var(--text);
+margin-bottom: 2px;
+}
+.download-desc {
+font-size: 13px;
+color: var(--text-mute);
+line-height: 1.5;
+}
+.download-meta {
+font-size: 11px;
+color: var(--text-faint);
+margin-top: 4px;
+}
+.download-arrow {
+font-size: 18px;
+color: var(--text-faint);
+flex-shrink: 0;
+transition: transform .25s ease, color .25s ease;
+}
+.download-card:hover .download-arrow {
+transform: translateX(4px);
+color: var(--accent);
+}
+
+/* ===== 返回链接 ===== */
+.back-link {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+margin-top: 16px;
+font-size: 14px;
+font-weight: 600;
+color: var(--text-soft);
+text-decoration: none;
+transition: color .25s ease;
+opacity: 0;
+animation: fadeUp 0.6s ease-out 1.1s forwards;
+}
+.back-link:hover { color: var(--text); }
+
+/* ===== 页脚 ===== */
+.footer {
+text-align: center;
+padding: 32px 24px;
+font-size: 12px;
+color: var(--text-faint);
+opacity: 0;
+animation: fadeIn 0.6s ease-out 1.2s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ===== 响应式 ===== */
+@media (max-width: 600px) {
+.nav { padding: 16px 20px; }
+.container { padding: 32px 20px 40px; }
+.hero-title { font-size: 26px; }
+.download-card { padding: 16px 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+*, *::before, *::after {
+animation-duration: 0.01ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: 0.01ms !important;
+}
+}
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="nav">
+<a href="/" class="nav-brand" target="_self">返回首页</a>
+<div class="nav-links">
+<a href="/place/" class="nav-anchor" target="_self">地名生成器</a>
+<a href="/sponsor.html" class="nav-anchor" target="_self">赞助</a>
+<button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
+<span class="icon-moon">🌙</span>
+<span class="icon-sun">☀️</span>
+</button>
+</div>
+</nav>
+
+<!-- 主内容 -->
+<main class="container">
+<h1 class="hero-title">源码下载</h1>
+<p class="hero-sub">地名生成器相关源码</p>
+
+<div class="section-title">下载列表</div>
+
+<div class="download-grid">
+
+
+<a class="download-card" href="https://raw.githubusercontent.com/Nanpuxi/Nanpuxi.github.io/main/place/index.html" download>
+
+<div class="download-info">
+<div class="download-name">index.html</div>
+<div class="download-desc">地名生成器南浦版</div>
+
+</div>
+<span class="download-arrow">点击即可下载</span>
+</a>
+
+<a class="download-card" href="https://raw.githubusercontent.com/Nanpuxi/Nanpuxi.github.io/main/place/kjmneu1a.py" download>
+
+<div class="download-info">
+<div class="download-name">kjmneu1a.py</div>
+<div class="download-desc">地名生成器源码</div>
+
+</div>
+<span class="download-arrow">点击即可下载</span>
+</a>
+
+<a class="download-card" href="https://raw.githubusercontent.com/Nanpuxi/Nanpuxi.github.io/main/place/gamma.html" download>
+
+<div class="download-info">
+<div class="download-name">gamma.html</div>
+<div class="download-desc">地名生成器原版，作者：南京精灵的灵芝</div>
+
+</div>
+<span class="download-arrow">点击即可下载</span>
+</a>
+
+
+
+</div>
+
+<a href="/place/index.html" class="back-link">← 返回地名生成器</a>
+</main>
+
+<!-- 页脚 -->
+<footer class="footer">
+<div>喵喵喵</div>
+</footer>
+
+<!-- 深色模式脚本（跟主站一致） -->
+<script>
+(function () {
+var btn = document.getElementById('themeToggle');
+var root = document.documentElement;
+var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(theme) {
+if (theme === 'dark') root.setAttribute('data-theme', 'dark');
+else root.removeAttribute('data-theme');
+}
+systemDark.addEventListener('change', function (e) {
+var saved = null;
+try { saved = localStorage.getItem('theme'); } catch (err) {}
+if (!saved) applyTheme(e.matches ? 'dark' : 'light');
+});
+btn.addEventListener('click', function () {
+var isDark = root.getAttribute('data-theme') === 'dark';
+var next = isDark ? 'light' : 'dark';
+applyTheme(next);
+try { localStorage.setItem('theme', next); } catch (err) {}
+});
+})();
+</script>
+</body>
+</html>

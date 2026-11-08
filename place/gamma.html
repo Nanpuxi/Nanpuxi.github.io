@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地名生成器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 0px;
+        }
+        h1 {
+            color: #1a2980;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        .subtitle {
+            color: #26d0ce;
+            font-size: 1.2rem;
+        }
+        .config-panel {
+            background: #f0f8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .color-block {
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap; 
+            align-items: center;
+        }
+        .color-block label {
+            width:33.333%;
+            gap: 4px;
+            align-items: center;
+            display: flex;
+            padding: 1px 0;
+        }
+        .color-block input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: #548dbb;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a2980;
+        }
+        .label {
+            display: flex;
+            font-weight: bold;
+            align-items: center;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            margin-left: 8px;
+            color: #1a2980;
+            margin-right: auto;
+            justify-content: space-between;
+            padding-left: 8px;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #1a2980;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #26d0ce;
+            outline: none;
+            box-shadow: 0 0 8px rgba(38, 208, 206, 0.5);
+        }
+        input[type="text"], select {
+            width: 60%;
+            padding: 8px;
+            border: 2px solid #cccccc;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #888888;
+            outline: none;
+            box-shadow: 0 0 2px #888888;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 8px;
+            accent-color: #1a2980;
+        }
+        .btn {
+            background: linear-gradient(to right, #1a2980, #26d0ce);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn-secondary {
+            background: linear-gradient(to right, #26d0ce, #1a2980);
+        }
+        .btn-ii {
+            display:flex;
+            padding: 4px 12px;
+            background: #aaaaaacc;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 48px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            align-items: center;
+        }
+        .btn-ii:active {
+            transform: translateY(1.5px);
+        }
+        .btn-iii {
+            padding: 3px 15px;
+            background: #1a2980;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            justify-content: center;
+        }
+        .btn-iii:active {
+            transform: translateY(1px);
+        }
+        .results {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f8ff;
+        }
+        .result-title {
+            color: #1a2980;
+            font-size: 1.5rem;
+        }
+        .result-count {
+            color: #26d0ce;
+            font-weight: bold;
+        }
+        .result-list {
+            list-style-type: none;
+            max-height: 640px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .result-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .result-list::-webkit-scrollbar-thumb {
+            background: #1a2980;
+            border-radius: 4px;
+        }
+        .result-list li {
+            padding: 15px;
+            border-bottom: 1px dashed #e0e0e0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .result-list li:hover {
+            background-color: #f8fdff;
+        }
+        .result-number {
+            background: #1a2980;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        .config {
+            color: #606060;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1rem;
+            padding: 10px;
+            background: #88888825;
+            border-radius: 8px;
+        }
+        .error {
+            color: #ff3860;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1rem;
+            padding: 10px;
+            background: rgba(255, 56, 96, 0.1);
+            border-radius: 8px;
+        }
+        .info {
+            padding: 0px;
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .normal {
+            padding: 0px;
+            font-size: 0.75rem;
+            color: #555;
+            text-align: center;
+        }
+        .normalbox {
+            padding: 0px;
+            margin-left:10px;
+            margin-right:10px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: #555;
+            text-align: center;
+        }
+        .counter {
+            background: #1a2980;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast-message {
+            position: fixed;
+            right: 30px;
+            top: 30px;
+            background: #1a2980;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            z-index: 999;
+            transform: translateX(20px);
+        }
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .btn {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            .result-list li {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>地名生成器</h1>
+            <span id="result" style="margin-left:16px;"></span>
+        </header>
+        
+        <div class="config-panel">
+            <div class="form-group">
+                <label for="count">生成数量：</label>
+                <input type="number" id="count" min="1" max="1000" value="10" placeholder="输入地名数量">
+            </div>
+            
+            <div class="form-group">
+                <label>地名类型：</label>
+                <div class="radio-group" style ="flex-direction: column;">
+                    <div>
+                    <label>
+                        <input type="radio" name="type" value="1" checked> 
+                        两字地名（无后缀）
+                    </label>
+                    </div>
+                    <div>
+                    <label>
+                        <input type="radio" name="type" value="2" > 
+                        两字地名（有后缀）
+                    </label>
+                    </div>
+                    <div>
+                    <label>
+                        <input type="radio" name="type" value="3" > 
+                        三字地名（有后缀）
+                    </label>
+                    </div>
+                    <div>
+                    <label>
+                        <input type="radio" name="type" value="4" > 
+                        自定义地名
+                    </label>
+                    </div>
+                </div>
+            </div>
+                <div class= "config" id="config" >
+                    <div class="form-group" >
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 16px;padding-top: 8px;">
+                            <span style="font-weight: bold; color: #1a2980; margin: 8px 0;">地名后缀：</span>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; padding-right: 16px;"> 
+                                <button id="selectAllBtn" class="btn-ii">全部选中</button>
+                                <button id="deselectAllBtn" class="btn-ii">取消全部</button>
+                            </div>
+                        </div>
+                        <div class="color-block" id="block">
+                            <label><input type="checkbox"checked> 坪</label>
+                            <label><input type="checkbox"checked> 坡</label>
+                            <label><input type="checkbox"checked> 坑</label>
+                            <label><input type="checkbox"checked> 塘</label>
+                            <label><input type="checkbox"checked> 圩</label>
+                            <label><input type="checkbox"checked> 埠</label>
+                            <label><input type="checkbox"checked> 埔</label>
+                            <label><input type="checkbox"checked> 坝</label>
+                            <label><input type="checkbox"checked> 墩</label>
+                            <label><input type="checkbox"checked> 垅</label>
+                            <label><input type="checkbox"checked> 坊</label>
+                            <label><input type="checkbox"checked> 场</label>
+                            <label><input type="checkbox"checked> 城</label>
+                            <label><input type="checkbox"checked> 堡</label>
+                            <label><input type="checkbox"checked> 溪</label>
+                            <label><input type="checkbox"checked> 港</label>
+                            <label><input type="checkbox"checked> 湾</label>
+                            <label><input type="checkbox"checked> 湖</label>
+                            <label><input type="checkbox"checked> 池</label>
+                            <label><input type="checkbox"checked> 洼</label>
+                            <label><input type="checkbox"checked> 沟</label>
+                            <label><input type="checkbox"checked> 洲</label>
+                            <label><input type="checkbox"checked> 渠</label>
+                            <label><input type="checkbox"checked> 涧</label>
+                            <label><input type="checkbox"checked> 河</label>
+                            <label><input type="checkbox"checked> 滘</label>
+                            <label><input type="checkbox"checked> 洞</label>
+                            <label><input type="checkbox"checked> 沙</label>
+                            <label><input type="checkbox"checked> 山</label>
+                            <label><input type="checkbox"checked> 岗</label>
+                            <label><input type="checkbox"checked> 岛</label>
+                            <label><input type="checkbox"checked> 屿</label>
+                            <label><input type="checkbox"checked> 岭</label>
+                            <label><input type="checkbox"checked> 集</label>
+                            <label><input type="checkbox"checked> 棚</label>
+                            <label><input type="checkbox"checked> 楼</label>
+                            <label><input type="checkbox"checked> 桥</label>
+                            <label><input type="checkbox"checked> 村</label>
+                            <label><input type="checkbox"checked> 矶</label>
+                            <label><input type="checkbox"checked> 口</label>
+                            <label><input type="checkbox"checked> 园</label>
+                            <label><input type="checkbox"checked> 围</label>
+                            <label><input type="checkbox"checked> 府</label>
+                            <label><input type="checkbox"checked> 庄</label>
+                            <label><input type="checkbox"checked> 店</label>
+                            <label><input type="checkbox"checked> 庙</label>
+                            <label><input type="checkbox"checked> 巷</label>
+                            <label><input type="checkbox"checked> 路</label>
+                            <label><input type="checkbox"checked> 街</label>
+                            <label><input type="checkbox"checked> 陂</label>
+                            <label><input type="checkbox"checked> 陵</label>
+                            <label><input type="checkbox"checked> 寺</label>
+                            <label><input type="checkbox"checked> 祠</label>
+                            <label><input type="checkbox"checked> 寨</label>
+                            <label><input type="checkbox"checked> 营</label>
+                            <label><input type="checkbox"checked> 苑</label>
+                            <label><input type="checkbox"checked> 郢</label>
+                            <label><input type="checkbox"checked> 铺</label>
+                            <label><input type="checkbox"checked> 堂</label>
+                            <label><input type="checkbox"checked> 镇</label>
+                            <label><input type="checkbox"checked> 角</label>
+                            <label><input type="checkbox"checked> 里</label>
+                            <label><input type="checkbox"checked> 台</label>
+                            <label><input type="checkbox"checked> 户</label>
+                            <label><input type="checkbox"checked> 丘</label>
+                            <label><input type="checkbox"checked> 井</label>
+                            <label><input type="checkbox"checked> 屯</label>
+                            <label><input type="checkbox"checked> 门</label>
+                            <label><input type="checkbox"checked> 卫</label>
+                            <label><input type="checkbox"checked> 甸</label>
+                        </div>
+                        <!-- 添加自定义后缀 -->
+                        <div>
+                            <label for="newSuffixInput">自定义后缀</label>
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 10px;">
+                                <input type="text" id="newSuffixInput" placeholder="输入新后缀" maxlength="1" />
+                                <button class="btn-iii" id="addSuffixBtn">添加</button>
+                            </div>
+                        </div>
+                        <!-- 集合展示区 -->
+                        <div>
+                            <div class="normalbox">
+                                <span>当前使用的后缀：</span>
+                                <span class="normal" id="countBadge">0 项</span>
+                                <div id="collectionDisplay" class="normal"></div>
+                            </div>
+                            
+                        </div class="form-group">
+                            <div class="radio-group">
+                                <label style="display: flex; font-weight: bold;justify-content: center; align-items: center; margin-left: 20px;">生成字数：</label>
+                                <label>
+                                    <input type="radio" name="zdytype" value="2" checked>
+                                    二字
+                                </label>
+                                <label>
+                                    <input type="radio" name="zdytype" value="3">
+                                    三字
+                                </label>
+                        </div>
+
+                    </div>
+            </div>
+            
+            <button id="generateBtn" class="btn">生成地名</button>
+
+            <div id="errorDisplay" class="error"></div>
+
+        </div>
+        
+        <div class="results">
+            <div class="result-header">
+                <h2 class="result-title">生成结果</h2>
+                <div class="result-count">已生成: <span id="resultCount">0</span> 个地名</div>
+            </div>
+            <ul id="resultList" class="result-list"></ul>
+        </div>
+
+        <div class="info">
+       	<p>本程序为gamma版本，适配移动端</p>
+        	<p>该工具使用真实地名用字和地名常用后缀尽可能生成合理可用的地名</p>
+            <p>生成的名称已排除常见的真实存在的地名</p>
+        	<p><a href="http://wiki.jowei19.com/#/w/di-ming-sheng-cheng-qi">详细介绍</a> <a href="http://static.wiki.jowei19.com/upload/kjmneu1a.py">源代码</a></p>
+        </div>
+
+    </div>
+    
+    <div class="counter">
+        已生成地名总数: <span id="totalCounter">0</span>
+    </div>
+
+    <div id="toastMessage" class="toast-message">已复制</div>
+
+    <script>
+
+
+
+
+
+    // ===== 原有的 radio 切换显示逻辑 =====
+    const radios = document.querySelectorAll('input[name="type"]');
+    const block = document.getElementById('config');
+
+    function handleRadioChange() {
+        const selected = document.querySelector('input[name="type"]:checked');
+        block.style.display = (selected && selected.value === '4') ? 'flex' : 'none';
+    }
+
+    radios.forEach(radio => radio.addEventListener('change', handleRadioChange));
+    handleRadioChange();
+
+
+
+
+
+    
+
+
+// 获取元素
+const errorDisplay = document.getElementById('errorDisplay');
+const checkboxGroup = document.getElementById('block');
+const collectionDisplay = document.getElementById('collectionDisplay');
+const countBadge = document.getElementById('countBadge');
+const selectAllBtn = document.getElementById('selectAllBtn');
+const deselectAllBtn = document.getElementById('deselectAllBtn');
+let wenben = ''
+// ========== 核心更新函数 ==========
+function updateCollection() {
+    const checkboxes = checkboxGroup.querySelectorAll('input[type="checkbox"]');
+    const selectedTexts = [];
+
+    // 收集选中项的文本（去除前后空格）
+    checkboxes.forEach(cb => {
+        if (cb.checked) {
+            const label = cb.closest('label');
+            if (label) {
+                const text = label.textContent.trim();
+                if (text) {
+                    selectedTexts.push(text);
+                }
+            }
+        }
+    });
+    wenben = selectedTexts.join('');
+    let suffix = wenben
+    // 更新显示区域
+    collectionDisplay.innerHTML = '';
+    if (selectedTexts.length === 0) {
+        // 空状态：显示提示文字，并添加样式类（若有）
+        const emptyMsg = document.createElement('span');
+        emptyMsg.className = 'collection-empty';
+        emptyMsg.textContent = '请至少选择一个后缀';
+        collectionDisplay.appendChild(emptyMsg);
+        errorDisplay.textContent = '请至少选择一个后缀';   // 显示错误
+    } else {
+        // 显示所有选中项
+        collectionDisplay.textContent = selectedTexts.join('');
+        collectionDisplay.className = '';   // 移除空状态样式
+        errorDisplay.textContent = '';      // 清空错误信息
+    }
+
+    // 更新计数徽章
+    countBadge.textContent = `${selectedTexts.length} 项`;
+}
+
+// ========== 绑定事件（假设复选框变化时触发） ==========
+checkboxGroup.addEventListener('change', updateCollection);
+
+// 初始化时调用一次（如果初始就有选中项）
+updateCollection();
+
+
+
+        // ========== 事件监听 ==========
+        // 用户手动点击复选框 → 自动触发 change 事件
+        checkboxGroup.addEventListener('change', function(e) {
+            if (e.target && e.target.matches('input[type="checkbox"]')) {
+                updateCollection();
+                
+            }
+        });
+
+
+
+
+
+const setAllCheckboxes = (checked) => {
+    checkboxGroup.querySelectorAll('input[type="checkbox"]')
+        .forEach(cb => {
+            cb.checked = checked;
+            cb.dispatchEvent(new Event('change'));
+        });
+    updateCollection();
+};
+
+selectAllBtn.addEventListener('click', () => setAllCheckboxes(true));
+deselectAllBtn.addEventListener('click', () => setAllCheckboxes(false));
+
+
+
+
+
+
+// ========== 添加自定义后缀 ==========
+function addCustomSuffix() {
+    const val = newSuffixInput.value.trim();
+    if (val === '') {
+        newSuffixInput.focus();
+        return;
+    }
+
+    // 去重检查：遍历当前所有复选框的 label 文本（不区分大小写）
+    const existingLabels = checkboxGroup.querySelectorAll('label');
+    for (let label of existingLabels) {
+        if (label.textContent.trim().toLowerCase() === val.toLowerCase()) {
+            newSuffixInput.value = '';   // 清空输入框
+            newSuffixInput.focus();
+            return;
+        }
+    }
+
+    // ---------- 动态创建复选框 ----------
+    // 创建 <label>
+    const label = document.createElement('label');
+    // 创建 <input type="checkbox">
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = true;   // 默认选中
+    // 将 checkbox 放入 label，再追加文本节点
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(' ' + val));  // 加一个空格再显示文本
+
+    // 添加到容器
+    checkboxGroup.appendChild(label);
+
+    // 清空输入框并聚焦
+    newSuffixInput.value = '';
+    newSuffixInput.focus();
+
+    // 手动触发 change 事件，以便更新显示
+    checkbox.dispatchEvent(new Event('change'));
+    updateCollection();
+}
+
+// 绑定回车和点击
+newSuffixInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        addCustomSuffix();
+    }
+});
+addSuffixBtn.addEventListener('click', addCustomSuffix);
+
+// ========== 初始化 ==========
+// 页面加载后，更新一次显示（如果已有默认选中项）
+updateCollection();
+
+
+        async function copyText(text) {
+            const cleanedText = text.replace(/^\d+/, '');
+            try {
+                await navigator.clipboard.writeText(cleanedText);
+            } catch {
+                // 降级方案
+                const ta = document.createElement('textarea');
+                ta.value = cleanedText;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+        }
+                // 点击列表项复制
+        document.getElementById('resultList').addEventListener('click', function(e) {
+            const li = e.target.closest('li');
+            if (!li) return;
+            showToast()
+            copyText(li.textContent.trim());
+            
+        function showToast() {
+  const toastMessage = document.getElementById('toastMessage');
+  toastMessage.classList.add('show');
+  // 自动隐藏
+  clearTimeout(toastMessage.timer);
+  toastMessage.timer = setTimeout(() => toastMessage.classList.remove('show'), 600);
+}
+        });
+
+
+
+
+// 初始化变量
+let totalCounter = 0;
+        
+// 定义排除字符的集合
+const excludedCharsA = new Set(["区","县","、","市","州"," ","口","门","头","尾","乡","城","都","溪","台","岛","哈"]);
+const excludedCharsB = new Set(["区","县","、","市"," ","哈"]);
+const excludedCharsC = new Set(["、"]);
+
+ // 真实存在的城市名集合
+const reality = new Set([
+    "河北","河南","河西","河东","湖北","湖南","湖东","湖西","江北","江南","江西","江东","山西","山东","山南","山北",
+    "南北","东西","北南","西东","下上","上下",
+    "西南","南西","东南","南东","西北","北西","东北","北东","中南","南中","中北","北中","中西","西中","中东","东中","中上","上中","中下","下中",
+    "南京","成都","北京","上海","南昌","九江","长沙",
+    "西宁","天津","长春","金华","广东","广西","玉林","北海","南海","东海","西海","海东","海西","海南","海北",
+    "海口","湖口","河口","天津","南平","海河","河海","南宁","深圳","江宁",
+    "怀化","吉林","四川","江苏","白云","开平","天水","济宁","青岛","昌江","昌吉","昌平","大同","德昌","清河","运河","韶关","黄河","长江",
+    "宜昌","许昌","文昌","荣昌","云南","青海","宁夏","重庆","桂林","东京","大连","宁波",
+    "贵州","广州","苏州","福州","抚州","湖州","沧州","朔州","忻州","锦州","徐州","常州","苏州","温州","衢州","滁州","宿州","亳州","池州","泉州","漳州","赣州","德州","滨州",
+    "鄂州","荆州","随州","梅州","惠州","潮州","柳州","扬州","杭州","常州","永州","贺州","台州","泰州","兰州","郑州","梧州","钦州","泸州","达州",
+    "伊州","原州","瓜州","肃州","甘州","凉州","秦州","商州","华州",
+    "耀州","播州","盘州","巴州","叙州","利州","安州","崇州","彭州","开州","万州","儋州","崖州","龙州","江州","象州","宜州","玉州","全州","横州","连州","端州","化州",
+    "高州","雷州","靖州","黄州","襄州","邓州","陕州","禹州","孟州","林州","汝州","兖州","青州","莱州","滕州","胶州","信州","袁州","吉州","宣州","颍州","徽州","嵊州",
+    "鄞州","润州","海州","通州","邳州","肇州","银州","海州","盖州","金州","霍州","泽州","潞州","云州","深州","冀州","霸州","定州","涿州","滦州","晋州","蓟州",
+    "安庆","西安","宝安","庆安","延安","新安","兴安","泰安","永安","长安","海安","定安","吉安","广安","六安","雅安","淮安","东安","大安","北安","南安","江安","瑞安","武安",
+    "雄安","迁安","平安",
+    "阳江","丹阳","山阳","江阳","南阳","庆阳","沈阳","贵阳","德阳","安阳","洛阳","揭阳","辽阳","朝阳","信阳","濮阳","襄阳","衡阳","岳阳","绵阳","资阳","紫阳","咸阳","溧阳",
+    "射阳","沭阳","东阳","富阳","阜阳","松阳","鄱阳","浏阳","汉阳","邵阳","简阳","合阳",
+    "华山","山上","高山","秀山","登山","中山","黄山","乐山","江山","大山","唐山","文山","韶山","青山","南山","东山","深山","阳山","天山","惠山","珠山","长山","泰山","白山",
+    "钟山","潜山","崂山","铜山","衡山","恒山","嵩山","鞍山","西山","昆山","新山","洋山","花山","房山","骊山","金山","舟山","眉山","宝山","保山","庐山","台山","鹤山","铅山",
+    "合山","含山","密山","乳山","梁山","凉山","佛山"
+]);
+// 定义地名来源字符集
+const inputText = "黄岛区、崂山区、李沧区、城阳区、即墨区、胶州市、平度市、莱芝罘区、福山区、牟平区、蓬莱区、龙口市、招远市、海阳市中山区、西岗区、沙河口区、甘井子区、旅顺口区、金州区、普兰店区、瓦房店市、庄河市、长海县古塔区、凌河区、太和区、凌海市、北镇黑山义东港区、岚山区、五莲县、莒县环翠区、文登区、荣成市云龙区、贾汪区、泉山区、铜山区、新沂市、邳州市、丰县、沛县、睢宁县崇川区、通州区、海门区、如皋市、启东市、海安市、如东县红花岗区、汇川区、播州区、赤水市、仁怀市、桐梓县、绥阳县、正安县、凤冈县、湄潭县、余庆县、习水县、道真务川秦都区、杨陵区、渭城区、兴平市、彬州市、三原县、泾阳县、乾县、礼泉县、永寿县、长武县、旬邑县、淳化县、武功县天元区、芦淞区、荷塘区、石峰区、渌口区、醴陵市、攸县、茶陵县、炎陵县雨湖区、岳塘区、湘乡市、韶山市琅琊区、南谯区、天长市、明光市、来安县、全椒县、定远县、凤阳县镜湖区、鸠江区、弋江区、湾沚区、繁昌区、无为市、南陵县涧西区、西工区、瀍河洛龙偃师孟津区、新安县、栾川县、嵩汝阳县、宜阳县、洛宁县、伊川县古冶区、开平区、丰南区、丰润区、曹妃甸区、遵化市、迁安市、滦乐亭县、迁西县、玉田县都匀市、福泉市、荔波县、贵定县、瓮安县、独山县、平塘县、罗甸县、长顺县、龙里县、惠水县、三都凯里市、黄平县、施秉县、三穗县、镇远县、岑巩县、天柱县、锦屏县、剑河县、台江县、黎平县、榕江县、从江县、雷山县、麻江县、丹寨县兴义市、兴仁市、普安县、晴隆县、贞丰县、望谟县、册亨县、安龙县新华区、运河区、泊头市、任丘市、黄骅市、河间沧青东光海兴盐山肃宁南皮吴桥献孟梁溪区、锡山区、惠山区、滨湖区、新吴区、江阴市、宜兴市天宁区、钟楼区、新北区、武进区、金坛区、溧阳市京口区、润州区、丹徒区、丹阳市、扬中市、句容市秀峰区、叠彩区、象山区、七星区、雁山区、临桂区、阳朔县、灵川县、全州县、兴安县、永福县、灌阳县、龙胜、资源县、平乐县、恭城、荔浦市鱼峰区、鹿寨县、融安县、融水、三江万秀区、长洲区、龙圩区、岑溪市、苍梧县、藤县、蒙山县西昌市、会理市、木里盐源德昌县、会东县、宁南县、普格县、金阳县、昭觉县、喜德县、冕宁县、越西县、甘洛县、美姑县、雷波县尧都区、侯马市、霍州市、曲沃县、翼城县、襄汾县、洪洞县、古县、安泽县、浮山县、吉县、乡宁县、大宁县、隰县、永和县、蒲县、汾西县章贡区、南康区、赣县区、瑞金市、龙南市、信丰县、大余县、上犹县、崇义县、安远县、定南县、全南县、宁都县、于都县、兴国县、会昌县、寻乌县、石城县康定市、泸定县、丹、九龙县、雅江县、道孚县、炉霍县、新龙县、德格县、白玉县、石渠县、理塘县、稻城县、得荣县邯山区、丛台区、复兴区、肥乡区、永年区、武安市、临漳县、成安县、大名县、涉磁邱鸡泽县、广平县、馆陶县、魏曲周县襄都区、信都区、任泽区、南和区、南宫市、沙河市、临城县、内丘县、柏乡县、隆尧县、宁晋县、巨鹿县、新河县、广宗县、平乡县、威县、清河县、临西县越城区、柯桥区、上虞区、诸暨市、嵊州市、新昌县浔阳区、濂溪区、柴桑区、瑞昌市、共青城市、庐山市、武宁县、修水县、永修县、德安县、都昌县、湖口县、彭泽县信州区、广丰区、广信区、德兴市、玉山县、铅山县、横峰县、弋阳县、余干县、鄱阳县、万年县、婺源县昌江区、珠山区、乐平市、浮梁县椒江区、黄岩区、路桥区、温岭市、临海市、玉环市、三门县、天台县、仙居县海陵区、高港区、姜堰区、兴化市、靖江市、泰兴市广陵区、邗江区、江都区、仪征市、高邮市、宝应县竞秀区、莲池区、满城区、清苑区、徐水区、涿州市、安国市、高碑店市、定州市蠡县、涞水县、阜平县、定兴县、唐县、高阳县、容城县、涞源县、望都县、安新县、易县、曲阳县、博野县、雄县、顺平县桃城区、冀州区、深州市、枣强县、武邑县、武强县、饶阳县、安平县、故城县、景县、阜城县桥东区、桥西区、宣化区、下花园区、万全区、崇礼区、张北县、康保县、沽源县、尚义县、蔚县、阳原县、怀安县、怀来县、涿鹿县、赤城县清城区、清新区、英德市、连州市、佛冈县、阳山县、连山、连南端州区、鼎湖区、高要区、四会市、广宁县、怀集县、封开县、德庆县禅城区、南海区、顺德区、三水区、高明区赤坎区、霞山区、坡头区、麻章区、雷州市、廉江市、吴川市、遂溪县、徐闻县茂南区、电白区、高州市、化州市、信宜市海棠区、吉阳区、天涯区、崖州区婺城区、金东区、兰溪市、义乌市、东阳市、永康市、武义县、浦江县、磐安县海曙区、江北区、北仑区、镇海区、鄞州区、奉化区、余姚市、慈溪市、象山县、宁海县城关区、七里河区、西固区、安宁区、红古区、永登县、皋兰县、榆中县兴庆区、西夏区、金凤区、灵武市、永宁县、贺兰县青云谱青山湖新建区、红谷滩区安义县、进贤县姑苏区、虎丘区、吴中区、相城区、吴江区、常熟市、张家港市、昆山市、太仓市芙蓉区、天心区、岳麓区、开福区、雨花区、望城区、长沙县、宁乡县、浏阳市五华区、盘龙区、官渡区、西山区、东川区、呈贡区、晋宁区、安宁市、富民县、宜良县、石林、嵩明县、禄劝、寻甸南明区、云岩区、花溪区、乌当区、白云区、观山湖区、清镇市、开阳县、息烽县、修文县兴宁区、青秀区、江南区、西乡塘区、良庆区、邕宁区、武鸣区、横州市、隆安县、马山县、上林县、宾阳县秀英区、龙华区、琼山区、美兰区鼓楼区、台江区、仓山区、马尾区、晋安区、长乐区、福清市、闽侯县、连江县、罗源县、闽清县、永泰县、平潭县瑶海庐阳蜀山区、包河区、长丰庐江巢湖市小店区、迎泽区、杏花岭区、尖草坪区、万柏林区、晋源区、清徐县、阳曲古交中原区、二七区、金水区、惠济区、管城上街区、新郑市、登封市、新密市、荥阳巩义中牟县桥西区、新华区、裕华区、井陉藁城区、鹿泉区、栾城区、辛集市、晋州市、新乐市、正定县、深泽县、无极县、赵县、高邑县、元氏县、赞皇县、平山县、灵寿县、行唐县历下槐荫区、天桥区、历城区、长清区、章丘区、济阳区、莱芜区、钢城区、平阴县、商河县道里区、南岗区、道外区、平房区、松北区、香坊区、阿城区、双城区、尚志市、五常市、依兰县、方正县、宾县、木兰县、通河县、延寿县和平区、沈河区、铁西区、皇姑区、大东区、浑南区、于洪区、沈北辽中新民市法库、康平县南关区、宽城区、朝阳区、二道区、绿园区、双阳区、九台区、农安榆树德惠江岸区、江汉区、硚口区、汉阳区、武昌区、洪山区、青山区蔡甸区、江夏区、黄陂区、新洲区、汉南区桐庐淳安建德上城区、下城区、拱墅区、江干区、西湖区、滨江区、萧山区、余杭区、富阳区、临安区锦江区、青羊区、金牛区、武侯区、成华区、龙泉驿区、青白江区、新都区、温江区、金堂县、双流县、郫县、大邑县、蒲江县、新津县、崇彭邛崃市碑林区、莲湖区、雁塔区、未央区、灞桥区、阎良区、临潼区、长安区、高陵区、周至县、蓝田县、罗湖福田南山宝安龙岗盐田龙华坪山光明荔湾越秀海珠天河白云黄埔番禺花都区南沙区从化区增城区万州黔江涪陵区、渝中江北南岸区、北碚区、渝北区、长寿江津合川永川区、南川区、綦江区、大足区、璧山区、铜梁区、潼南区、荣昌区、开州梁平武隆城口丰都垫江云阳奉节巫山巫溪石柱秀山酉阳彭水和平区南开区红桥区、东丽区、西青区、津南区、北辰区、武清区、宝坻区、静海区、宁河区、蓟州区浦东徐汇黄浦杨浦区、虹口区、闵行区、宝山嘉定金山松江青浦奉贤崇明静安长宁普陀朝阳丰台区海淀区房山区、通州区、顺义区、昌平区、大兴区、怀柔区、平谷密云延庆区荃湾屯门元朗大埔西贡沙田葵青离岛玄武秦淮建邺鼓楼浦口栖霞雨花 江宁六合溧水 高淳白下北京上海天津重庆安庆蚌埠亳州池州滁州阜阳合肥淮北淮南黄山六安宿州铜陵芜湖宣城常德 长沙 郴 衡阳 怀化 娄底 邵阳 湘潭 湘西 益阳 永州 岳阳 株洲固原 吴忠 银川 中卫高雄 花莲 基隆 嘉义 金门县 连江县 马祖 苗栗县南投县 澎湖县 屏东县 台北 台东县 台南 台中桃园 新北 新竹 宜兰县云林县彰化县福州 龙岩 南平 宁德 莆田 泉州 三明 厦门 漳州保定沧州承德邯郸衡水 廊坊 唐山 邢台白城 白山 吉林 辽源 四平 松原 通化 长春滨州德州东营 菏泽 济南 济宁 聊城 临沂 青岛 日照 泰安 威海 潍坊 烟台 枣庄淄博昌都 林芝 那曲 白银 定西 甘南 嘉峪 金昌 酒泉 兰州临夏陇南 平凉 庆阳 天水 武威 张掖潮州 东莞 佛山 广州 河源 惠 江门 揭阳茂名梅州清远汕头汕尾韶关 深圳 阳江 云浮 湛江 肇庆 中山 珠海安阳 鹤壁 济源 焦作 开封 洛阳 漯河 南阳 濮阳 商丘 新乡 信阳 许昌 郑州周口抚赣吉安 九江 南昌 萍乡 上饶 新余 宜春 鹰潭安康 宝鸡汉中商洛铜川 渭南 西安 咸阳 延安 榆林大同 晋城 晋中 临汾 吕梁 朔州太原忻州阳泉 运城 长治鞍山 本溪 朝阳 大连 丹东 抚顺 阜新 葫芦岛 锦州辽阳盘锦 沈阳 铁岭 营口鹤岗 黑河 鸡西绥化伊春百色 北海 崇左 贵港 桂林 河池 贺州 来宾 柳州 南宁 钦州 梧州 玉林安顺 毕节 贵阳 铜仁遵义鄂州恩施黄冈 黄石 荆门 荆州 潜江十堰 随州 天门 武汉 仙桃 咸宁 襄阳孝感宜昌 昌吉 哈密北屯和田昆玉双河塔城伊犁巴中 成都 达 德阳 甘孜广安广元 乐山 凉山泸眉山 绵阳 南充 内江 遂宁 雅安 宜宾 资阳 自贡杭州湖州 嘉兴 金华 丽水 宁波 衢州 绍兴 台州 温 舟山保山 楚雄大理德宏迪庆红河昆明 丽江 临沧 怒江普洱 曲靖 文山 玉溪 昭通白沙保亭 昌江澄迈儋州 定安东方 海口 乐东临高陵水琼海 琼中三沙 三亚 屯昌万宁文昌果洛黄南西宁玉树常州 淮安 南京 南通 苏州 宿迁 泰州 无锡 徐州 盐城 扬州镇江";
+        
+const origsuffix = "坪坡坑塘圩埠埔坝墩垅坊场城堡、溪港湾湖池洼沟洲渠涧河滘洞沙、山岗岛屿岭、集棚楼桥村、矶、口园围、府庄店庙、巷路街、陂陵、寺、祠、寨、营苑、郢、铺、堂、镇、角、里、台、户、丘、井、屯、门、卫、甸";
+let suffix = origsuffix
+
+
+// 获取用户输入
+const count = parseInt(document.getElementById('count').value);
+const placeType = document.querySelector('input[name="type"]:checked').value;
+
+
+        // 生成函数 A
+        function a(num_samples = 1) {
+            const filtered_chars = Array.from(inputText).filter(char => 
+                !excludedCharsA.has(char));
+            
+            const results_a = [];
+            for (let i = 0; i < num_samples; i++) {
+                const sampled_char = filtered_chars[Math.floor(Math.random() * filtered_chars.length)];
+                results_a.push(sampled_char);
+            }
+            return results_a;
+        }
+
+
+
+        // 生成函数 B
+        function b(num_samples = 1) {
+            const filtered_chars = Array.from(inputText).filter(char => 
+                !excludedCharsB.has(char));
+            
+            const results_b = [];
+            for (let i = 0; i < num_samples; i++) {
+                const sampled_char = filtered_chars[Math.floor(Math.random() * filtered_chars.length)];
+                results_b.push(sampled_char);
+            }
+            return results_b;
+        }
+
+
+
+        // 生成函数 C
+        function c(num_samples = 1) {
+            const placeType = document.querySelector('input[name="type"]:checked').value;
+            let suffix;
+            if (placeType === "4") {
+                suffix = wenben
+            } else { 
+                suffix = origsuffix
+            }
+            const filtered_chars = Array.from(suffix).filter(char => 
+                !excludedCharsC.has(char));
+            
+            const results_c = [];
+            for (let i = 0; i < num_samples; i++) {
+                const sampled_char = filtered_chars[Math.floor(Math.random() * filtered_chars.length)];
+                results_c.push(sampled_char);
+            }
+            return results_c;
+        }
+
+
+
+        // 生成地名
+        function generatePlaceNames() {
+
+            const resultList = document.getElementById('resultList');
+            const nnnnn = document.getElementById('resultCount'); //需要生成的地名个数
+            const totalDisplay = document.getElementById('totalCounter');
+            const count = parseInt(document.getElementById('count').value);
+            const placeType = document.querySelector('input[name="type"]:checked').value;
+            const zdyplaceType = document.querySelector('input[name="zdytype"]:checked')?.value || '';
+            console.log('placeType:', placeType, 'zdyplaceType:', zdyplaceType);
+
+
+
+
+            // 验证输入
+            if (isNaN(count) || count <= 0) {
+                errorDisplay.textContent = "错误：生成数量必须大于0";
+                return;
+            }
+
+            if (isNaN(count) || count >= 1001) {
+                errorDisplay.textContent = "错误：一次性最多生成1000个地名";
+                return;
+            }
+            
+            // 清空错误信息
+            errorDisplay.textContent = "";
+            
+            // 清空结果列表
+            resultList.innerHTML = "";
+            
+            let validCount = 0;
+            let generatedCount = 0;
+            
+            while (validCount < count && generatedCount < count * 10) {
+                generatedCount++;
+                
+                const result_a = a(1);
+                const result_b = b(1);
+                const result_c = c(1);
+
+                // 跳过无效结果
+                if (result_a[0] === result_b[0] || result_a[0] === result_c[0] || reality.has(result_a.join('') + result_b.join('')) || reality.has(result_a.join('') + result_c.join(''))) {
+                    continue;
+                }
+                
+                let placeName;
+
+                if (placeType === "1") {
+                    placeName = result_a.join('') + result_b.join('');
+                } else if (placeType === "2") {
+                    placeName = result_a.join('') + result_c.join('');
+	            } else if (placeType === "3") {
+                    placeName = result_a.join('') + result_b.join('') + result_c.join('');
+                } else if (placeType === "4" && zdyplaceType === "2") {
+                    placeName = result_a.join('') + result_c.join('');
+                } else if (placeType === "4" && zdyplaceType === "3") {
+                    placeName = result_a.join('') + result_b.join('') + result_c.join('');
+                } else {
+                    placeName = "出错";
+	            }
+            
+                
+                // 添加到结果列表
+                const li = document.createElement('li');
+                li.innerHTML = `<div class="result-number">${validCount + 1}</div>${placeName}`;
+                resultList.appendChild(li);
+                
+                validCount++;
+                totalCounter++;
+            }
+            
+            // 更新计数器
+            nnnnn.textContent = validCount;
+            totalDisplay.textContent = totalCounter;
+            
+            if (validCount < count) {
+                errorDisplay.textContent = `注意：成功生成 ${validCount} 个地名（过滤掉了 ${count - validCount} 个无效地名）`;
+            }
+        }
+
+
+
+
+
+
+        // 初始化页面
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('generateBtn').addEventListener('click', generatePlaceNames);
+
+        });
+
+
+
+
+
+    </script>
+</body>
+</html>
