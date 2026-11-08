@@ -8,7 +8,7 @@ window.UPDATE_LOG = {
       author: '南浦Xi',
       version: '2.4',
       date: '2026/11/8',
-      content: '地名生成器适配'
+      content: '地名生成器改编版上线，支持在网页上生成架空世界地名。'
     },
     {
       
