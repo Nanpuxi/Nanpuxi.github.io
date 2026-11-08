@@ -848,41 +848,43 @@ btn.textContent = expanded ? '查看全部 ▼' : '收起 ▲';
 
 // ===== 自动检测更新 + 橙黄方块自动刷新 =====
 (function () {
-var CHECK_INTERVAL = 5 * 60 * 1000;
-var box = document.getElementById('updateBox');
-if (!box) return;
-var currentVersion = null;
+  var CHECK_INTERVAL = 5 * 60 * 1000;
+  var box = document.getElementById('updateBox');
+  if (!box) return;
+  var currentVersion = null;
 
-fetch(location.href, { cache: 'no-store' })
-.then(function (r) {
-currentVersion = r.headers.get('ETag') || r.headers.get('Last-Modified');
-})
-.catch(function () {});
+  // 首次加载获取当前版本标识
+  fetch(location.href, { cache: 'no-store' })
+    .then(function (r) {
+      currentVersion = r.headers.get('ETag') || r.headers.get('Last-Modified');
+    })
+    .catch(function () {});
 
-function checkUpdate() {
-fetch(location.href, { cache: 'no-store' })
-.then(function (r) {
-var serverVersion = r.headers.get('ETag') || r.headers.get('Last-Modified');
-if (!serverVersion || !currentVersion) {
-if (serverVersion) currentVersion = serverVersion;
-return;
-}
-if (serverVersion !== currentVersion) {
-  box.classList.add('show');
-  clearInterval(timer);
-  // 直接跳回首页根路径，不带任何参数
-  location.replace('/');
-}
+  function checkUpdate() {
+    fetch(location.href, { cache: 'no-store' })
+      .then(function (r) {
+        var serverVersion = r.headers.get('ETag') || r.headers.get('Last-Modified');
+        if (!serverVersion || !currentVersion) {
+          if (serverVersion) currentVersion = serverVersion;
+          return;
+        }
+        if (serverVersion !== currentVersion) {
+          // 弹方块动画 → 直接跳 /
+          box.classList.add('show');
+          clearInterval(timer);
+          location.replace('/');
+        }
+      })
+      .catch(function () {});
+  }
 
-})
-.catch(function () {});
-}
+  // 切回标签页立即查一次
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) checkUpdate();
+  });
 
-document.addEventListener('visibilitychange', function () {
-if (!document.hidden) checkUpdate();
-});
-
-var timer = setInterval(checkUpdate, CHECK_INTERVAL);
+  // 每 5 分钟轮询
+  var timer = setInterval(checkUpdate, CHECK_INTERVAL);
 })();
 </script>
 </body>
