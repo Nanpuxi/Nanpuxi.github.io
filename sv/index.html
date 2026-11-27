@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地铁图查看器</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+<!-- 图片清单：加图只改这一个文件 -->
+<script src="images.js"></script>
+<!-- 主题初始化：必须在样式之后、渲染之前，避免闪白 -->
+<script>
+(function () {
+var saved = null;
+try { saved = localStorage.getItem('theme'); } catch (e) {}
+var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+var dark = saved ? saved === 'dark' : systemDark;
+if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="nav">
+<a href="./" class="nav-brand">地铁图</a>
+<div class="nav-links">
+<a href="/" class="nav-anchor active">首页</a>
+<a href="#about" class="nav-anchor">关于</a>
+<button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式" aria-label="切换主题">
+<span class="icon-moon">🌙</span>
+<span class="icon-sun">☀️</span>
+</button>
+</div>
+</nav>
+
+<!-- 主内容 -->
+<main class="container">
+<h1 class="hero-title">地铁图</h1>
+<p class="hero-sub">点击查看大图</p>
+<div class="tags" id="filterTags">
+<span class="tag active" data-group="__all__">全部</span>
+</div>
+
+<!-- 图库 -->
+<div id="gallery">
+<p class="section-title">图库</p>
+<div class="card-grid" id="grid"><!-- JS 渲染 --></div>
+</div>
+
+<!-- 关于 -->
+<div id="about">
+<p class="section-title">关于</p>
+<div class="about-text">
+<p>少管我</p>
+<p style="margin-top:8px;">拉布拉多是泰迪</p>
+</div>
+</div>
+</main>
+
+<!-- 页脚 -->
+<footer class="footer">
+<div>图片仅供参考，实际运营以官方公布为准</div>
+</footer>
+
+<!-- 回到顶部按钮 -->
+<button id="backToTop" title="回到顶部">↑</button>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 灯箱 -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+<div class="lb-bar">
+<span class="lb-title" id="lbTitle"></span>
+<span class="lb-meta" id="lbMeta"></span>
+<div class="lb-actions">
+<button id="lbCopy" title="复制图片链接">🔗</button>
+<button id="lbOpen" title="新标签打开原图">↗</button>
+<button id="lbZoomIn" title="放大">+</button>
+<button id="lbZoomOut" title="缩小">−</button>
+<button id="lbReset" title="复位">R</button>
+<button id="lbPrev" title="上一张">←</button>
+<button id="lbNext" title="下一张">→</button>
+<button id="lbClose" title="关闭">✕</button>
+</div>
+</div>
+<div class="lb-stage" id="lbStage">
+<img id="lbImg" alt="" draggable="false">
+</div>
+<div class="lb-tip">滚轮缩放 · 拖拽平移 · Esc 关闭</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -6,6 +6,13 @@ window.UPDATE_LOG = {
      {
        
       author: '南浦Xi',
+      version: '2.6',
+      date: '2026/11/27',
+      content: '添加了 subway-view 项目，简称sv，是一个地铁线路图查看器，支持在网页上查看地铁线路图。'
+    },
+     {
+       
+      author: '南浦Xi',
       version: '2.4',
       date: '2026/11/8',
       content: '地名生成器改编版上线，支持在网页上生成架空世界地名。'
