@@ -14,4 +14,8 @@ window.IMAGES = [
 
   { src: 'img/yuegangao.svg', title: '粤港澳大湾区', group: '现实', badge: '2026.7.1' },
   { src: 'img/ningbo.svg', title: '宁波', group: '现实', badge: '2026.9.22' },
+  { src: 'img/20205.svg', title: '天津', group: '现实', badge: '2026.11.28' },
+  { src: 'img/15252.svg', title: '北京', group: '现实', badge: '2026.5.16' },
+  { src: 'img/15253.svg', title: '芜湖', group: '现实' },
+  { src: 'img/15254.svg', title: '台中', group: '现实' },
 ];
